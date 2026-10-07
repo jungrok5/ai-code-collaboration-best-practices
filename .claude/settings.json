@@ -1,0 +1,163 @@
+{
+  "$schema": "https://www.schemastore.org/claude-code-settings.json",
+  "permissions": {
+    "defaultMode": "default",
+    "allow": [
+      "Bash(git status *)",
+      "Bash(git status)",
+      "Bash(git diff *)",
+      "Bash(git diff)",
+      "Bash(git log *)",
+      "Bash(git log)",
+      "Bash(git show *)",
+      "Bash(git blame *)",
+      "Bash(git branch *)",
+      "Bash(git switch *)",
+      "Bash(git checkout -b *)",
+      "Bash(git fetch *)",
+      "Bash(git pull *)",
+      "Bash(git add *)",
+      "Bash(git commit *)",
+      "Bash(git stash *)",
+      "Bash(git worktree *)",
+      "Bash(git rev-parse *)",
+      "Bash(make *)",
+      "Bash(npm run *)",
+      "Bash(npm test)",
+      "Bash(npm test *)",
+      "Bash(npm ci)",
+      "Bash(pnpm run *)",
+      "Bash(pnpm test)",
+      "Bash(pnpm install --frozen-lockfile)",
+      "Bash(yarn test)",
+      "Bash(yarn lint)",
+      "Bash(uv run *)",
+      "Bash(uv sync)",
+      "Bash(pytest *)",
+      "Bash(ruff *)",
+      "Bash(mypy *)",
+      "Bash(go build *)",
+      "Bash(go test *)",
+      "Bash(go vet *)",
+      "Bash(gofmt *)",
+      "Bash(cargo build *)",
+      "Bash(cargo test *)",
+      "Bash(cargo clippy *)",
+      "Bash(cargo fmt *)",
+      "Bash(pre-commit run *)",
+      "Bash(actionlint *)",
+      "Bash(shellcheck *)",
+      "Bash(yamllint *)",
+      "Bash(gh issue view *)",
+      "Bash(gh issue list *)",
+      "Bash(gh pr view *)",
+      "Bash(gh pr list *)",
+      "Bash(gh pr diff *)",
+      "Bash(gh pr checks *)",
+      "Bash(gh pr status *)",
+      "Bash(gh run view *)",
+      "Bash(gh run list *)",
+      "Bash(gh release list *)",
+      "Bash(gh label list *)",
+      "Bash(claude plugin validate *)",
+      "WebFetch(domain:docs.github.com)",
+      "WebFetch(domain:code.claude.com)",
+      "WebFetch(domain:docs.claude.com)",
+      "WebFetch(domain:agents.md)",
+      "WebFetch(domain:docs.anthropic.com)"
+    ],
+    "ask": [
+      "Bash(git push *)",
+      "Bash(git rebase *)",
+      "Bash(git merge *)",
+      "Bash(git cherry-pick *)",
+      "Bash(git tag *)",
+      "Bash(gh pr create *)",
+      "Bash(gh pr edit *)",
+      "Bash(gh pr merge *)",
+      "Bash(gh pr comment *)",
+      "Bash(gh pr review *)",
+      "Bash(gh issue create *)",
+      "Bash(gh issue edit *)",
+      "Bash(gh issue comment *)",
+      "Bash(gh issue close *)",
+      "Bash(gh api *)",
+      "Bash(gh workflow run *)",
+      "Bash(npm install *)",
+      "Bash(npm i *)",
+      "Bash(npm uninstall *)",
+      "Bash(pnpm add *)",
+      "Bash(pnpm remove *)",
+      "Bash(yarn add *)",
+      "Bash(pip install *)",
+      "Bash(uv add *)",
+      "Bash(uv pip install *)",
+      "Bash(cargo add *)",
+      "Bash(go get *)",
+      "Bash(npx *)",
+      "Bash(docker *)",
+      "Bash(rm -r *)",
+      "Bash(rm -rf *)"
+    ],
+    "deny": [
+      "Read(./.env)",
+      "Read(./.env.*)",
+      "Read(./secrets/**)",
+      "Read(**/*.pem)",
+      "Read(**/*.key)",
+      "Read(~/.ssh/**)",
+      "Read(~/.aws/**)",
+      "Bash(git push --force *)",
+      "Bash(git push -f *)",
+      "Bash(git push * --force)",
+      "Bash(git reset --hard *)",
+      "Bash(git clean -fd*)",
+      "Bash(git branch -D *)",
+      "Bash(gh repo delete *)",
+      "Bash(gh secret *)",
+      "Bash(gh auth *)",
+      "Bash(sudo *)",
+      "Bash(curl * | sh)",
+      "Bash(curl * | bash)",
+      "Bash(wget * | sh)"
+    ]
+  },
+
+  "env": {
+    "AI_MAX_COMMIT_LINES": "800",
+    "AI_MAX_PR_LINES": "400"
+  },
+
+  "attribution": {
+    "commit": "Co-Authored-By: Claude <noreply@anthropic.com>",
+    "pr": "🤖 Generated with [Claude Code](https://claude.com/claude-code)"
+  },
+
+  "hooks": {
+    "SessionStart": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash \"$CLAUDE_PROJECT_DIR/.claude/hooks/session-start.sh\"",
+            "timeout": 120,
+            "statusMessage": "Preparing workspace (deps, pre-commit, team context)"
+          }
+        ]
+      }
+    ]
+  },
+
+  "extraKnownMarketplaces": {
+    "ai-collab": {
+      "source": {
+        "source": "github",
+        "repo": "jungrok5/ai-code-collaboration-best-practices"
+      }
+    }
+  },
+
+  "enabledPlugins": {
+    "team-ai-workflow@ai-collab": true
+  }
+}

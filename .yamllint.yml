@@ -1,0 +1,17 @@
+extends: default
+rules:
+  line-length:
+    max: 160
+    level: warning
+  document-start: disable
+  truthy:
+    allowed-values: ["true", "false", "on", "off"]   # GitHub Actions uses `on:`
+    check-keys: false
+  comments:
+    min-spaces-from-content: 1
+  indentation:
+    spaces: 2
+    indent-sequences: consistent
+ignore: |
+  node_modules/
+  .venv/

@@ -1,0 +1,23 @@
+# CODEOWNERS — last matching pattern wins. Owners need write access.
+# Replace @jungrok5 with your GitHub user or @ORG/team. Rulesets require a code-owner review.
+
+# Default: everything needs a maintainer review
+*                               @jungrok5
+
+# Governance and automation: policy changes are human-owned (agents may not edit these)
+/.github/                       @jungrok5
+/.github/CODEOWNERS             @jungrok5
+/.github/workflows/             @jungrok5
+/scripts/rulesets/              @jungrok5
+/.claude/settings.json          @jungrok5
+/.claude-plugin/                @jungrok5
+/plugins/                       @jungrok5
+/AGENTS.md                      @jungrok5
+/CLAUDE.md                      @jungrok5
+/LICENSE                        @jungrok5
+
+# Examples of sensitive areas that always need a specific owner (edit for your project)
+# /src/auth/                    @ORG/security
+# /src/billing/                 @ORG/payments
+# /infra/                       @ORG/platform
+# /db/migrations/               @ORG/data

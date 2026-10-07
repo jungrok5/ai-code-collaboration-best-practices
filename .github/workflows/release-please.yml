@@ -1,0 +1,25 @@
+# Release automation from Conventional Commits: opens/updates a release PR; merging it tags a release.
+# Use a PAT or GitHub App token (RELEASE_PLEASE_TOKEN) so the release tag can trigger other workflows;
+# falls back to GITHUB_TOKEN (release PR still works, but tag-triggered workflows will not run).
+name: release-please
+
+on:
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  release-please:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    permissions:
+      contents: write
+      pull-requests: write
+    steps:
+      - uses: googleapis/release-please-action@45996ed1f6d02564a971a2fa1b5860e934307cf7 # v5
+        with:
+          token: ${{ secrets.RELEASE_PLEASE_TOKEN || secrets.GITHUB_TOKEN }}
+          config-file: release-please-config.json
+          manifest-file: .release-please-manifest.json

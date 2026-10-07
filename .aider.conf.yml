@@ -1,0 +1,9 @@
+# Aider: load the team rules on every session, run tests automatically, conventional commits.
+read:
+  - AGENTS.md
+auto-commits: false
+auto-test: true
+test-cmd: make test
+lint-cmd: make lint
+attribute-author: true
+attribute-committer: false

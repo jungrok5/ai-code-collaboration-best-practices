@@ -1,0 +1,30 @@
+# One-time setup of things a template cannot copy: merge settings, security features, labels, rulesets.
+# Needs an admin token: secret REPO_ADMIN_TOKEN (fine-grained PAT with Administration: write, or a GitHub App token).
+# Alternative: run `make github-setup` locally with `gh auth login` as a repo admin.
+name: Bootstrap repository settings
+
+on:
+  workflow_dispatch:
+    inputs:
+      what:
+        description: "What to apply"
+        type: choice
+        options: [all, settings, labels, rulesets, check]
+        default: check
+
+permissions:
+  contents: read
+
+jobs:
+  bootstrap:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          persist-credentials: false
+      - name: Apply
+        env:
+          GH_TOKEN: ${{ secrets.REPO_ADMIN_TOKEN || secrets.GITHUB_TOKEN }}
+          WHAT: ${{ inputs.what }}
+        run: scripts/setup-github.sh "$WHAT"

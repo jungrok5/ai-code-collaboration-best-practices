@@ -1,0 +1,9 @@
+# zizmor (GitHub Actions security audit) configuration. https://docs.zizmor.sh/configuration/
+rules:
+  dangerous-triggers:
+    # These workflows use pull_request_target ONLY for metadata (labels, title, size) and never
+    # check out or execute PR code; agent-approval-check is designed to run from the base branch.
+    ignore:
+      - pr-checks.yml
+      - issue-state-sync.yml
+      - agent-approval-check.yml

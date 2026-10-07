@@ -1,0 +1,38 @@
+# yaml-language-server: $schema=https://coderabbit.ai/integrations/schema.v2.json
+# CodeRabbit (optional AI reviewer). Advisory profile; humans own approvals (docs/06-code-review-policy.md).
+language: "en-US"
+tone_instructions: "Be concise. Prefer concrete fixes over commentary. Follow REVIEW.md and AGENTS.md."
+reviews:
+  profile: "chill"
+  request_changes_workflow: false
+  high_level_summary: true
+  review_status: true
+  poem: false
+  collapse_walkthrough: true
+  auto_review:
+    enabled: true
+    auto_incremental_review: true
+    drafts: false
+    base_branches: ["^main$", "^release/.*"]
+    ignore_title_keywords: ["wip"]
+  path_filters:
+    - "!**/*.lock"
+    - "!**/dist/**"
+  path_instructions:
+    - path: ".github/workflows/**"
+      instructions: "Check for script injection via ${{ }} in run steps, missing permissions blocks, unpinned actions, and pull_request_target with PR checkouts."
+    - path: "**/tests/**"
+      instructions: "Prefer behaviour-level assertions; flag skipped tests and tests that assert implementation details."
+  tools:
+    shellcheck:
+      enabled: true
+    ruff:
+      enabled: true
+    eslint:
+      enabled: true
+    gitleaks:
+      enabled: true
+    actionlint:
+      enabled: true
+chat:
+  auto_reply: true

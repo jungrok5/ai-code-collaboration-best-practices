@@ -1,0 +1,8 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Question / discussion
+    url: https://github.com/jungrok5/ai-code-collaboration-best-practices/discussions
+    about: Ask questions and discuss ideas here instead of opening an issue.
+  - name: Security vulnerability
+    url: https://github.com/jungrok5/ai-code-collaboration-best-practices/security/advisories/new
+    about: Report vulnerabilities privately (see SECURITY.md). Never in a public issue.

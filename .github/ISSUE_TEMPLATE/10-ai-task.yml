@@ -1,0 +1,85 @@
+name: "Task (AI-ready)"
+description: "A well-scoped task that a human or an AI coding agent can implement end-to-end."
+title: "[Task]: "
+labels: ["status/needs-triage"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Fill every section. Agents and humans both work best with explicit scope, testable acceptance criteria and a verification plan.
+        A maintainer adds the `ai:ready` label when this is good enough for an agent to pick up.
+  - type: textarea
+    id: background
+    attributes:
+      label: Background / context
+      description: Why this matters. Link related issues, ADRs, docs, logs.
+    validations:
+      required: true
+  - type: textarea
+    id: goal
+    attributes:
+      label: Goal
+      description: What should be true when this is done? (one or two sentences)
+    validations:
+      required: true
+  - type: textarea
+    id: acceptance
+    attributes:
+      label: Acceptance criteria
+      description: Observable, testable statements. One per line. These become the tests.
+      value: |
+        - [ ]
+        - [ ]
+    validations:
+      required: true
+  - type: textarea
+    id: scope
+    attributes:
+      label: Scope (files / directories / modules to touch)
+      description: Where the change is expected to live, and pointers to similar existing code to copy patterns from.
+      placeholder: "src/auth/*, tests/auth/*  (similar: src/billing/limits.ts)"
+    validations:
+      required: true
+  - type: textarea
+    id: out-of-scope
+    attributes:
+      label: Out of scope / non-goals
+      description: Things the implementer must NOT change (refactors, renames, other modules).
+  - type: textarea
+    id: test-plan
+    attributes:
+      label: Test plan / verification
+      description: Exact commands and expected results.
+      render: bash
+      value: |
+        make check
+  - type: dropdown
+    id: agent-ok
+    attributes:
+      label: May an AI agent implement this end-to-end?
+      options:
+        - "Yes - an agent may open a draft PR"
+        - "Agent may draft, a human must finish"
+        - "No - human only (security, PII, infra, product decision pending)"
+      default: 0
+    validations:
+      required: true
+  - type: dropdown
+    id: size
+    attributes:
+      label: Expected size
+      options:
+        - "XS (≤ 20 lines)"
+        - "S (≤ 100 lines)"
+        - "M (≤ 300 lines)"
+        - "L (≤ 800 lines) - consider splitting"
+        - "XL (> 800 lines) - must be split into a stack"
+      default: 1
+  - type: checkboxes
+    id: dod
+    attributes:
+      label: Definition of done
+      options:
+        - label: Tests added/updated and passing in CI
+        - label: Docs / ADR / CHANGELOG note updated if user-facing or architectural
+        - label: No secrets, no unrelated refactors, PR ≤ 400 lines (or split)

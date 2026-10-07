@@ -1,0 +1,41 @@
+# Weekly repository hygiene report as ONE issue (stale TODOs, old issues, outdated docs, dependency notes).
+name: Weekly maintenance report
+
+on:
+  schedule:
+    - cron: "0 1 * * 1"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  report:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    permissions:
+      contents: read
+      issues: write
+      id-token: write
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: anthropics/claude-code-action@58985842b834ed26087302ba27d07bc24ca8697a # v1
+        with:
+          anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
+          prompt: |
+            REPO: ${{ github.repository }}
+
+            Produce a weekly maintenance report:
+            1. `gh issue list --state open --limit 200 --json number,title,labels,updatedAt`: list issues with no
+               update for > 60 days and `ai:needs-human` issues waiting on a decision.
+            2. `git log --since="7 days ago" --stat`: summarise what merged; note TODO/FIXME added without an issue number.
+            3. Check that commands in AGENTS.md §2 still exist in the Makefile; flag drift between AGENTS.md and docs/.
+            4. If a package manifest exists, list outdated/vulnerable dependencies from its audit command output.
+            Create ONE issue titled "Weekly maintenance report — <date>" with the findings as checklists, labelled
+            type/chore. Do not modify files, close issues, or comment on PRs.
+          claude_args: |
+            --max-turns 20
+            --allowedTools "Read,Glob,Grep,Bash(git log:*),Bash(gh issue list:*),Bash(gh issue create:*),Bash(npm audit:*),Bash(npm outdated:*),Bash(uv pip list:*),Bash(go list:*)"

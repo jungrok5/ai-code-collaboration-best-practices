@@ -1,0 +1,29 @@
+name: Close stale issues and PRs
+
+on:
+  schedule:
+    - cron: "30 1 * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  stale:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      issues: write
+      pull-requests: write
+    steps:
+      - uses: actions/stale@4391f3da665fdf50b6810c1a66712fb9ba21aa93 # v11
+        with:
+          stale-issue-message: "No activity for 60 days. This will close in 7 days unless updated. Add `status/blocked` if it must stay open."
+          stale-pr-message: "No activity for 60 days. This will close in 7 days unless updated. Short-lived branches are the team rule; consider splitting or closing."
+          days-before-stale: 60
+          days-before-close: 7
+          stale-issue-label: "status/stale"
+          stale-pr-label: "status/stale"
+          exempt-issue-labels: "ai:in-progress,priority/p0,status/blocked"
+          exempt-pr-labels: "ai:in-progress,priority/p0"
+          operations-per-run: 100

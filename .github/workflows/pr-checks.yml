@@ -1,0 +1,114 @@
+# PR hygiene: Conventional-Commit title, size labels, area labels, AI-disclosure checkbox.
+# Uses pull_request_target ONLY for metadata; it never checks out or runs PR code.
+name: PR checks
+
+on:
+  pull_request_target:
+    types: [opened, edited, synchronize, reopened, ready_for_review]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: pr-checks-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
+jobs:
+  title:
+    name: Conventional PR title
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    permissions:
+      pull-requests: read
+    steps:
+      - uses: amannn/action-semantic-pull-request@48f256284bd46cdaab1048c3721360e808335d50 # v6
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          types: |
+            feat
+            fix
+            chore
+            docs
+            refactor
+            test
+            ci
+            build
+            perf
+            revert
+          requireScope: false
+          subjectPattern: ^(?![A-Z]).+$
+          subjectPatternError: |
+            The subject "{subject}" must start with a lowercase letter (Conventional Commits).
+          ignoreLabels: |
+            bot
+            ignore-semantic-pull-request
+
+  size:
+    name: Size label
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    permissions:
+      pull-requests: write
+    steps:
+      - uses: codelytv/pr-size-labeler@19c335e7695ba922de938806dd129f0a9b992644 # v1
+        with:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          xs_label: "size/XS"
+          xs_max_size: "20"
+          s_label: "size/S"
+          s_max_size: "100"
+          m_label: "size/M"
+          m_max_size: "300"
+          l_label: "size/L"
+          l_max_size: "800"
+          xl_label: "size/XL"
+          fail_if_xl: "false"
+          message_if_xl: >
+            This PR is larger than 800 changed lines (lockfiles excluded). Team rule (AGENTS.md §3):
+            target ≤ 400 lines; please split it into a stack (`/split-pr`) or add a written justification.
+          files_to_ignore: "package-lock.json pnpm-lock.yaml yarn.lock uv.lock poetry.lock Cargo.lock go.sum *.snap"
+
+  labels:
+    name: Area labels
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    permissions:
+      contents: read
+      pull-requests: write
+    steps:
+      - uses: actions/labeler@bf12e9b00b37c5c0ca2b87b79b2daf7891dbda13 # v7
+        with:
+          sync-labels: true
+
+  ai-disclosure:
+    name: AI disclosure checked
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    permissions:
+      pull-requests: write
+    steps:
+      - name: Verify the AI assistance section and apply provenance label
+        uses: actions/github-script@3a2844b7e9c422d3c10d287c895573f7108da1b3 # v9
+        with:
+          script: |
+            const pr = context.payload.pull_request;
+            const body = pr.body || "";
+            const login = (pr.user && pr.user.login) || "";
+            const isBot = (pr.user && pr.user.type === "Bot") || login.endsWith("[bot]");
+            const checked = (re) => re.test(body);
+            const none = checked(/- \[x\] No AI tools were used/i);
+            const assisted = checked(/- \[x\] AI-assisted/i);
+            const generated = checked(/- \[x\] AI-generated/i);
+            const ticked = [none, assisted, generated].filter(Boolean).length;
+            const add = async (name) => github.rest.issues.addLabels({ ...context.repo, issue_number: pr.number, labels: [name] });
+            if (isBot) {
+              core.info(`Bot-authored PR (${login}); skipping disclosure check.`);
+              return;
+            }
+            if (ticked !== 1) {
+              core.setFailed("Tick exactly one box in the 'AI assistance disclosure' section of the PR body (see .github/pull_request_template.md).");
+              return;
+            }
+            if (assisted) await add("ai:assisted");
+            if (generated) await add("ai:generated");

@@ -1,0 +1,44 @@
+# --- Secrets: never commit ---
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+secrets/
+
+# --- Personal AI tool state (team config IS committed; personal overrides are not) ---
+.claude/settings.local.json
+.claude/*.local.*
+CLAUDE.local.md
+.claude/worktrees/
+.cursor/mcp.local.json
+.gemini/settings.local.json
+.copilot/
+.codex/
+
+# --- Dependencies / builds ---
+node_modules/
+.venv/
+venv/
+__pycache__/
+*.pyc
+dist/
+build/
+coverage/
+.coverage
+*.log
+.cache/
+.ruff_cache/
+.pytest_cache/
+.mypy_cache/
+target/
+
+# --- OS / editors ---
+.DS_Store
+Thumbs.db
+.idea/
+*.swp
+.vscode/*
+!.vscode/settings.json
+!.vscode/extensions.json
+!.vscode/mcp.json

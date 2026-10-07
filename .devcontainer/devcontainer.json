@@ -1,0 +1,32 @@
+{
+  "name": "ai-collab",
+  "image": "mcr.microsoft.com/devcontainers/base:ubuntu",
+  "features": {
+    "ghcr.io/devcontainers/features/node:1": { "version": "lts" },
+    "ghcr.io/devcontainers/features/python:1": { "version": "3.12" },
+    "ghcr.io/devcontainers/features/github-cli:1": {},
+    "ghcr.io/anthropics/devcontainer-features/claude-code:1.0": {}
+  },
+  "postCreateCommand": "pipx install pre-commit yamllint check-jsonschema actionlint-py || pip install --user pre-commit yamllint check-jsonschema actionlint-py; npm i -g markdownlint-cli2; make setup",
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "anthropic.claude-code",
+        "GitHub.copilot",
+        "GitHub.copilot-chat",
+        "GitHub.vscode-pull-request-github",
+        "EditorConfig.EditorConfig",
+        "redhat.vscode-yaml",
+        "DavidAnson.vscode-markdownlint",
+        "timonwong.shellcheck"
+      ],
+      "settings": {
+        "files.insertFinalNewline": true,
+        "editor.formatOnSave": true
+      }
+    }
+  },
+  "remoteEnv": {
+    "CLAUDE_CODE_DISABLE_AUTO_MEMORY": "0"
+  }
+}

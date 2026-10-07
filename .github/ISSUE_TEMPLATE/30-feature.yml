@@ -1,0 +1,38 @@
+name: "Feature request"
+description: "Propose a new capability. Product decisions happen here; implementation tasks are split out as AI-ready tasks."
+title: "[Feature]: "
+labels: ["type/feature", "status/needs-triage"]
+body:
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problem / user need
+      description: Who needs this and why? What happens today without it?
+    validations:
+      required: true
+  - type: textarea
+    id: proposal
+    attributes:
+      label: Proposed solution
+      description: Describe the behaviour, not the implementation. Alternatives considered are welcome.
+    validations:
+      required: true
+  - type: textarea
+    id: acceptance
+    attributes:
+      label: Acceptance criteria (draft)
+      value: |
+        - [ ]
+        - [ ]
+  - type: textarea
+    id: impact
+    attributes:
+      label: Impact / risks
+      description: Public API, data model, migrations, performance, security, cost. Needs an ADR?
+  - type: checkboxes
+    id: next
+    attributes:
+      label: Next steps
+      options:
+        - label: Needs a design discussion / ADR before implementation
+        - label: Can be split into AI-ready tasks once accepted

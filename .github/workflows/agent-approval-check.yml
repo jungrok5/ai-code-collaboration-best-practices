@@ -1,0 +1,31 @@
+# Human approval gate for AI-authored commits: any PR containing commits by claude[bot] / Claude Code
+# (Co-Authored-By noreply@anthropic.com) needs N human approvals. Posts the `agent-approval-check` status;
+# add it to the ruleset's required status checks (scripts/rulesets/main.json). Same gate Anthropic runs internally.
+name: Agent approval check
+
+on:
+  pull_request_target:
+    types: [opened, synchronize, reopened, ready_for_review]
+  pull_request_review:
+    types: [submitted, dismissed]
+  issue_comment:
+    types: [created]
+
+permissions:
+  contents: read
+
+jobs:
+  check:
+    if: github.event_name != 'issue_comment' || github.event.issue.pull_request
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    permissions:
+      contents: read
+      pull-requests: write
+      statuses: write
+    steps:
+      - uses: anthropics/claude-code-action/agent-approval-check@58985842b834ed26087302ba27d07bc24ca8697a # main
+        with:
+          required_approvals: 1
+          agent_emails: "noreply@anthropic.com"
+          agent_logins: "claude[bot],claude-code[bot],copilot-swe-agent[bot],Copilot"

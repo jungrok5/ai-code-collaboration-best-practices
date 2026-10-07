@@ -1,0 +1,20 @@
+{
+  "$schema": "https://www.schemastore.org/claude-code-marketplace.json",
+  "name": "ai-collab",
+  "version": "1.0.0",
+  "description": "Team marketplace: shared Claude Code plugins (skills, subagents, hooks) for AI-assisted multi-repo collaboration on GitHub.",
+  "owner": {
+    "name": "ai-code-collaboration-best-practices maintainers",
+    "url": "https://github.com/jungrok5/ai-code-collaboration-best-practices"
+  },
+  "plugins": [
+    {
+      "name": "team-ai-workflow",
+      "source": "./plugins/team-ai-workflow",
+      "description": "Guard-rail hooks (protected paths, git rules, auto-format), workflow skills (implement-issue, create-pr, review-pr, fix-ci, write-adr, split-pr, triage-issue) and subagents (code-reviewer, security-reviewer, test-writer, issue-triager, docs-writer).",
+      "version": "1.0.0",
+      "category": "development",
+      "tags": ["workflow", "github", "review", "guardrails"]
+    }
+  ]
+}

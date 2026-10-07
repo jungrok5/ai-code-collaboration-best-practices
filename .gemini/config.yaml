@@ -1,0 +1,17 @@
+# Gemini Code Assist on GitHub (PR review). Note: the consumer app was shut down on 2026-07-17;
+# the enterprise version (Google Cloud Gemini Code Assist Standard/Enterprise) still reads this file.
+have_fun: false
+memory_config:
+  disabled: false
+code_review:
+  disable: false
+  comment_severity_threshold: MEDIUM
+  max_review_comments: -1
+  pull_request_opened:
+    help: false
+    summary: true
+    code_review: true
+    include_drafts: false
+ignore_patterns:
+  - "**/*.lock"
+  - "**/dist/**"

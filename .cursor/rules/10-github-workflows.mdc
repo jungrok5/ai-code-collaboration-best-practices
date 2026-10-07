@@ -1,0 +1,10 @@
+---
+description: Hardening rules for GitHub Actions workflow files
+globs: .github/workflows/**
+alwaysApply: false
+---
+- Top-level `permissions:` with minimum scopes; widen per job only.
+- Pin third-party actions to a full commit SHA with a `# vX.Y.Z` comment.
+- Never put `${{ github.event.* }}` text inside `run:`; use `env:` and quote it.
+- No `pull_request_target` with a checkout of PR code; `concurrency` + `timeout-minutes` on PR jobs.
+- Validate with `make ai-validate` (actionlint + zizmor) before committing.

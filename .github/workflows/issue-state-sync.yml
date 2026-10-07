@@ -1,0 +1,48 @@
+# Keeps the ai:* label state machine consistent:
+#  - PR opened by an agent → label ai:generated
+#  - PR merged → linked issues (Closes/Fixes/Resolves #n) move ai:review / ai:in-progress → ai:done
+name: Issue state sync
+
+on:
+  pull_request_target:
+    types: [opened, closed]
+
+permissions:
+  contents: read
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    permissions:
+      issues: write
+      pull-requests: write
+    steps:
+      - uses: actions/github-script@3a2844b7e9c422d3c10d287c895573f7108da1b3 # v9
+        with:
+          script: |
+            const pr = context.payload.pull_request;
+            const login = (pr.user && pr.user.login) || "";
+            const agents = ["claude[bot]", "claude-code[bot]", "copilot-swe-agent[bot]", "Copilot", "codex[bot]", "devin-ai-integration[bot]", "google-labs-jules[bot]"];
+            if (context.payload.action === "opened" && agents.includes(login)) {
+              await github.rest.issues.addLabels({ ...context.repo, issue_number: pr.number, labels: ["ai:generated"] });
+              core.info(`labelled PR #${pr.number} ai:generated (author ${login})`);
+            }
+            if (context.payload.action === "closed" && pr.merged) {
+              const body = pr.body || "";
+              const re = /\b(?:close|closes|closed|fix|fixes|fixed|resolve|resolves|resolved)\s+#(\d+)/gi;
+              const seen = new Set();
+              let m;
+              while ((m = re.exec(body)) !== null) seen.add(Number(m[1]));
+              for (const n of seen) {
+                const { data: issue } = await github.rest.issues.get({ ...context.repo, issue_number: n }).catch(() => ({ data: null }));
+                if (!issue) continue;
+                const names = issue.labels.map(l => (typeof l === "string" ? l : l.name));
+                if (!names.some(x => x.startsWith("ai:"))) continue;
+                for (const old of ["ai:ready", "ai:in-progress", "ai:review", "ai:needs-human"]) {
+                  if (names.includes(old)) await github.rest.issues.removeLabel({ ...context.repo, issue_number: n, name: old }).catch(() => {});
+                }
+                await github.rest.issues.addLabels({ ...context.repo, issue_number: n, labels: ["ai:done"] });
+                core.info(`issue #${n} → ai:done`);
+              }
+            }

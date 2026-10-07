@@ -1,0 +1,11 @@
+---
+description: Team rules for humans and AI agents (single source of truth is AGENTS.md)
+alwaysApply: true
+---
+Cursor reads `AGENTS.md` at the repository root natively; it is the single source of truth for commands,
+workflow, coding/testing/git rules, protected paths and agent behaviour. If anything here conflicts, AGENTS.md wins.
+
+Cursor-specific:
+- Run `make check` before declaring work done and paste the result in the PR body.
+- Never edit protected paths (`.env*`, lockfiles, `.github/CODEOWNERS`, `scripts/rulesets/`, `.claude/settings.json`).
+- Prefer the existing module's patterns; no unrelated refactors in a feature/fix PR.

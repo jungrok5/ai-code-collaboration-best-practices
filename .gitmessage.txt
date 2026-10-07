@@ -1,0 +1,7 @@
+# <type>(<scope>): <summary>  (#<issue>)        ← ≤ 72 chars, imperative, no period
+#
+# Why this change? (not what — the diff shows what)
+#
+# type: feat | fix | chore | docs | refactor | test | ci | perf | build | revert
+# BREAKING CHANGE: <description>  (if any)
+# Keep AI attribution trailers (Co-Authored-By: ...) — they are the audit trail.

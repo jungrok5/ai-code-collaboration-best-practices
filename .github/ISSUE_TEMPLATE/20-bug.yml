@@ -1,0 +1,50 @@
+name: "Bug report"
+description: "Something is broken. Include a reproduction so a human or agent can write the regression test first."
+title: "[Bug]: "
+labels: ["type/bug", "status/needs-triage"]
+body:
+  - type: textarea
+    id: what
+    attributes:
+      label: What happened?
+      description: Also tell us what you expected to happen.
+    validations:
+      required: true
+  - type: textarea
+    id: repro
+    attributes:
+      label: Steps to reproduce
+      description: Minimal, deterministic steps or a failing test. This becomes the regression test `issue_<n>_*`.
+      value: |
+        1.
+        2.
+        3.
+    validations:
+      required: true
+  - type: textarea
+    id: logs
+    attributes:
+      label: Logs / error output
+      render: shell
+  - type: input
+    id: version
+    attributes:
+      label: Version / commit / environment
+      placeholder: "v1.4.2, main@abc123, Node 22 / macOS 15"
+  - type: textarea
+    id: scope
+    attributes:
+      label: Suspected area (files / modules)
+      description: Optional, but it makes the fix much faster and more focused.
+  - type: dropdown
+    id: severity
+    attributes:
+      label: Severity
+      options:
+        - "p0 - outage / data loss / security"
+        - "p1 - blocks a release or many users"
+        - "p2 - normal"
+        - "p3 - minor / cosmetic"
+      default: 2
+    validations:
+      required: true

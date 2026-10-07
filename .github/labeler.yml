@@ -1,0 +1,43 @@
+# actions/labeler v5+ syntax. Applies area/* labels to PRs from changed paths.
+area/ci:
+  - changed-files:
+      - any-glob-to-any-file: [".github/**", "Makefile", "scripts/**", "**/Dockerfile", ".devcontainer/**"]
+area/ai-config:
+  - changed-files:
+      - any-glob-to-any-file:
+          - "AGENTS.md"
+          - "CLAUDE.md"
+          - "GEMINI.md"
+          - "REVIEW.md"
+          - ".claude/**"
+          - ".claude-plugin/**"
+          - "plugins/**"
+          - ".cursor/**"
+          - ".gemini/**"
+          - ".github/copilot-instructions.md"
+          - ".github/instructions/**"
+          - ".github/agents/**"
+          - ".mcp.json"
+          - ".coderabbit.yaml"
+          - ".aider.conf.yml"
+area/docs:
+  - changed-files:
+      - any-glob-to-any-file: ["docs/**", "**/*.md", "!AGENTS.md", "!CLAUDE.md"]
+area/deps:
+  - changed-files:
+      - any-glob-to-any-file:
+          - "package.json"
+          - "package-lock.json"
+          - "pnpm-lock.yaml"
+          - "yarn.lock"
+          - "pyproject.toml"
+          - "uv.lock"
+          - "poetry.lock"
+          - "go.mod"
+          - "go.sum"
+          - "Cargo.toml"
+          - "Cargo.lock"
+          - ".github/dependabot.yml"
+area/tests:
+  - changed-files:
+      - any-glob-to-any-file: ["**/*.test.*", "**/*.spec.*", "**/tests/**", "**/__tests__/**", "**/test_*.py", "**/*_test.go"]
