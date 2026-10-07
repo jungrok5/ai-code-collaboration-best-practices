@@ -11,7 +11,7 @@ cd "$(ai_root)"
 ai_log "backend: $(ai_backend)"
 head="$(gh pr view "$PR" --json headRefName -q .headRefName)"
 run_id="$(gh run list --branch "$head" --workflow CI --limit 5 --json databaseId,conclusion -q '[.[] | select(.conclusion=="failure")][0].databaseId' 2>/dev/null || true)"
-[ -n "$run_id" ] && [ "$run_id" != "null" ] || { ai_warn "no failed CI run found for branch $head"; exit 0; }
+if [ -z "$run_id" ] || [ "$run_id" = "null" ]; then ai_warn "no failed CI run found for branch $head"; exit 0; fi
 log_file="$(mktemp)"; gh run view "$run_id" --log-failed 2>/dev/null | tail -c 40000 > "$log_file" || true
 ts="$(date +%Y%m%d%H%M)"; fix_branch="ai/ci-fix-$(printf '%s' "$head" | tr -cd 'a-zA-Z0-9/_.-')-${ts}"
 wt="$(ai_worktree "ai-ci-fix-${PR}" "$fix_branch" "origin/$head")"

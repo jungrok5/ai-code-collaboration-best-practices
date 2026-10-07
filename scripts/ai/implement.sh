@@ -13,7 +13,7 @@ ts="$(date +%Y%m%d%H%M)"
 branch="ai/issue-${ISSUE}-${ts}"
 wt="$(ai_worktree "ai-issue-${ISSUE}" "$branch" "origin/$default")"
 ai_log "worktree: $wt (branch $branch from origin/$default)"
-[ "$POST" = 1 ] && gh issue edit "$ISSUE" --remove-label ai:ready --add-label ai:in-progress >/dev/null 2>&1 || true
+if [ "$POST" = 1 ]; then gh issue edit "$ISSUE" --remove-label ai:ready --add-label ai:in-progress >/dev/null 2>&1 || true; fi
 
 issue_json="$(gh issue view "$ISSUE" --json number,title,body,labels,comments --jq '{number,title,body,labels:[.labels[].name],comments:[.comments[] | {author:.author.login, body:.body}]}')"
 prompt="$(cat <<PROMPT
@@ -31,13 +31,20 @@ PROMPT
 export AI_PERMISSION_MODE="${AI_PERMISSION_MODE:-acceptEdits}"
 export AI_ALLOWED_TOOLS="${AI_ALLOWED_TOOLS:-Read,Glob,Grep,Edit,MultiEdit,Write,Bash(make *),Bash(git status *),Bash(git diff *),Bash(git log *),Bash(git add *),Bash(git commit *),Bash(gh issue view *)}"
 export AI_MAX_TURNS="${AI_MAX_TURNS:-60}"
-report="$( cd "$wt" && ai_run "$prompt" )" || { ai_warn "implementation run failed"; [ "$POST" = 1 ] && gh issue edit "$ISSUE" --remove-label ai:in-progress --add-label ai:needs-human >/dev/null 2>&1 || true; exit 1; }
+if ! report="$( cd "$wt" && ai_run "$prompt" )"; then
+  ai_warn "implementation run failed"
+  if [ "$POST" = 1 ]; then gh issue edit "$ISSUE" --remove-label ai:in-progress --add-label ai:needs-human >/dev/null 2>&1 || true; fi
+  exit 1
+fi
 printf '%s\n' "$report"
 
 commits="$(git -C "$wt" rev-list --count "origin/$default..HEAD" 2>/dev/null || echo 0)"
 if [ "$commits" = 0 ]; then
   ai_warn "no commits were made; nothing to push"
-  [ "$POST" = 1 ] && gh issue edit "$ISSUE" --remove-label ai:in-progress --add-label ai:needs-human >/dev/null 2>&1 && gh issue comment "$ISSUE" --body "The agent could not produce a verified change. A human needs to look. Re-apply \`ai:ready\` to retry after refining the issue." >/dev/null
+  if [ "$POST" = 1 ]; then
+    gh issue edit "$ISSUE" --remove-label ai:in-progress --add-label ai:needs-human >/dev/null 2>&1 || true
+    gh issue comment "$ISSUE" --body "The agent could not produce a verified change. A human needs to look. Re-apply the ai:ready label to retry after refining the issue." >/dev/null || true
+  fi
   exit 2
 fi
 ai_log "$commits commit(s) on $branch"

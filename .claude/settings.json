@@ -64,7 +64,11 @@
       "WebFetch(domain:code.claude.com)",
       "WebFetch(domain:docs.claude.com)",
       "WebFetch(domain:agents.md)",
-      "WebFetch(domain:docs.anthropic.com)"
+      "WebFetch(domain:docs.anthropic.com)",
+      "Bash(gh auth status)",
+      "Bash(gh repo view *)",
+      "Bash(gh workflow list *)",
+      "Bash(gh variable list *)"
     ],
     "ask": [
       "Bash(git push *)",

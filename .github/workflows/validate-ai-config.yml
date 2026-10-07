@@ -50,6 +50,7 @@ jobs:
           uv tool install yamllint
           uv tool install check-jsonschema
           uv tool install actionlint-py
+          uv tool install shellcheck-py
           echo "$HOME/.local/bin" >> "$GITHUB_PATH"
       - name: Run scripts/check-ai-config.sh
         run: scripts/check-ai-config.sh

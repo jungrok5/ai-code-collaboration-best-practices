@@ -37,9 +37,6 @@ jobs:
             perf
             revert
           requireScope: false
-          subjectPattern: ^(?![A-Z]).+$
-          subjectPatternError: |
-            The subject "{subject}" must start with a lowercase letter (Conventional Commits).
           ignoreLabels: |
             bot
             ignore-semantic-pull-request

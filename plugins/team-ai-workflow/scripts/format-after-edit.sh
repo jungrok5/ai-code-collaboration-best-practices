@@ -10,7 +10,7 @@ file_path="$(printf '%s' "$input" | jq -r '.tool_input.file_path // empty')"
 [ -z "$file_path" ] || [ ! -f "$file_path" ] && exit 0
 
 ext="${file_path##*.}"
-run() { command -v "$1" >/dev/null 2>&1 && "$@" >/dev/null 2>&1 || true; }
+run() { if command -v "$1" >/dev/null 2>&1; then "$@" >/dev/null 2>&1 || true; fi; }
 
 case "$ext" in
   js|jsx|ts|tsx|json|css|scss|md|mdx|yml|yaml|html|vue|svelte)

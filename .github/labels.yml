@@ -4,7 +4,7 @@
 # --- AI workflow state (issues): ai:ready → ai:in-progress → ai:review | ai:needs-human → ai:done ---
 - name: "ai:ready"
   color: "0E8A16"
-  description: "Scoped well enough for an AI agent: testable AC, bounded scope, no open product decision"
+  description: "Scoped well enough for an AI agent: testable acceptance criteria, bounded scope, no open product decision"
 - name: "ai:in-progress"
   color: "1D76DB"
   description: "An AI agent is actively working on this; avoid duplicate work"

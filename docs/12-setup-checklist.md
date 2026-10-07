@@ -2,7 +2,8 @@
 
 ## A. 허브(이 템플릿 레포) 관리자
 
-- [ ] Settings → General → **Template repository** 체크
+- [ ] Settings → General → **Default branch**를 `main`으로, **Template repository** 체크
+- [ ] Settings → Actions → General → Workflow permissions → **"Allow GitHub Actions to create and approve pull requests"** 체크 (release-please·Dependabot 자동 머지에 필요; `make github-setup`이 API로도 설정)
 - [ ] `make github-setup`(설정·라벨·룰셋) — rulesets는 공개 레포 또는 Pro/Team/Enterprise
 - [ ] AI 백엔드 결정(`docs/13-ai-backends.md`): 기본은 아무것도 안 함(개발자가 `make ai-*`). 서버 자동화를 원하면 `AI_BACKEND` 변수 + (`local`: `AI_BASE_URL`/`AI_MODEL`, `anthropic`: `CLAUDE_CODE_OAUTH_TOKEN` 또는 `ANTHROPIC_API_KEY` + Claude GitHub App)
 - [ ] 선택 시크릿: `RELEASE_PLEASE_TOKEN`, `REPO_ADMIN_TOKEN`
@@ -44,6 +45,8 @@ gh workflow list          # 워크플로 등록 확인
 ## E. 자주 묻는 문제
 
 - **워크플로가 안 돈다**: 템플릿에서 만든 레포는 Actions가 꺼져 있을 수 있음 → Actions 탭에서 활성화, 한 번 push.
+- **release-please가 "GitHub Actions is not permitted to create or approve pull requests"로 실패**: 위 Actions 설정 체크박스를 켠다.
+- **라벨이 없다**: Actions 탭 → "Sync labels" → Run workflow (또는 `.github/labels.yml`을 수정해 main에 push).
 - **AI 워크플로가 항상 skipped**: 의도된 기본값. `AI_BACKEND` 변수를 설정해야 켜진다(docs/13).
 - **Claude 액션이 "write access" 거부**: 트리거한 사람에게 쓰기 권한이 없음. 공개 레포 트리아지는 워크플로 주석의 `allowed_non_write_users` 참고.
 - **에이전트 PR에 CI가 안 돈다**: `github_token`을 직접 넘기면 `GITHUB_TOKEN`이라 워크플로가 연쇄 트리거되지 않음 → 앱 인증(기본) 사용.

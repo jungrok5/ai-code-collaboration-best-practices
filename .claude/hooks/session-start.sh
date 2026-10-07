@@ -16,7 +16,9 @@ if [ -f package.json ] && [ ! -d node_modules ]; then
 fi
 if [ -f pyproject.toml ] && [ ! -d .venv ]; then
   if command -v uv >/dev/null; then uv sync >/dev/null 2>&1 || true
-  elif command -v python3 >/dev/null; then python3 -m venv .venv >/dev/null 2>&1 && .venv/bin/pip install -q -e . >/dev/null 2>&1 || true; fi
+  elif command -v python3 >/dev/null; then
+    if python3 -m venv .venv >/dev/null 2>&1; then .venv/bin/pip install -q -e . >/dev/null 2>&1 || true; fi
+  fi
 fi
 if [ -f go.mod ] && command -v go >/dev/null; then go mod download >/dev/null 2>&1 || true; fi
 

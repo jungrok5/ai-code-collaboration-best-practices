@@ -55,7 +55,7 @@ case "$task" in
     esac ;;
   lint)
     case "$stack" in
-      node)   run_node_script lint; has_script format:check && run_node_script format:check || true ;;
+      node)   run_node_script lint; if has_script format:check; then run_node_script format:check; fi ;;
       python) if command -v ruff >/dev/null 2>&1 || py ruff --version >/dev/null 2>&1; then py ruff check . && py ruff format --check .; else echo "(skip) ruff not installed"; fi ;;
       go)     gofmt -l . | tee /tmp/gofmt.out; test ! -s /tmp/gofmt.out; go vet ./... ;;
       rust)   cargo fmt --all -- --check && cargo clippy --all-targets -- -D warnings ;;

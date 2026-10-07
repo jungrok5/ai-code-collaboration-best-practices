@@ -131,7 +131,7 @@ fi
 bold "4/6 Project dependencies + git hooks"
 scripts/stack.sh setup || warn "dependency install failed (fix and re-run: make setup)"
 if have pre-commit; then pre-commit install --install-hooks >/dev/null && pre-commit install --hook-type commit-msg >/dev/null && ok "pre-commit hooks installed"; fi
-git config --local commit.template .gitmessage.txt 2>/dev/null && ok "commit template set (.gitmessage.txt)" || true
+if git config --local commit.template .gitmessage.txt 2>/dev/null; then ok "commit template set (.gitmessage.txt)"; fi
 
 bold "5/6 Claude Code plugin"
 if [ "$USE_CLAUDE" = 1 ] && have claude; then
