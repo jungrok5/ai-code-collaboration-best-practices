@@ -1,6 +1,7 @@
 # Local guard rails for humans AND agents (install: make setup / make hooks)
 # Keep in sync with CI (.github/workflows/ci.yml runs the same checks).
 default_install_hook_types: [pre-commit, commit-msg]
+default_stages: [pre-commit]
 repos:
   - repo: https://github.com/pre-commit/pre-commit-hooks
     rev: v6.0.0
