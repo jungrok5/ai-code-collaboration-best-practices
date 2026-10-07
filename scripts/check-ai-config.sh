@@ -64,6 +64,16 @@ if command -v markdownlint-cli2 >/dev/null 2>&1; then
   if markdownlint-cli2 "**/*.md" >/tmp/ml.out 2>&1; then pass "markdown"; else bad "markdownlint"; tail -30 /tmp/ml.out; fi
 else skip "markdownlint-cli2 not installed (npm i -g markdownlint-cli2)"; fi
 
+section "Label descriptions (GitHub limit: 100 characters)"
+if [ -f .github/labels.yml ]; then
+  bad_labels=0
+  while IFS= read -r line; do
+    desc="$(printf '%s' "$line" | sed -E 's/^[[:space:]]*description:[[:space:]]*"?//; s/"?[[:space:]]*$//')"
+    if [ "${#desc}" -gt 100 ]; then bad ".github/labels.yml: description longer than 100 chars: ${desc:0:60}…"; bad_labels=1; fi
+  done < <(grep -E '^[[:space:]]*description:' .github/labels.yml)
+  [ "$bad_labels" = 0 ] && pass "all label descriptions ≤ 100 chars"
+fi
+
 section "AGENTS.md size (≤ 200 lines recommended)"
 if [ -f AGENTS.md ]; then
   n=$(wc -l < AGENTS.md)
