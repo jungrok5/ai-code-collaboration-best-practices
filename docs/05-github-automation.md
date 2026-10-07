@@ -7,6 +7,7 @@
 | `ci.yml` | PR, main push, merge_group | `make setup-ci → lint → typecheck → test → build`; 필수 체크 `ci-ok` | 없음 | — |
 | `pr-checks.yml` | pull_request_target(메타데이터만) | 제목 Conventional 검사, `size/*`, `area/*` 라벨, **AI 공개 체크박스** 검증 → `ai:assisted`/`ai:generated` | PR 라벨 | — |
 | `validate-ai-config.yml` | 설정 파일 변경 | `scripts/check-ai-config.sh`(플러그인·스키마·actionlint·shellcheck·yamllint·markdownlint) + zizmor | SARIF 업로드 | — |
+| `ai-local-runner.yml` | 이슈·PR·댓글·CI 실패·주간(`AI_BACKEND=local`) | self-hosted 러너 + 로컬 LLM에서 `scripts/ai/dispatch.sh` 실행 | contents/PR/issues | 스크립트별 턴 상한 |
 | `claude.yml` | `@claude` 멘션(이슈/PR 댓글/리뷰) | 질문 답변, 요청한 변경을 커밋·푸시, "Create PR" 링크 | contents/PR/issues | 30턴 |
 | `claude-code-review.yml` | PR opened/synchronize/ready | 인라인 코멘트 + 스티키 요약(**승인 안 함**); 초안·봇·포크 PR 제외 | PR 코멘트 | 30턴, 새 push 시 취소 |
 | `claude-issue-triage.yml` | 이슈 opened | type/area/priority/size 라벨 제안·적용, 누락 항목·중복 1회 댓글(닫지 않음) | issues | 12턴, Bash 금지 |
@@ -23,7 +24,7 @@
 | `copilot-setup-steps.yml` | 자기 파일 변경 | Copilot 클라우드 에이전트 환경 준비 | 없음 | — |
 | `bootstrap-repo.yml` | 수동 | 레포 설정·라벨·룰셋 적용(`REPO_ADMIN_TOKEN`) | admin 토큰 | — |
 
-모든 워크플로: 최상위 `permissions: contents: read`, 잡 단위로만 확대, `timeout-minutes`, PR 잡은 `concurrency`. 서드파티 액션은 SHA 핀(`scripts/pin-actions.sh`) + Dependabot 갱신.
+`claude*.yml`은 `AI_BACKEND=anthropic`, `ai-local-runner.yml`은 `AI_BACKEND=local`일 때만 실행됩니다(변수가 비어 있으면 skipped). 모든 워크플로: 최상위 `permissions: contents: read`, 잡 단위로만 확대, `timeout-minutes`, PR 잡은 `concurrency`. 서드파티 액션은 SHA 핀(`scripts/pin-actions.sh`) + Dependabot 갱신.
 
 ## 2. 라벨 상태 머신
 
@@ -50,25 +51,30 @@ stateDiagram-v2
 4. 에이전트 커밋이 포함된 PR은 `agent-approval-check`가 사람 승인 N명을 요구한다(Anthropic 내부와 같은 게이트).
 5. `risk/low` + `ai:generated` + 승인 완료 → 자동 머지는 **옵션**(기본 꺼짐; 06 문서).
 
-## 4. 설치 (한 번)
+## 4. 백엔드 선택 (기본: 아무것도 안 해도 됨)
+
+| `AI_BACKEND` 변수 | 동작 |
+| --- | --- |
+| (비움, 기본) | `claude*.yml`과 `ai-local-runner.yml`은 전부 **skipped**. CI·PR 검사·라벨·릴리스는 정상 |
+| `anthropic` | `claude*.yml`이 공식 액션으로 실행. 시크릿 `CLAUDE_CODE_OAUTH_TOKEN`(구독, `claude setup-token`) 또는 `ANTHROPIC_API_KEY` 필요 |
+| `local` | `ai-local-runner.yml`이 self-hosted 러너에서 `scripts/ai/dispatch.sh` 실행. 변수 `AI_BASE_URL`, `AI_MODEL`(로컬 LLM) |
+
+개발자는 백엔드와 무관하게 자기 자리에서 `make ai-triage ISSUE=1` 같은 명령으로 같은 작업을 돌릴 수 있습니다(구독 로그인, 키 불필요). 자세한 선택 가이드: `docs/13-ai-backends.md`.
 
 ```bash
-# 1) Claude GitHub App + 시크릿
-claude            # 세션 안에서
-/install-github-app          # 앱 설치 + ANTHROPIC_API_KEY(또는 CLAUDE_CODE_OAUTH_TOKEN) 저장 + 워크플로 PR
-# 또는 수동: https://github.com/apps/claude 설치 후
-gh secret set ANTHROPIC_API_KEY
-
-# 2) 레포 설정·라벨·룰셋
-make github-setup            # = scripts/setup-github.sh all (gh auth login, admin)
-
-# 3) 선택
-gh secret set RELEASE_PLEASE_TOKEN   # 릴리스 태그로 배포 워크플로를 트리거할 때
-gh secret set REPO_ADMIN_TOKEN       # bootstrap-repo.yml을 Actions에서 돌릴 때
+# ③ Anthropic 모드일 때만
+gh variable set AI_BACKEND -b anthropic
+gh secret set CLAUDE_CODE_OAUTH_TOKEN        # 또는 gh secret set ANTHROPIC_API_KEY
+# Claude GitHub App 설치: claude 안에서 /install-github-app (또는 https://github.com/apps/claude)
+# ② 로컬 모드일 때만
+gh variable set AI_BACKEND -b local; gh variable set AI_BASE_URL -b http://127.0.0.1:8080; gh variable set AI_MODEL -b local-coder
+# 공통(관리자 1회)
+make github-setup                            # 설정·라벨·룰셋
+gh secret set RELEASE_PLEASE_TOKEN           # 선택: 릴리스 태그로 배포 워크플로를 트리거할 때
 ```
 
-- 구독 토큰(`claude setup-token`)은 개인에게 묶이므로 조직 레포는 API 키 또는 **Workload Identity Federation**(정적 키 없음; `anthropic_federation_rule_id` 등 입력) 권장. Bedrock/Vertex/Foundry는 `use_bedrock|use_vertex|use_foundry` + OIDC + 커스텀 GitHub App.
-- 공개 레포에서 쓰기 권한 없는 사용자의 이슈를 트리아지하려면 `allowed_non_write_users: "*"` + `github_token: ${{ secrets.GITHUB_TOKEN }}`(해당 워크플로의 주석 참고). PAT는 절대 넣지 않는다.
+- 구독 토큰은 개인에게 묶이므로 조직 레포는 API 키 또는 **Workload Identity Federation**(정적 키 없음) 권장. Bedrock/Vertex/Foundry는 `use_bedrock|use_vertex|use_foundry` + OIDC + 커스텀 GitHub App.
+- 공개 레포에서 쓰기 권한 없는 사용자의 이슈를 트리아지하려면 `allowed_non_write_users: "*"` + `github_token: ${{ secrets.GITHUB_TOKEN }}`(워크플로 주석 참고). PAT는 절대 넣지 않는다.
 
 ## 5. 액션 동작 요점 (anthropics/claude-code-action@v1)
 

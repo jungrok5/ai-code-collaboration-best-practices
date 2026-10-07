@@ -1,4 +1,6 @@
 # Weekly repository hygiene report as ONE issue (stale TODOs, old issues, outdated docs, dependency notes).
+# Runs only when the repository variable AI_BACKEND is "anthropic" (gh variable set AI_BACKEND -b anthropic)
+# with secret ANTHROPIC_API_KEY or CLAUDE_CODE_OAUTH_TOKEN (claude setup-token). Local-LLM mode: ai-local-runner.yml.
 name: Weekly maintenance report
 
 on:
@@ -11,6 +13,7 @@ permissions:
 
 jobs:
   report:
+    if: vars.AI_BACKEND == 'anthropic'
     runs-on: ubuntu-latest
     timeout-minutes: 15
     permissions:
@@ -25,6 +28,7 @@ jobs:
       - uses: anthropics/claude-code-action@58985842b834ed26087302ba27d07bc24ca8697a # v1
         with:
           anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
+          claude_code_oauth_token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
           prompt: |
             REPO: ${{ github.repository }}
 

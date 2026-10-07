@@ -1,5 +1,7 @@
 # Advisory AI review on every non-draft PR: inline comments for concrete findings + one sticky summary.
 # It never approves/requests changes/merges; humans (CODEOWNERS) own the decision (docs/06-code-review-policy.md).
+# Runs only when the repository variable AI_BACKEND is "anthropic" (gh variable set AI_BACKEND -b anthropic)
+# with secret ANTHROPIC_API_KEY or CLAUDE_CODE_OAUTH_TOKEN (claude setup-token). Local-LLM mode: ai-local-runner.yml.
 name: Claude Code Review
 
 on:
@@ -18,6 +20,7 @@ jobs:
   review:
     # Skip drafts, bot PRs (dependabot/renovate/copilot/claude), and fork PRs (no secrets / no OIDC token).
     if: |
+      vars.AI_BACKEND == 'anthropic' &&
       github.event.pull_request.draft == false &&
       github.event.pull_request.user.type != 'Bot' &&
       !endsWith(github.event.pull_request.user.login, '[bot]') &&
@@ -39,6 +42,7 @@ jobs:
         uses: anthropics/claude-code-action@58985842b834ed26087302ba27d07bc24ca8697a # v1
         with:
           anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
+          claude_code_oauth_token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
           track_progress: true
           use_sticky_comment: true
           prompt: |

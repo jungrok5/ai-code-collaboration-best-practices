@@ -1,0 +1,4 @@
+# actionlint config: custom labels of our self-hosted runners (see infra/local-llm/README.md)
+self-hosted-runner:
+  labels:
+    - ai

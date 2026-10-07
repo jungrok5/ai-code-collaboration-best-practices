@@ -1,6 +1,8 @@
 # Label an issue `ai:ready` (write access required) → Claude implements it on a branch, runs the checks,
 # pushes verified commits, and a deterministic step opens a DRAFT PR labelled ai:generated.
 # Label state machine: ai:ready → ai:in-progress → ai:review (PR open) | ai:needs-human (failed) → ai:done (merged).
+# Runs only when the repository variable AI_BACKEND is "anthropic" (gh variable set AI_BACKEND -b anthropic)
+# with secret ANTHROPIC_API_KEY or CLAUDE_CODE_OAUTH_TOKEN (claude setup-token). Local-LLM mode: ai-local-runner.yml.
 name: Claude Implement Issue
 
 on:
@@ -16,7 +18,7 @@ concurrency:
 
 jobs:
   implement:
-    if: github.event.label.name == 'ai:ready'
+    if: vars.AI_BACKEND == 'anthropic' && github.event.label.name == 'ai:ready'
     runs-on: ubuntu-latest
     timeout-minutes: 45
     permissions:
@@ -60,6 +62,7 @@ jobs:
         uses: anthropics/claude-code-action@58985842b834ed26087302ba27d07bc24ca8697a # v1
         with:
           anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
+          claude_code_oauth_token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
           label_trigger: "ai:ready"
           branch_prefix: "ai/"
           branch_name_template: "{{prefix}}issue-{{entityNumber}}-{{timestamp}}"

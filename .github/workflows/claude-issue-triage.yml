@@ -1,5 +1,7 @@
 # Triage new issues: propose type/area/priority labels, flag missing info and duplicates, post ONE comment.
 # Never closes, edits, or assigns issues. A human adds `ai:ready` (the first human checkpoint).
+# Runs only when the repository variable AI_BACKEND is "anthropic" (gh variable set AI_BACKEND -b anthropic)
+# with secret ANTHROPIC_API_KEY or CLAUDE_CODE_OAUTH_TOKEN (claude setup-token). Local-LLM mode: ai-local-runner.yml.
 name: Claude Issue Triage
 
 on:
@@ -15,6 +17,7 @@ concurrency:
 
 jobs:
   triage:
+    if: vars.AI_BACKEND == 'anthropic'
     runs-on: ubuntu-latest
     timeout-minutes: 10
     permissions:
@@ -31,6 +34,7 @@ jobs:
         uses: anthropics/claude-code-action@58985842b834ed26087302ba27d07bc24ca8697a # v1
         with:
           anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
+          claude_code_oauth_token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
           # Public repo where issue authors lack write access? Uncomment BOTH lines (labels/comments then
           # come from github-actions[bot] with only the permissions declared above):
           # allowed_non_write_users: "*"

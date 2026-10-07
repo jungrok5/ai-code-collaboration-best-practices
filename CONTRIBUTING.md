@@ -22,7 +22,7 @@ make check          # 린트 + 타입체크 + 테스트 (커밋 전에 항상)
 
 ## 3. AI 도구를 쓸 때
 
-- 에이전트에게 이슈 번호를 주고 `AGENTS.md`를 따르게 합니다. Claude Code는 `/implement-issue 123`.
+- 에이전트에게 이슈 번호를 주고 `AGENTS.md`를 따르게 합니다. Claude Code는 `/implement-issue 123`, 터미널에서는 `make ai-implement ISSUE=123`(본인 구독 로그인, API 키 불필요).
 - AI가 작성한 코드는 **본인이 모두 읽고 이해한 뒤** PR을 올립니다. PR 본문의 AI 공개 항목을 반드시 체크합니다.
 - 보호 경로(`.env*`, 락파일, CODEOWNERS, 룰셋, `.claude/settings.json`)는 사람이 직접 수정합니다.
 - 테스트를 끄거나 건너뛰어 CI를 초록으로 만들지 않습니다. 원인을 고치거나 이슈를 엽니다.

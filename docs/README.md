@@ -14,4 +14,5 @@
 | [10 조사 교차검증](10-research-crosscheck.md) | Gemini 조사 내용 검증 결과와 1차 출처 | 궁금한 사람 |
 | [11 도구 지원 매트릭스](11-tool-support-matrix.md) | 도구별 규칙 파일·AGENTS.md 지원·PR 리뷰 봇 트리거 | 도구 선택 시 |
 | [12 셋업 체크리스트](12-setup-checklist.md) | 허브/신규 레포/팀원 온보딩에서 할 일 | 관리자, 신규 팀원 |
+| [13 AI 백엔드](13-ai-backends.md) | API 키 없이: 개인 자리 `claude -p` · 로컬 LLM 서버 · (선택) Anthropic. 없어도 동작 | 모두 |
 | [ADR](adr/) | 아키텍처 결정 기록 (왜 이렇게 했는가) | 모두 |

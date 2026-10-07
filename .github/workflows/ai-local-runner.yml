@@ -1,0 +1,92 @@
+# Key-free AI automation on a SELF-HOSTED runner with a local LLM (llama.cpp / Ollama) or any Anthropic-compatible
+# gateway. Enabled only when the repository variable AI_BACKEND == "local"; otherwise every run is skipped.
+# Routes events to scripts/ai/dispatch.sh (the same scripts developers run at their own seat with `make ai-*`).
+name: AI local runner
+
+on:
+  issues:
+    types: [opened, labeled]
+  issue_comment:
+    types: [created]
+  pull_request:
+    types: [opened, synchronize, ready_for_review]
+  workflow_run:
+    workflows: ["CI"]
+    types: [completed]
+  schedule:
+    - cron: "0 1 * * 1"
+  workflow_dispatch:
+    inputs:
+      task:
+        description: "Task"
+        type: choice
+        options: [triage, review, implement, fix-ci, respond, maintenance, queue]
+        default: review
+      number:
+        description: "Issue or PR number (not needed for maintenance/queue)"
+        type: string
+        default: ""
+      text:
+        description: "Question for respond"
+        type: string
+        default: ""
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ai-local-${{ github.event.issue.number || github.event.pull_request.number || github.event.workflow_run.head_branch || github.run_id }}
+  cancel-in-progress: false
+
+jobs:
+  run:
+    # Only write-access humans can steer the agent; fork PRs and bots are ignored; own fix branches are excluded.
+    if: |
+      vars.AI_BACKEND == 'local' && (
+        (github.event_name == 'issues' && github.event.action == 'opened') ||
+        (github.event_name == 'issues' && github.event.action == 'labeled' && github.event.label.name == 'ai:ready') ||
+        (github.event_name == 'issue_comment' && contains(github.event.comment.body, '@claude') &&
+          contains(fromJSON('["OWNER","MEMBER","COLLABORATOR"]'), github.event.comment.author_association)) ||
+        (github.event_name == 'pull_request' && github.event.pull_request.draft == false &&
+          github.event.pull_request.user.type != 'Bot' &&
+          github.event.pull_request.head.repo.full_name == github.repository) ||
+        (github.event_name == 'workflow_run' && github.event.workflow_run.conclusion == 'failure' &&
+          github.event.workflow_run.pull_requests[0] &&
+          github.event.workflow_run.head_repository.full_name == github.repository &&
+          !startsWith(github.event.workflow_run.head_branch, 'ai/')) ||
+        github.event_name == 'schedule' || github.event_name == 'workflow_dispatch')
+    runs-on: [self-hosted, ai]
+    timeout-minutes: 90
+    permissions:
+      contents: write
+      issues: write
+      pull-requests: write
+      actions: read
+    env:
+      ANTHROPIC_BASE_URL: ${{ vars.AI_BASE_URL }}
+      ANTHROPIC_AUTH_TOKEN: ${{ secrets.AI_AUTH_TOKEN || 'local' }}
+      ANTHROPIC_MODEL: ${{ vars.AI_MODEL }}
+      ANTHROPIC_DEFAULT_SONNET_MODEL: ${{ vars.AI_MODEL }}
+      ANTHROPIC_DEFAULT_HAIKU_MODEL: ${{ vars.AI_MODEL }}
+      ANTHROPIC_DEFAULT_OPUS_MODEL: ${{ vars.AI_MODEL }}
+      CLAUDE_CODE_SUBAGENT_MODEL: ${{ vars.AI_MODEL }}
+      AI_MODEL: ${{ vars.AI_MODEL }}
+      CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC: "1"
+      # A GitHub App or PAT token lets agent PRs trigger CI; the default token cannot.
+      GH_TOKEN: ${{ secrets.AI_GH_TOKEN || github.token }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          fetch-depth: 0
+          token: ${{ secrets.AI_GH_TOKEN || github.token }}
+      - name: Install project dependencies
+        run: make setup-ci
+      # Headless Claude ignores project permission rules in an untrusted checkout; mark the runner's checkout trusted once.
+      - name: Trust this checkout for Claude Code
+        run: |
+          cfg="$HOME/.claude.json"; [ -f "$cfg" ] || echo '{}' > "$cfg"
+          tmp="$(mktemp)"; jq --arg p "$PWD" '.projects[$p].hasTrustDialogAccepted = true' "$cfg" > "$tmp" && mv "$tmp" "$cfg"
+      - name: Check the local LLM endpoint
+        run: scripts/ai/local-llm-check.sh
+      - name: Run the matching AI task
+        run: scripts/ai/dispatch.sh

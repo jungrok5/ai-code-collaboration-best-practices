@@ -1,0 +1,27 @@
+# llama.cpp server with the Anthropic-compatible /v1/messages endpoint.
+# Usage: cp local-llm.env.example .env && docker compose up -d
+# GPU: switch the image to ghcr.io/ggml-org/llama.cpp:server-cuda and uncomment the deploy block.
+services:
+  llama:
+    image: ghcr.io/ggml-org/llama.cpp:server
+    restart: unless-stopped
+    ports:
+      - "${LLAMA_PORT:-8080}:8080"
+    volumes:
+      - ./models:/models
+    environment:
+      LLAMA_CACHE: /models
+    command: >
+      -hf ${LLAMA_MODEL_HF:-unsloth/Qwen3-Coder-30B-A3B-Instruct-GGUF:Q4_K_M}
+      --alias ${LLAMA_ALIAS:-local-coder}
+      --host 0.0.0.0 --port 8080
+      --jinja
+      -c ${LLAMA_CTX:-65536}
+      -ngl ${LLAMA_GPU_LAYERS:-0}
+    # deploy:
+    #   resources:
+    #     reservations:
+    #       devices:
+    #         - driver: nvidia
+    #           count: all
+    #           capabilities: [gpu]

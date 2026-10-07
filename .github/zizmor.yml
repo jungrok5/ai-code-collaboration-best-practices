@@ -7,3 +7,7 @@ rules:
       - pr-checks.yml
       - issue-state-sync.yml
       - agent-approval-check.yml
+      - ai-local-runner.yml
+  self-hosted-runner:
+    ignore:
+      - ai-local-runner.yml

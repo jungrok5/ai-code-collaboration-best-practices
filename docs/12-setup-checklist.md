@@ -4,8 +4,8 @@
 
 - [ ] Settings → General → **Template repository** 체크
 - [ ] `make github-setup`(설정·라벨·룰셋) — rulesets는 공개 레포 또는 Pro/Team/Enterprise
-- [ ] 시크릿: `ANTHROPIC_API_KEY`(또는 `CLAUDE_CODE_OAUTH_TOKEN`), 선택 `RELEASE_PLEASE_TOKEN`, `REPO_ADMIN_TOKEN`
-- [ ] Claude GitHub App 설치(`/install-github-app` 또는 https://github.com/apps/claude)
+- [ ] AI 백엔드 결정(`docs/13-ai-backends.md`): 기본은 아무것도 안 함(개발자가 `make ai-*`). 서버 자동화를 원하면 `AI_BACKEND` 변수 + (`local`: `AI_BASE_URL`/`AI_MODEL`, `anthropic`: `CLAUDE_CODE_OAUTH_TOKEN` 또는 `ANTHROPIC_API_KEY` + Claude GitHub App)
+- [ ] 선택 시크릿: `RELEASE_PLEASE_TOKEN`, `REPO_ADMIN_TOKEN`
 - [ ] `.github/CODEOWNERS`의 `@OWNER` 교체, `ISSUE_TEMPLATE/config.yml`의 `OWNER/REPO` 교체
 - [ ] `.claude/settings.json`의 `extraKnownMarketplaces.ai-collab.source.repo`를 허브 경로로
 - [ ] 플러그인 릴리스: `plugins/team-ai-workflow/.claude-plugin/plugin.json`과 `marketplace.json` 버전 동일 → `claude plugin tag plugins/team-ai-workflow`
@@ -17,13 +17,13 @@
 - [ ] `AGENTS.md` §1 프로젝트 스냅샷 작성, §2 명령 확인(`make check`가 실제로 돌아야 함)
 - [ ] `CODEOWNERS`, `labels.yml`의 `area/*`, `release-please-config.json`의 `release-type`
 - [ ] `ci.yml` 툴체인 버전(`vars.NODE_VERSION`/`PYTHON_VERSION`), `codeql.yml` 언어 매트릭스
-- [ ] 시크릿·앱 설치(A와 동일), `make github-setup`
+- [ ] AI 백엔드(A와 동일, 선택), `make github-setup`
 - [ ] 첫 PR을 열어 `ci-ok`, `pr-checks`, `Claude Code Review`가 도는지 확인
-- [ ] 이슈 하나에 `ai:ready`를 붙여 `claude-implement-issue.yml` 끝까지 확인(초안 PR + `ai:review`)
+- [ ] 이슈 하나로 `make ai-triage ISSUE=1`, `make ai-implement ISSUE=1 POST=1`을 끝까지 확인(초안 PR + `ai:review`)
 
 ## C. 팀원 온보딩(10분)
 
-- [ ] 도구: `git`, `jq`, `gh`(`gh auth login`), 선택 `claude`(`npm i -g @anthropic-ai/claude-code`), `pre-commit`
+- [ ] 도구: `git`, `jq`, `gh`(`gh auth login`), `claude`(`npm i -g @anthropic-ai/claude-code`, 한 번 실행해 구독 로그인), `pre-commit`
 - [ ] `git clone … && make setup` → 마지막 "ALL CHECKS PASSED" 확인
 - [ ] Claude Code: 첫 세션에서 플러그인 설치 수락(또는 `claude plugin install team-ai-workflow@ai-collab`), `/onboard`
 - [ ] VS Code: 권장 확장 설치 팝업 수락(`.vscode/extensions.json`), GitHub MCP는 `.vscode/mcp.json`(PAT 프롬프트)
@@ -44,6 +44,7 @@ gh workflow list          # 워크플로 등록 확인
 ## E. 자주 묻는 문제
 
 - **워크플로가 안 돈다**: 템플릿에서 만든 레포는 Actions가 꺼져 있을 수 있음 → Actions 탭에서 활성화, 한 번 push.
+- **AI 워크플로가 항상 skipped**: 의도된 기본값. `AI_BACKEND` 변수를 설정해야 켜진다(docs/13).
 - **Claude 액션이 "write access" 거부**: 트리거한 사람에게 쓰기 권한이 없음. 공개 레포 트리아지는 워크플로 주석의 `allowed_non_write_users` 참고.
 - **에이전트 PR에 CI가 안 돈다**: `github_token`을 직접 넘기면 `GITHUB_TOKEN`이라 워크플로가 연쇄 트리거되지 않음 → 앱 인증(기본) 사용.
 - **룰셋 생성 403**: admin 권한 필요. 개인 private 레포는 플랜 제한.

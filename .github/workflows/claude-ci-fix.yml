@@ -3,6 +3,8 @@
 #
 # SECURITY NOTE: this checks out the PR branch and runs its build/test commands with contents:write.
 # Keep it only in repositories where everyone with write access is trusted. Fork PRs are excluded.
+# Runs only when the repository variable AI_BACKEND is "anthropic" (gh variable set AI_BACKEND -b anthropic)
+# with secret ANTHROPIC_API_KEY or CLAUDE_CODE_OAUTH_TOKEN (claude setup-token). Local-LLM mode: ai-local-runner.yml.
 name: Claude CI Fix
 
 on:
@@ -20,6 +22,7 @@ concurrency:
 jobs:
   auto-fix:
     if: |
+      vars.AI_BACKEND == 'anthropic' &&
       github.event.workflow_run.conclusion == 'failure' &&
       github.event.workflow_run.pull_requests[0] &&
       github.event.workflow_run.head_repository.full_name == github.repository &&
@@ -90,6 +93,7 @@ jobs:
         uses: anthropics/claude-code-action@58985842b834ed26087302ba27d07bc24ca8697a # v1
         with:
           anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
+          claude_code_oauth_token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
           prompt: |
             REPO: ${{ github.repository }}
             PR NUMBER: ${{ github.event.workflow_run.pull_requests[0].number }}

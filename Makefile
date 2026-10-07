@@ -2,7 +2,7 @@
 SHELL := /bin/bash
 .DEFAULT_GOAL := help
 
-.PHONY: help setup setup-ci lint typecheck test build check ai-validate labels github-setup new-repo hooks
+.PHONY: help setup setup-ci lint typecheck test build check ai-validate labels github-setup new-repo hooks ai-check ai-triage ai-review ai-implement ai-fix-ci ai-respond ai-maintenance ai-queue ai-local-check
 
 help: ## Show this help
 	@grep -E '^[a-zA-Z_-]+:.*?## ' $(MAKEFILE_LIST) | awk 'BEGIN {FS = ":.*?## "}; {printf "  \033[36m%-14s\033[0m %s\n", $$1, $$2}'
@@ -41,3 +41,34 @@ github-setup: ## Apply repo settings, labels and rulesets to the current GitHub 
 
 new-repo: ## Create a new repo from this template: make new-repo REPO=owner/name [VISIBILITY=private]
 	@scripts/new-repo.sh "$(REPO)" --$(or $(VISIBILITY),private)
+
+# ---- Key-free AI tasks: run at your own seat with your claude.ai login (no API key), or point at a local LLM
+# ---- via ANTHROPIC_BASE_URL (infra/local-llm/). Add POST=1 to publish results to GitHub; default is a dry run.
+POSTFLAG := $(if $(POST),--post,)
+
+ai-check: ## Show which AI backend `claude` would use (login / local LLM / key)
+	@bash -c '. scripts/ai/common.sh; echo "backend: $$(ai_backend)"; command -v claude >/dev/null && claude --version || echo "claude CLI not installed: npm i -g @anthropic-ai/claude-code"'
+
+ai-triage: ## Triage an issue: make ai-triage ISSUE=12 [POST=1]
+	@scripts/ai/triage.sh "$(ISSUE)" $(POSTFLAG)
+
+ai-review: ## Review a PR (advisory, never approves): make ai-review PR=34 [POST=1]
+	@scripts/ai/review.sh "$(PR)" $(POSTFLAG)
+
+ai-implement: ## Implement an issue in an isolated worktree: make ai-implement ISSUE=12 [POST=1 → draft PR]
+	@scripts/ai/implement.sh "$(ISSUE)" $(POSTFLAG)
+
+ai-fix-ci: ## Diagnose/fix the failing CI run of a PR: make ai-fix-ci PR=34 [POST=1]
+	@scripts/ai/fix-ci.sh "$(PR)" $(POSTFLAG)
+
+ai-respond: ## Answer a question on an issue/PR: make ai-respond NUM=12 TEXT="..." [POST=1]
+	@scripts/ai/respond.sh "$(NUM)" --text "$(TEXT)" $(POSTFLAG)
+
+ai-maintenance: ## Weekly maintenance report: make ai-maintenance [POST=1 → creates an issue]
+	@scripts/ai/maintenance.sh $(POSTFLAG)
+
+ai-queue: ## Implement every ai:ready issue from this seat: make ai-queue [POST=1] [LIMIT=5]
+	@scripts/ai/queue.sh $(POSTFLAG) --limit $(or $(LIMIT),5)
+
+ai-local-check: ## Verify a local LLM endpoint (ANTHROPIC_BASE_URL) speaks the Anthropic Messages API
+	@scripts/ai/local-llm-check.sh

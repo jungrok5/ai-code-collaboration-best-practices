@@ -21,6 +21,7 @@
 | Unit tests | `make test` |
 | Full fast check — run before every commit | `make check` |
 | Validate AI / automation config | `make ai-validate` |
+| AI tasks from your own seat (no API key; uses your `claude` login) | `make ai-triage ISSUE=1` · `make ai-review PR=2` · `make ai-implement ISSUE=1` · `make ai-fix-ci PR=2` · `make ai-queue` (add `POST=1` to publish) |
 
 The targets auto-detect the stack (`scripts/stack.sh`). If a target is wrong for this repo, fix the
 Makefile in a dedicated PR; do not invent ad-hoc alternatives.
@@ -95,14 +96,15 @@ Enforced by the `team-ai-workflow` plugin hook (`plugins/team-ai-workflow/script
 | --- | --- |
 | Issue opened | AI triage proposes labels + missing info (`.github/workflows/claude-issue-triage.yml`) |
 | Label `ai:ready` on an issue | Agent implements it on a branch and opens a **draft** PR (`claude-implement-issue.yml`) |
-| `@claude` in an issue/PR comment | Claude Code Action answers or makes the requested change (`claude.yml`) |
+| `@claude` in an issue/PR comment | Claude answers or makes the requested change (`claude.yml` / `ai-local-runner.yml`) |
 | PR opened / updated | CI (`ci.yml`), hygiene checks (`pr-checks.yml`), AI review — advisory (`claude-code-review.yml`) |
 | CI failure on a PR | `@claude fix the failing checks` or `/fix-ci` locally; never re-run blindly |
 | Merge to default branch | release-please PR, CodeQL, labels/config sync |
 
 Issue state labels: `ai:ready → ai:in-progress → ai:review | ai:needs-human → ai:done`.
 PR provenance labels: `ai:assisted` (human wrote it with AI help) · `ai:generated` (an agent authored it; needs full human review).
-Details: `docs/05-github-automation.md`.
+Server-side AI jobs run only when the repo variable `AI_BACKEND` is set (`anthropic` or `local`); otherwise they are skipped and
+humans run the same tasks locally with `make ai-*`. Details: `docs/05-github-automation.md`, `docs/13-ai-backends.md`.
 
 ## 10. Where to look
 
