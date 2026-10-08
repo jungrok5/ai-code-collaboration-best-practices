@@ -1,0 +1,121 @@
+<!doctype html>
+<html lang="ko"><head><meta charset="utf-8"><title>AI 협업 템플릿 전체 구조도</title>
+<!-- Source of docs/images/architecture.png. Re-render: node scripts/render-diagram.mjs -->
+<style>
+  :root{--ink:#1f2933;--muted:#5b6670;--line:#c9d2da;--bg:#f7f9fb;
+        --c1:#2563eb;--c2:#7c3aed;--c3:#0f766e;--c4:#c2410c;--c5:#475569;--c6:#b45309;}
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:"Noto Sans CJK KR","Noto Sans KR",sans-serif;background:#fff;color:var(--ink);width:1600px;padding:36px 40px}
+  h1{font-size:30px;font-weight:700}
+  .sub{color:var(--muted);font-size:16px;margin:6px 0 22px}
+  .row{display:flex;gap:14px;align-items:stretch}
+  .people{border:2px solid var(--ink);border-radius:14px;padding:14px 18px;display:flex;gap:14px;align-items:center;margin-bottom:10px}
+  .people b{font-size:18px;white-space:nowrap}
+  .chip{border:1px solid var(--line);border-radius:999px;padding:5px 12px;font-size:14px;background:var(--bg);white-space:nowrap}
+  .arrow{text-align:center;color:var(--muted);font-size:14px;margin:4px 0}
+  .arrow:before{content:"▼ ";}
+  .layer{border-radius:14px;padding:14px 16px;border:2px solid;margin-bottom:4px}
+  .layer h2{font-size:18px;margin-bottom:10px;display:flex;align-items:baseline;gap:10px}
+  .layer h2 small{font-size:13px;color:var(--muted);font-weight:400}
+  .box{background:#fff;border:1px solid var(--line);border-radius:10px;padding:10px 12px;font-size:13.5px;line-height:1.45;flex:1}
+  .box b{display:block;font-size:14.5px;margin-bottom:3px}
+  .main{border-width:2px}
+  .l1{border-color:var(--c1);background:#eff5ff}.l1 .main{border-color:var(--c1)}
+  .l2{border-color:var(--c2);background:#f5f0ff}
+  .l3{border-color:var(--c3);background:#ecf8f6}
+  .l4{border-color:var(--c4);background:#fff4ec}
+  .l5{border-color:var(--c6);background:#fffaeb}
+  .l6{border-color:var(--c5);background:#f2f4f7}
+  .flow{display:flex;align-items:center;gap:6px;flex-wrap:nowrap}
+  .step{background:#fff;border:1px solid var(--line);border-radius:10px;padding:8px 9px;font-size:13px;line-height:1.35;text-align:center;flex:1;min-height:74px;display:flex;flex-direction:column;justify-content:center}
+  .step b{font-size:13.5px}
+  .step.h{border:2px solid var(--c4)}
+  .to{color:var(--c4);font-weight:700}
+  .tag{display:inline-block;font-size:11.5px;border-radius:6px;padding:1px 6px;margin-top:4px;background:#fde7d7;color:#9a3412}
+  .tag.p{background:#e0e7ff;color:#3730a3}
+  .grid2{display:grid;grid-template-columns:1.25fr 1fr;gap:14px}
+  .note{font-size:12.5px;color:var(--muted);margin-top:8px}
+  .foot{margin-top:14px;font-size:13px;color:var(--muted);display:flex;justify-content:space-between}
+  .spoke{display:flex;gap:8px;margin-top:6px}.spoke span{border:1px dashed var(--c5);border-radius:8px;padding:4px 10px;font-size:13px;background:#fff}
+</style></head>
+<body>
+<h1>AI Code Collaboration Template — 전체 구조도</h1>
+<div class="sub">git clone → <code>make setup</code> 한 번으로 규칙 · 가드레일 · GitHub 거버넌스 · 자동화 · 멀티 레포 배포가 갖춰진다. API 키 없이도 전체가 동작한다.</div>
+
+<div class="people">
+  <b>사람 + AI 도구</b>
+  <span class="chip">개발자 · 리뷰어 · CODEOWNERS</span>
+  <span class="chip">Claude Code</span><span class="chip">GitHub Copilot</span><span class="chip">Cursor</span>
+  <span class="chip">OpenAI Codex</span><span class="chip">Gemini CLI</span><span class="chip">Aider · Zed · Jules …</span>
+  <span style="margin-left:auto;font-size:13px;color:var(--muted)">모두 같은 규칙을 읽는다</span>
+</div>
+<div class="arrow">지시는 ①에서 읽고, 강제는 ②③에서 한다</div>
+
+<div class="layer l1">
+  <h2>① 규칙 레이어 — 단일 소스 <small>지시 = 컨텍스트 (advisory)</small></h2>
+  <div class="row">
+    <div class="box main" style="flex:1.4"><b>AGENTS.md (≤200줄)</b>명령(make setup/check) · 이슈→브랜치→PR→리뷰→머지 · 코딩/테스트/git 규칙 · 보호 경로 · 에이전트 행동</div>
+    <div class="box"><b>얇은 래퍼 (가리키기만)</b>CLAUDE.md(@AGENTS.md) · copilot-instructions.md · .cursor/rules · GEMINI.md · .codex · .aider.conf.yml · .rules</div>
+    <div class="box"><b>경로 규칙</b>.claude/rules (paths) · .github/instructions (applyTo) · *.mdc (globs)</div>
+    <div class="box" style="flex:.8"><b>REVIEW.md · ADR</b>리뷰 기준 · 결정 기록(docs/adr)</div>
+  </div>
+</div>
+
+<div class="grid2" style="margin-top:10px">
+  <div class="layer l2">
+    <h2>② 로컬 가드레일 <small>결정적 강제 — 내 PC</small></h2>
+    <div class="row">
+      <div class="box"><b>플러그인 team-ai-workflow</b>훅: 보호 경로 차단 · main 커밋/force-push 차단 · 800줄 커밋 차단 · 자동 포맷<br>스킬 8 · 서브에이전트 5</div>
+      <div class="box"><b>.claude/settings.json</b>권한 allow/ask/deny · 공동저자 표기 · SessionStart 훅 · 마켓플레이스 등록</div>
+      <div class="box"><b>pre-commit · make check</b>gitleaks · actionlint · shellcheck · yamllint · conventional commit · devcontainer</div>
+    </div>
+  </div>
+  <div class="layer l3">
+    <h2>③ GitHub 거버넌스 <small>결정적 강제 — 서버</small></h2>
+    <div class="row">
+      <div class="box"><b>템플릿</b>이슈 폼(AI-ready) · PR 템플릿(AI 공개 필수)</div>
+      <div class="box"><b>보호</b>CODEOWNERS · 룰셋(PR + 사람 승인 + ci-ok + Conventional) · squash only</div>
+      <div class="box"><b>보안·위생</b>Dependabot · CodeQL · 시크릿 스캔 · 라벨 as code</div>
+    </div>
+  </div>
+</div>
+
+<div class="layer l4" style="margin-top:10px">
+  <h2>④ 자동화 — 에이전트가 이슈/PR을 읽고 쓴다 <small>주황 테두리 = 사람 체크포인트</small></h2>
+  <div class="flow">
+    <div class="step"><b>이슈 생성</b>템플릿: 배경·수용기준·범위·테스트</div><span class="to">→</span>
+    <div class="step"><b>AI 트리아지</b>라벨·누락·중복 제안<span class="tag p">닫지 않음</span></div><span class="to">→</span>
+    <div class="step h"><b>ai:ready 부여</b>쓰기 권한자만</div><span class="to">→</span>
+    <div class="step"><b>에이전트 구현</b>worktree · 테스트 먼저 · make check</div><span class="to">→</span>
+    <div class="step"><b>초안 PR</b>ai:generated · Closes #n</div><span class="to">→</span>
+    <div class="step"><b>CI + PR 검사</b>ci-ok · 제목 · size · AI 공개</div><span class="to">→</span>
+    <div class="step"><b>AI 리뷰</b>인라인 + 요약<span class="tag p">승인 없음</span></div><span class="to">→</span>
+    <div class="step h"><b>사람 승인</b>CODEOWNER · 에이전트 승인 게이트</div><span class="to">→</span>
+    <div class="step"><b>squash 머지</b>이슈 ai:done · release-please</div>
+  </div>
+  <div class="note">CI 실패 → ci-fix가 로그를 읽고 수정 PR · 언제든 @claude 로 질문/수정 요청 · 주간 유지보수 리포트 · stale 정리 · Dependabot 자동 머지(minor/patch)</div>
+</div>
+
+<div class="grid2" style="margin-top:10px">
+  <div class="layer l5">
+    <h2>⑤ AI 실행 주체 (선택) <small>레포 변수 AI_BACKEND</small></h2>
+    <div class="row">
+      <div class="box main" style="border-color:var(--c6)"><b>① 내 자리 (기본, 키 없음)</b>본인 claude 로그인으로 <code>claude -p</code><br>make ai-triage · ai-review · ai-implement · ai-fix-ci · ai-queue</div>
+      <div class="box"><b>② 로컬 LLM 서버</b>llama.cpp / Ollama (/v1/messages)<br>+ self-hosted 러너 · AI_BACKEND=local</div>
+      <div class="box"><b>③ Anthropic (선택)</b>구독 토큰 또는 API 키<br>공식 액션 · AI_BACKEND=anthropic</div>
+    </div>
+    <div class="note">변수가 없으면 AI 잡은 skipped — CI · 검사 · 라벨 · 릴리스는 그대로 동작</div>
+  </div>
+  <div class="layer l6">
+    <h2>⑥ 멀티 레포 배포 <small>허브 1개 → 스포크 N개</small></h2>
+    <div class="row">
+      <div class="box"><b>템플릿 복사</b>make new-repo<br>(gh repo create --template)</div>
+      <div class="box"><b>플러그인 마켓플레이스</b>enabledPlugins · plugin update 로 훅·스킬 일괄 갱신</div>
+      <div class="box"><b>조직 수준</b>재사용 워크플로 · 조직 룰셋 · .github 레포</div>
+    </div>
+    <div class="spoke"><span>svc-a</span><span>svc-b</span><span>web</span><span>…</span></div>
+  </div>
+</div>
+
+<div class="foot"><span>github.com/jungrok5/ai-code-collaboration-best-practices</span><span>docs/ · AGENTS.md · README.md</span></div>
+</body></html>

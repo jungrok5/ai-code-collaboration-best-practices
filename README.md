@@ -45,6 +45,10 @@ make ai-queue POST=1               # ai:ready 이슈를 순서대로 처리
 
 ## 전체 구조도
 
+![AI 협업 템플릿 전체 구조도](docs/images/architecture.png)
+
+> 이미지 원본: [docs/images/architecture.html](docs/images/architecture.html) · 다시 그리기: `node scripts/render-diagram.mjs` · 아래는 같은 내용의 Mermaid 버전입니다.
+
 ```mermaid
 flowchart TB
   subgraph PEOPLE["사람 + AI 도구"]
