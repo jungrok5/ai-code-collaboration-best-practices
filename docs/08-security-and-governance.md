@@ -4,10 +4,10 @@
 
 | 위협 | 예 | 통제(파일) |
 | --- | --- | --- |
-| **프롬프트 인젝션** | 이슈/PR/댓글/CI 로그/웹 페이지에 숨긴 지시로 비밀 유출·리뷰 우회 ("Comment and Control", 2026-04: Claude Code Security Review·Gemini CLI·Copilot 에이전트에서 API 키 탈취 재현) | 액션은 쓰기 권한자만 트리거, 봇 거부, 숨은 문자 제거; 프롬프트에 "untrusted data" 명시; 도구 allow-list 최소; `AGENTS.md` §8 |
+| **프롬프트 인젝션** | 이슈/PR/댓글/CI 로그/웹 페이지에 숨긴 지시로 비밀 유출·리뷰 우회 ("Comment and Control", 2026-04: Claude Code Security Review·Gemini CLI·Copilot 에이전트에서 API 키 탈취 재현) | 액션은 쓰기 권한자만 트리거, 봇 거부, 숨은 문자 제거; 프롬프트에 "untrusted data" 명시; 도구 allow-list 최소; `AGENTS.md` "Things to know" |
 | **과도한 권한** | 에이전트가 `contents: write`로 포크 코드 실행, PAT 유출 | 최상위 `permissions: read`, 잡별 확대; 포크 PR 제외(`head.repo.full_name == github.repository`); `pull_request_target`는 메타데이터 잡에만; PAT 대신 App/OIDC |
 | **보호 자산 변경** | `.env`, 락파일, CODEOWNERS, 룰셋, `.claude/settings.json` 수정 | PreToolUse 훅 `protect-files.sh`, CODEOWNERS, 룰셋, 액션의 베이스 브랜치 설정 복원 |
-| **테스트 무력화** | skip/only, 실패를 삼키는 쉘 OR-true 트릭, 타임아웃 증가로 CI 초록 | `AGENTS.md` §5, `.claude/rules/tests.md`, 리뷰 체크리스트, CI-fix 프롬프트 금지 조항 |
+| **테스트 무력화** | skip/only, 실패를 삼키는 쉘 OR-true 트릭, 타임아웃 증가로 CI 초록 | `AGENTS.md` "Things to know", `.claude/rules/tests.md`, 리뷰 체크리스트, CI-fix 프롬프트 금지 조항 |
 | **공급망** | 태그 핀 액션 변조, 타이포스쿼팅 패키지 | SHA 핀(`scripts/pin-actions.sh`) + Dependabot, zizmor, CodeQL(actions), 의존성 추가 사유 의무 |
 | **비밀 커밋** | 키·토큰 푸시 | gitleaks(pre-commit), 푸시 보호, `deny: Read(./.env)` |
 | **기록 파괴** | force-push, reset --hard, branch -D | `deny` 규칙, `git-guard.sh`, 룰셋 `non_fast_forward`/`deletion` |
@@ -27,7 +27,7 @@ OWASP 참고: LLM Top 10(2025) LLM01 프롬프트 인젝션, LLM02 민감정보 
 
 ## 3. 팀 AI 정책(DORA 2025의 1번 역량: "명확히 소통된 AI 스탠스")
 
-템플릿을 쓰는 팀은 아래를 채워 `docs/`에 두고 `AGENTS.md` §1에서 링크한다.
+템플릿을 쓰는 팀은 아래를 채워 `docs/`에 두고 `AGENTS.md`의 Project 섹션에서 링크한다.
 
 - **허용 도구**: (예) Claude Code, Copilot, Cursor. 회사 데이터 정책에 맞는 플랜/엔드포인트(Bedrock/Vertex 등).
 - **공개 의무**: PR 본문 체크박스 + `ai:assisted`/`ai:generated` 라벨 + 공동저자 트레일러(ADR-0002).

@@ -34,7 +34,7 @@ GitHub가 2,500개 레포를 분석한 결론과 Anthropic·OpenAI 가이드를 
 1. **명령을 맨 앞에**, 정확한 플래그와 함께(빌드·테스트·린트·타입체크). 이 레포는 `make` 타깃으로 고정했고 CI가 같은 명령을 돈다.
 2. **코드에서 유추할 수 있는 것은 쓰지 않는다.** 아키텍처 결정, 기본값과 다른 스타일, 테스트 러너, 레포 에티켓(브랜치·PR), 환경의 함정만.
 3. **경계 3단계**: Always do / Ask first / Never do. 비밀 커밋 금지가 가장 흔한 규칙.
-4. **200줄 이하**(Anthropic: "비대한 CLAUDE.md는 실제 지시를 무시하게 만든다"). Codex는 체인 합계 32KiB 기본 상한, Cursor는 규칙 500줄 권장.
+4. **짧게**(Anthropic: "비대한 CLAUDE.md는 실제 지시를 무시하게 만든다"). 줄 수보다 "이 줄을 지우면 에이전트가 실수하나?"가 기준이다. 이 레포는 약 55줄이고 150줄을 넘으면 `make ai-validate`가 경고한다([15](15-lean-harness.md)). Codex는 체인 합계 32KiB 기본 상한, Cursor는 규칙 500줄 권장.
 5. **짧고 정확한 파일이 길고 모호한 파일보다 낫다**(OpenAI). 반복 실수를 관찰한 뒤에만 규칙을 추가한다.
 6. 스타일은 설명보다 **실제 코드 한 조각**이 낫다.
 7. 지시 파일은 **컨텍스트이지 강제가 아니다**. 반드시 막아야 하면 훅(PreToolUse)이나 CI로 강제한다(`plugins/team-ai-workflow/hooks`).
@@ -81,7 +81,7 @@ Ruler(`npx @intellectronica/ruler apply`, ~2.9k★)나 rulesync(`npx rulesync ge
 ## 7. 유지보수
 
 - 규칙 변경은 PR + CODEOWNERS 리뷰(`.claude/rules/ai-config.md`).
-- `make ai-validate`가 프런트매터·스키마·길이(≤200줄)를 검사한다.
+- `make ai-validate`가 프런트매터·스키마를 검사하고, 길이가 150줄을 넘으면 경고한다.
 - 분기마다(또는 주요 모델 출시 후) 규칙을 다듬는다: 더 이상 틀리지 않는 규칙은 지운다.
 
 ## 출처

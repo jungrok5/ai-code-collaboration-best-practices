@@ -4,8 +4,8 @@ Guard rails, skills and subagents that make AI-assisted work on GitHub predictab
 
 | Component | What it does |
 | --- | --- |
-| `hooks/hooks.json` | **PreToolUse** blocks edits to protected paths (secrets, lockfiles, policy files) and enforces git rules (no commits on `main`, no force-push to shared branches, staged-diff size limit). **PostToolUse** formats edited files. **Stop** reminds to run checks when the tree is dirty. |
-| `skills/` | `/implement-issue`, `/create-pr`, `/review-pr`, `/fix-ci`, `/split-pr`, `/triage-issue`, `/write-adr`, `/onboard` |
+| `hooks/hooks.json` | **PreToolUse** blocks edits to protected paths (secrets, lockfiles, policy files) and enforces git rules (no commits on `main`/`master`/`develop`/`release/*`, no force-push — including `+refspec` — except to your own feature branch). **PostToolUse** formats edited files. |
+| `skills/` | `/design`, `/check-overlap`, `/implement-issue`, `/create-pr`, `/review-pr`, `/fix-ci`, `/split-pr`, `/triage-issue`, `/write-adr`, `/onboard` |
 | `agents/` | `code-reviewer`, `security-reviewer`, `test-writer`, `issue-triager`, `docs-writer` |
 
 ## Install (any repository)
@@ -29,12 +29,6 @@ Or commit it as team policy in the repo's `.claude/settings.json` (members are p
 Try it without installing: `claude --plugin-dir ./plugins/team-ai-workflow`.
 
 ## Configuration
-
-Environment variables (set in `.claude/settings.json` → `env`, or your shell):
-
-| Variable | Default | Meaning |
-|---|---|---|
-| `AI_MAX_COMMIT_LINES` | `800` | `git commit` is blocked when the staged diff is larger (keep PRs small) |
 
 Protected path patterns live in `scripts/protect-files.sh`; extend them there and document the change in `AGENTS.md`.
 

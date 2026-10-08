@@ -16,7 +16,7 @@
 | **플러그인 + 마켓플레이스** | `plugins/team-ai-workflow`: 보호 경로·git 규칙·자동 포맷 **훅**, `/design` `/check-overlap` `/implement-issue` `/create-pr` `/review-pr` `/fix-ci` `/split-pr` `/triage-issue` `/write-adr` `/onboard` **스킬**, `code-reviewer` `security-reviewer` `test-writer` `issue-triager` `docs-writer` **서브에이전트**. 이 레포 자체가 마켓플레이스(`.claude-plugin/marketplace.json`) |
 | **GitHub 템플릿·거버넌스** | 에이전트 친화 이슈 폼 3종, PR 템플릿(AI 공개 필수), CODEOWNERS, 라벨-as-code, Dependabot, 룰셋 JSON(브랜치 보호), squash-only 설정 스크립트 |
 | **설계 먼저 + 팀 작업 보드** | 일의 크기별 T0/T1/T2. 큰 일은 1쪽 설계 + 구조도(`docs/designs/`, `/design`)를 먼저 머지. 여러 레포의 활성 설계·열린 PR 파일을 모은 `board.json`을 세션 시작 때 한 줄 요약으로 보여 주고, PR마다 겹침을 댓글로 알림(LLM 토큰 0) — [docs/14](docs/14-design-first-and-overlap.md) |
-| **가벼운 하네스** | 최신 모델 기준으로 규칙·스킬·훅을 덜어냄(AGENTS.md 55줄, 스킬 합계 95줄). 결정적 안전장치만 남기고 권한은 auto + 좁은 deny — [docs/15](docs/15-lean-harness.md) |
+| **가벼운 하네스** | 최신 모델 기준으로 규칙·스킬·훅을 덜어냄(AGENTS.md 55줄, 스킬 10개 합계 약 100줄). 결정적 안전장치만 남김. 권한을 auto + 좁은 deny로 바꾸는 것은 사람이 `scripts/apply-lean-permissions.sh`로 적용 — [docs/15](docs/15-lean-harness.md) |
 | **자동화 21개 워크플로** | CI(스택 자동 감지) · PR 위생(제목/크기/라벨/AI 공개) · `@claude` 응답 · AI 코드 리뷰(참고용) · 이슈 트리아지 · **`ai:ready` 라벨 → 에이전트 구현 → 초안 PR** · CI 실패 자동 수정 PR · 에이전트 커밋 사람 승인 게이트 · 라벨 상태 동기화 · 주간 유지보수 리포트 · release-please · CodeQL · Dependabot 자동 머지 · stale · Copilot 환경 · 레포 부트스트랩 · 설정 검증 · 설계 겹침 확인 · 작업 보드/Pages |
 | **키 없는 AI 실행 경로** | `make ai-triage/ai-review/ai-implement/ai-fix-ci/ai-queue`: 개인 자리에서 `claude -p`(헤드리스)로 이슈 트리아지·PR 리뷰·구현·CI 수정·주간 리포트. 서버는 `infra/local-llm/`(llama.cpp/Ollama) + self-hosted 러너(`ai-local-runner.yml`). GitHub 호스티드 러너에서 Anthropic을 쓰는 것은 선택(`AI_BACKEND=anthropic`) |
 | **로컬 재현 환경** | `Makefile`(스택 무관 `make check`), `scripts/bootstrap.sh`, pre-commit(gitleaks·actionlint·shellcheck·yamllint·markdownlint·conventional commit), devcontainer, EditorConfig, VS Code 권장 확장·MCP |
@@ -69,7 +69,7 @@ flowchart TB
   end
 
   subgraph LOCAL["② 로컬 가드레일 — 결정적 강제"]
-    PL["플러그인 team-ai-workflow<br/>훅: 보호 경로 차단 · git 규칙 · 자동 포맷 · Stop 리마인드<br/>스킬 8개 · 서브에이전트 5개"]
+    PL["플러그인 team-ai-workflow<br/>훅: 보호 경로 차단 · git 규칙 · 자동 포맷<br/>스킬 10개 · 서브에이전트 5개"]
     ST[".claude/settings.json<br/>권한 allow/ask/deny · attribution · SessionStart 훅 · 마켓플레이스 등록"]
     PC["pre-commit · Makefile(make check) · devcontainer"]
   end
@@ -89,6 +89,7 @@ flowchart TB
     FIX["ci-fix: 실패 로그 → 수정 PR"]
     GATE["agent-approval-check: 에이전트 커밋 = 사람 승인 N명"]
     REL["release-please · labels-sync · state-sync · stale · maintenance"]
+    WB["work-board: 레포들의 활성 설계 + 열린 PR → board.json<br/>design-check: PR 겹침 알림 (LLM 없음)"]
     BK["AI 백엔드 (선택)<br/>① 내 자리 claude -p (키 없음) · ② self-hosted 로컬 LLM · ③ Anthropic API/구독 토큰<br/>없으면 AI 잡은 skip, 나머지 정상"]
   end
 
@@ -127,7 +128,8 @@ flowchart TB
         ▼
 ③ GitHub 거버넌스 이슈 폼 · PR 템플릿(AI 공개) · CODEOWNERS · 라벨 · 룰셋(PR + 사람 승인 + ci-ok) · Dependabot · CodeQL
         ▼
-④ 자동화        이슈 → 트리아지 → ai:ready → 에이전트 구현 → 초안 PR → CI + AI 리뷰(참고) → 사람 승인(+에이전트 게이트) → squash 머지 → 릴리스
+④ 자동화        (큰 일은 설계 PR 먼저) 이슈 → 트리아지 → ai:ready → 에이전트 구현 → 초안 PR → CI + AI 리뷰(참고) → 사람 승인(+에이전트 게이트) → squash 머지 → 릴리스
+                팀 작업 보드: work-board가 모든 레포의 설계·열린 PR을 모으고 design-check가 겹침을 알림
                 AI 실행 주체(선택): ① 내 자리 claude -p(키 없음) · ② self-hosted 로컬 LLM · ③ Anthropic API/구독 토큰 · 없으면 AI 잡 skip
         ▼
 ⑤ 배포          템플릿 복사(make new-repo) + 플러그인 마켓플레이스(plugin update) + 재사용 워크플로/조직 룰셋 → svc-a, svc-b, web …
@@ -152,7 +154,7 @@ sequenceDiagram
   Tri-->>GH: type/area/priority 라벨 + 누락 항목·중복 댓글 (닫지 않음)
   Dev->>GH: 검토 후 ai:ready 라벨 (쓰기 권한자 = 1차 체크포인트)
   GH->>Ag: issues.labeled(ai:ready) → ai:in-progress
-  Ag->>Ag: 테스트 먼저 → 구현 → make check (훅이 보호 경로·대형 커밋 차단)
+  Ag->>Ag: 테스트 먼저 → 구현 → make check (훅이 보호 경로·main 커밋·force-push 차단)
   Ag-->>GH: 서명 커밋 push → 초안 PR (ai:generated, Closes #n) → 이슈 ai:review
   GH->>CI: ci.yml(ci-ok) · pr-checks(제목/크기/라벨) · Claude 리뷰(인라인+요약, 승인 없음)
   CI-->>GH: 상태 체크 + 코멘트 (agent-approval-check: 사람 승인 필요)
@@ -167,7 +169,7 @@ CI가 실패하면 `claude-ci-fix.yml`이 로그를 읽고 PR 브랜치를 향�
 
 ```text
 .
-├── AGENTS.md                      # ★ 단일 소스: 명령·워크플로·규칙·보호 경로·에이전트 행동 (≤200줄)
+├── AGENTS.md                      # ★ 단일 소스: 명령·워크플로·규칙·보호 경로·에이전트 행동 (짧게: 약 55줄, 150줄 넘으면 경고)
 ├── CLAUDE.md                      # @AGENTS.md + Claude Code 전용 메모
 ├── GEMINI.md · REVIEW.md · .rules # Gemini 메모 · 리뷰 기준 · Zed 포인터
 ├── .claude/
@@ -197,9 +199,12 @@ CI가 실패하면 `claude-ci-fix.yml`이 로그를 읽고 PR 브랜치를 향�
 │   ├── setup-github.sh            # make github-setup (설정·라벨·룰셋)
 │   ├── new-repo.sh                # make new-repo
 │   ├── pin-actions.sh             # 액션 SHA 핀
+│   ├── designs/board.py           # 설계 색인 · 겹침 확인 · 팀 보드 집계 (make designs / make overlap)
+│   ├── apply-lean-permissions.sh  # 사람이 실행: settings.json을 auto 모드 + 좁은 deny로 (docs/15)
+│   ├── build-site.sh · render-diagram.mjs  # 해설 페이지 · 구조도 PNG 생성
 │   └── rulesets/*.json            # 브랜치 보호 룰셋 (main · feature-branches · optional copilot review)
 ├── infra/local-llm/               # llama.cpp/Ollama 로컬 LLM 서버 + self-hosted 러너 가이드
-├── docs/                          # 한국어 문서 01~13 + adr/
+├── docs/                          # 한국어 문서 01~15 + adr/ + designs/(설계 문서) + site/(해설 페이지)
 ├── Makefile · .pre-commit-config.yaml · .devcontainer/ · .editorconfig · .gitattributes · .gitmessage.txt
 ├── release-please-config.json · .release-please-manifest.json · version.txt
 └── CONTRIBUTING.md · SECURITY.md · SUPPORT.md · CODE_OF_CONDUCT.md · LICENSE (MIT)
@@ -251,7 +256,7 @@ CI가 실패하면 `claude-ci-fix.yml`이 로그를 읽고 PR 브랜치를 향�
 
 ## 커스터마이즈 포인트
 
-`AGENTS.md` §1(프로젝트 스냅샷) · `.github/CODEOWNERS`의 `@OWNER` · `.github/ISSUE_TEMPLATE/config.yml`의 `OWNER/REPO` · `.claude/settings.json`의 마켓플레이스 경로 · `labels.yml`의 `area/*` · `ci.yml`/`codeql.yml` 언어 · `release-please-config.json`의 `release-type` · 워크플로의 `--max-turns`/모델 · AI 백엔드 변수(`AI_BACKEND`, `AI_BASE_URL`, `AI_MODEL`). 체크리스트: [docs/12-setup-checklist.md](docs/12-setup-checklist.md).
+`AGENTS.md`의 Project 섹션 · `.github/CODEOWNERS`의 `@OWNER` · `.github/ISSUE_TEMPLATE/config.yml`의 `OWNER/REPO` · `.claude/settings.json`의 마켓플레이스 경로 · `labels.yml`의 `area/*` · `ci.yml`/`codeql.yml` 언어 · `release-please-config.json`의 `release-type` · 워크플로의 `--max-turns`/모델 · AI 백엔드 변수(`AI_BACKEND`, `AI_BASE_URL`, `AI_MODEL`). 체크리스트: [docs/12-setup-checklist.md](docs/12-setup-checklist.md).
 
 ## 검증
 

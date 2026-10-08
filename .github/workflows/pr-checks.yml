@@ -62,7 +62,7 @@ jobs:
           xl_label: "size/XL"
           fail_if_xl: "false"
           message_if_xl: >
-            This PR is larger than 800 changed lines (lockfiles excluded). Team rule (AGENTS.md §3):
+            This PR is larger than 800 changed lines (lockfiles excluded). Team rule (AGENTS.md "How work flows"):
             target ≤ 400 lines; please split it into a stack (`/split-pr`) or add a written justification.
           files_to_ignore: "package-lock.json pnpm-lock.yaml yarn.lock uv.lock poetry.lock Cargo.lock go.sum *.snap"
 

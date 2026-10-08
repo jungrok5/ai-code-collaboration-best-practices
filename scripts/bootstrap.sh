@@ -153,6 +153,6 @@ cat <<'TXT'
   1. GitHub settings, labels, rulesets:     make github-setup            (needs: gh auth login, admin rights)
   2. Secrets for AI workflows:              gh secret set ANTHROPIC_API_KEY   (or CLAUDE_CODE_OAUTH_TOKEN from `claude setup-token`)
   3. Install the Claude GitHub App:         run `/install-github-app` inside Claude Code, or https://github.com/apps/claude
-  4. Fill in: AGENTS.md §1 (project snapshot), .github/CODEOWNERS, .github/labels.yml (area/* labels)
+  4. Fill in: AGENTS.md Project section, .github/CODEOWNERS, .github/labels.yml (area/* labels)
   5. Optional: enable Copilot code review / Dependabot / CodeQL default setup in repository settings
 TXT

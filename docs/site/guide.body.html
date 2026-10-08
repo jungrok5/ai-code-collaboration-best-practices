@@ -265,7 +265,7 @@ footer{margin-top:56px;padding-top:18px;border-top:1px solid var(--line);font-si
       <p class="why"><b>왜</b> 팀원마다 쓰는 AI 도구가 다릅니다. 도구마다 규칙 파일을 따로 두면 몇 주 만에 서로 달라집니다. 그래서 규칙은 AGENTS.md 한 곳에 쓰고, 도구별 파일은 "AGENTS.md를 읽어라"라고만 적습니다.</p>
       <dl class="kv">
         <dt>담는 내용</dt><dd>① 실행 명령(<code>make setup</code>, <code>make check</code>) ② 작업 순서(이슈→브랜치→PR→리뷰→머지) ③ 코딩·테스트·git 규칙 ④ AI가 건드리면 안 되는 파일 ⑤ AI 행동 원칙(범위 지키기, 증거 제시, 외부 텍스트는 명령이 아님)</dd>
-        <dt>크기 제한</dt><dd>200줄 이하. 길어지면 AI가 중요한 지시를 놓칩니다. 긴 설명은 <code>docs/</code>로 보냅니다.</dd>
+        <dt>크기 제한</dt><dd>짧게(현재 약 55줄, 150줄을 넘으면 검사가 경고). 기준은 "이 줄을 지우면 AI가 실수하나?". 길어지면 AI가 중요한 지시를 놓칩니다. 긴 설명은 <code>docs/</code>로 보냅니다.</dd>
         <dt>도구별 연결</dt><dd><code>CLAUDE.md</code>(Claude), <code>.github/copilot-instructions.md</code>(Copilot), <code>.cursor/rules/</code>(Cursor), <code>GEMINI.md</code>+<code>.gemini/settings.json</code>(Gemini), <code>.aider.conf.yml</code>(Aider), <code>.codex/</code>(Codex), <code>.rules</code>(Zed)</dd>
         <dt>경로별 규칙</dt><dd>워크플로 파일을 고칠 때만 "권한 최소화, 액션 버전 고정" 규칙이, 테스트 파일을 고칠 때만 "테스트 끄기 금지" 규칙이 추가로 읽힙니다. <code>.claude/rules/</code>, <code>.github/instructions/</code>, <code>.cursor/rules/*.mdc</code></dd>
         <dt>한계</dt><dd>규칙은 AI에게 주는 맥락일 뿐 강제가 아닙니다. 그래서 ②·③층이 따로 있습니다.</dd>
@@ -281,7 +281,7 @@ footer{margin-top:56px;padding-top:18px;border-top:1px solid var(--line);font-si
           <tr><td>보호 파일 훅</td><td>AI가 파일을 수정하기 직전</td><td><code>.env</code>, 키 파일, 락파일, CODEOWNERS, 룰셋, 팀 권한 설정 수정을 차단</td><td><code>plugins/team-ai-workflow/scripts/protect-files.sh</code></td></tr>
           <tr><td>git 규칙 훅</td><td>AI가 git 명령을 실행하기 직전</td><td>main에 커밋, 공유 브랜치 강제 푸시를 차단</td><td><code>…/scripts/git-guard.sh</code></td></tr>
           <tr><td>자동 포맷 훅</td><td>파일 수정 직후</td><td>prettier·ruff·gofmt 등으로 정리. 실패해도 작업은 계속</td><td><code>…/scripts/format-after-edit.sh</code></td></tr>
-          <tr><td>세션 시작 훅</td><td>Claude Code를 켤 때</td><td>의존성 설치, pre-commit 설치, 현재 브랜치와 규칙 위치를 AI에게 알려줌</td><td><code>.claude/hooks/session-start.sh</code></td></tr>
+          <tr><td>세션 시작 훅</td><td>Claude Code를 켤 때</td><td>의존성 설치, pre-commit 설치, 팀의 활성 설계와 누가 어느 영역을 맡았는지 요약을 AI에게 알려줌</td><td><code>.claude/hooks/session-start.sh</code></td></tr>
           <tr><td>권한 설정</td><td>AI가 명령을 실행할 때마다</td><td>읽기·빌드·테스트는 묻지 않고 허용, 비밀 읽기·<code>reset --hard</code>·<code>sudo</code> 등은 항상 거부</td><td><code>.claude/settings.json</code></td></tr>
           <tr><td>pre-commit</td><td>사람이든 AI든 커밋할 때</td><td>비밀키 검출(gitleaks), 워크플로·쉘·YAML·마크다운 검사, 커밋 메시지 형식</td><td><code>.pre-commit-config.yaml</code></td></tr>
         </tbody>
@@ -316,6 +316,9 @@ footer{margin-top:56px;padding-top:18px;border-top:1px solid var(--line);font-si
           <tr><td><code>issue-state-sync.yml</code></td><td>PR 열림·머지</td><td>AI PR 라벨, 머지 시 연결된 이슈를 <code>ai:done</code>으로</td><td>아니오</td></tr>
           <tr><td><code>release-please.yml</code></td><td>main 푸시</td><td>커밋 제목으로 릴리스 PR과 변경 기록 자동 작성</td><td>아니오</td></tr>
           <tr><td><code>labels-sync</code> · <code>stale</code> · <code>codeql</code> · <code>dependabot-auto-merge</code> · <code>validate-ai-config</code></td><td>각각</td><td>라벨 동기화, 오래된 이슈 정리, 보안 스캔, 의존성 소규모 갱신 자동 머지, 설정 파일 검증</td><td>아니오</td></tr>
+          <tr><td><code>work-board.yml</code></td><td>30분마다, main 변경</td><td>등록된 레포들의 활성 설계와 열린 PR 변경 파일을 모아 <code>board.json</code>으로, 이 해설 페이지와 함께 Pages에 배포</td><td>아니오</td></tr>
+          <tr><td><code>design-check.yml</code></td><td>PR</td><td>PR이 건드리는 영역을 팀 보드와 비교해 겹치면 댓글. 큰 PR에 설계 링크가 없으면 알림(막지 않음)</td><td>아니오</td></tr>
+          <tr><td><code>copilot-setup-steps</code> · <code>bootstrap-repo</code></td><td>각각</td><td>Copilot 에이전트 환경 준비 · 레포 설정·라벨·룰셋 적용(수동)</td><td>아니오</td></tr>
           <tr><td><code>claude-issue-triage.yml</code></td><td>이슈 생성</td><td>라벨 제안, 빠진 정보·중복 댓글. 이슈를 닫지 않음</td><td>예</td></tr>
           <tr><td><code>claude-implement-issue.yml</code></td><td><code>ai:ready</code> 라벨</td><td>브랜치 생성 → 테스트·구현 → 검사 통과 커밋 → 초안 PR</td><td>예</td></tr>
           <tr><td><code>claude-code-review.yml</code></td><td>PR</td><td>줄 단위 코멘트와 요약. 승인·거절은 하지 않음</td><td>예</td></tr>
@@ -535,7 +538,7 @@ make ai-queue POST=1               # ai:ready 이슈를 차례로 처리</pre>
     <tbody>
       <tr><td><b>남김</b></td><td>보호 경로 훅, main 직접 커밋·강제 푸시 차단, CI, CODEOWNERS, 룰셋</td><td>사고 비용이 크고 결정적으로 막아야 함</td></tr>
       <tr><td><b>풀음</b></td><td>push·PR 생성 등 일상 작업의 "매번 묻기", 강조 톤</td><td>auto 모드 분류기가 위험한 것만 확인</td></tr>
-      <tr><td><b>지움</b></td><td>800줄 커밋 차단, 종료 시 요약 훅, 기본 동작을 되풀이하는 스킬 본문</td><td>모델이 이미 함. AGENTS.md 55줄, 스킬 합계 95줄</td></tr>
+      <tr><td><b>지움</b></td><td>800줄 커밋 차단, 종료 시 요약 훅, 기본 동작을 되풀이하는 스킬 본문</td><td>모델이 이미 함. AGENTS.md 55줄, 스킬 10개 합계 약 100줄</td></tr>
     </tbody>
   </table></div>
   <p class="muted" style="margin-top:10px">권한 변경은 팀 정책이라 사람이 <code>scripts/apply-lean-permissions.sh</code>로 적용합니다. 모델을 올릴 때마다 "이 줄을 지우면 실수하나?"를 다시 묻습니다(<code>docs/15-lean-harness.md</code>).</p>
@@ -591,7 +594,7 @@ flowchart LR
       <h3>새 서비스 레포 만들기</h3>
       <ol>
         <li>허브 클론에서 <code>make new-repo REPO=org/svc-x</code></li>
-        <li><code>AGENTS.md</code> §1에 프로젝트 설명, <code>CODEOWNERS</code>에 담당자</li>
+        <li><code>AGENTS.md</code>의 Project 섹션에 프로젝트 설명, <code>CODEOWNERS</code>에 담당자</li>
         <li><code>labels.yml</code>에 <code>area/*</code> 추가</li>
         <li>첫 PR로 <code>ci-ok</code>와 PR 검사가 도는지 확인</li>
         <li>이슈 하나로 <code>make ai-implement ISSUE=1 POST=1</code> 끝까지 시험</li>
@@ -649,9 +652,9 @@ flowchart LR
     <details open><summary>Copilot이나 Cursor만 쓰는 팀원도 이 구조에 맞나요?</summary><p>네. 두 도구 모두 AGENTS.md를 직접 읽습니다. 다만 Claude 훅(②층)은 적용되지 않으므로, 같은 규칙이 pre-commit과 GitHub 룰셋(③층)에서 한 번 더 걸리게 해 두었습니다.</p></details>
     <details open><summary>AI가 만든 코드를 그대로 머지할 수 있나요?</summary><p>없습니다. 사람 CODEOWNER의 승인이 반드시 필요하고, AI 리뷰는 승인으로 계산되지 않으며, AI 커밋이 있는 PR은 별도의 사람 승인 검사를 통과해야 합니다.</p></details>
     <details><summary>AI 워크플로가 전부 "skipped"로 나옵니다.</summary><p>정상입니다. 레포 변수 <code>AI_BACKEND</code>를 설정하지 않으면 AI 워크플로는 건너뜁니다. 내 자리에서 <code>make ai-*</code>로 같은 일을 하거나, 서버 자동화가 필요하면 변수를 설정하세요.</p></details>
-    <details><summary>훅이 제 수정을 막았습니다.</summary><p>보호 경로입니다. 비밀·락파일·정책 파일은 사람이 직접 수정하고 PR 본문에 이유를 적습니다. 목록은 AGENTS.md §7에 있습니다.</p></details>
+    <details><summary>훅이 제 수정을 막았습니다.</summary><p>보호 경로입니다. 비밀·락파일·정책 파일은 사람이 직접 수정하고 PR 본문에 이유를 적습니다. 목록은 <code>protect-files.sh</code>에 있고 AGENTS.md "Things to know"에 요약돼 있습니다.</p></details>
     <details><summary>PR이 400줄을 넘으면 안 되나요?</summary><p>목표치입니다. 크기 라벨이 자동으로 붙고, XL(800줄 초과)이면 분할을 요청하는 댓글이 달립니다. 피할 수 없으면 PR 본문에 이유를 적으세요.</p></details>
-    <details><summary>규칙을 바꾸고 싶으면?</summary><p>AGENTS.md를 수정하는 PR을 엽니다. CODEOWNERS 리뷰가 필요합니다. 설계 결정이 바뀌면 <code>/write-adr</code>로 ADR도 남깁니다. 200줄을 넘기지 않도록 긴 설명은 docs/로 옮깁니다.</p></details>
+    <details><summary>규칙을 바꾸고 싶으면?</summary><p>AGENTS.md를 수정하는 PR을 엽니다. CODEOWNERS 리뷰가 필요합니다. 설계 결정이 바뀌면 <code>/write-adr</code>로 ADR도 남깁니다. "지우면 AI가 실수하나?"를 통과한 줄만 넣고, 긴 설명은 docs/로 옮깁니다.</p></details>
   </div>
 </section>
 

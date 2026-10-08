@@ -1,4 +1,4 @@
-# Baseline CI. Runs the same `make` targets humans and agents run locally (see AGENTS.md §2).
+# Baseline CI. Runs the same `make` targets humans and agents run locally (see the Commands table in AGENTS.md).
 # The single required status check for branch protection is the job named `ci-ok`.
 name: CI
 

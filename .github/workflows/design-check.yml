@@ -38,6 +38,7 @@ jobs:
           BODY: ${{ github.event.pull_request.body }}
           LABELS: ${{ join(github.event.pull_request.labels.*.name, ',') }}
           PR_NUMBER: ${{ github.event.pull_request.number }}
+          PR_AUTHOR: ${{ github.event.pull_request.user.login }}
           DESIGN_BOARD: board.json
         run: |
           set -u
@@ -45,12 +46,17 @@ jobs:
           # board entries for this very PR are not overlaps
           jq --argjson n "$PR_NUMBER" --arg r "$GITHUB_REPOSITORY" '.pull_requests |= [ .[]? | select(.number != $n or .repo != $r) ]' board.json > b.json && mv b.json board.json
           designs="$(git diff --name-only "$BASE"...HEAD -- 'docs/designs/*.md' | grep -vE '(TEMPLATE|INDEX|README)\.md$' || true)"
+          # The PR's own designs (changed here or linked from the body) and the author's own claims are not overlaps.
+          skip=(--author "$PR_AUTHOR")
+          for id in $( { printf '%s\n' "$designs"; printf '%s' "$BODY" | grep -oE 'docs/designs/[0-9A-Za-z._-]+\.md' || true; } | sed -nE 's#^docs/designs/(.+)\.md$#\1#p' | sort -u); do
+            skip+=(--exclude "$id")
+          done
           for f in $designs; do
             [ -f "$f" ] || continue
-            out="$(python3 scripts/designs/board.py overlap --design "$f" || true)"
+            out="$(python3 scripts/designs/board.py overlap --design "$f" "${skip[@]}")" || [ $? -eq 1 ] || { echo "::error::overlap check failed for $f"; exit 1; }
             case "$out" in *OVERLAP*) report="$report"$'\n'"**$f**"$'\n```\n'"$out"$'\n```' ;; esac
           done
-          code_out="$(python3 scripts/designs/board.py overlap --diff "$BASE" || true)"
+          code_out="$(python3 scripts/designs/board.py overlap --diff "$BASE" "${skip[@]}")" || [ $? -eq 1 ] || { echo "::error::overlap check failed"; exit 1; }
           case "$code_out" in *OVERLAP*) report="$report"$'\n'"**Changed files**"$'\n```\n'"$code_out"$'\n```' ;; esac
           changed="$(git diff --name-only "$BASE"...HEAD | grep -cvE '^(docs/|.*\.md$|.*(test|spec)[^/]*$|.*/tests?/)' || true)"
           need_design=0
@@ -61,7 +67,7 @@ jobs:
           } >> "$GITHUB_OUTPUT"
           printf '%s\n' "$report"
       - name: Comment (advisory)
-        if: steps.check.outputs.report != '' || steps.check.outputs.need_design == '1'
+        # Always runs so a stale warning is replaced once the overlap is resolved.
         continue-on-error: true
         uses: actions/github-script@3a2844b7e9c422d3c10d287c895573f7108da1b3 # v9
         env:
@@ -74,7 +80,9 @@ jobs:
             let body = `${marker}\n### Design check (advisory)\n`;
             if (process.env.REPORT.trim()) body += `\nThis PR touches areas that other active designs or open PRs also touch. Talk to their owners before going further — merge the work, split the area, or agree on an order.\n${process.env.REPORT}\n`;
             if (process.env.NEED_DESIGN === "1") body += `\nThis PR changes ${process.env.CHANGED} code files but links no design. For work this size, write a 1-page design first (\`/design\` or \`docs/designs/TEMPLATE.md\`), get it approved in its own small PR, then link it here. Add the \`no-design\` label if a design is not useful for this change.\n`;
-            const { data: comments } = await github.rest.issues.listComments({ ...context.repo, issue_number: context.issue.number, per_page: 100 });
+            const clean = !process.env.REPORT.trim() && process.env.NEED_DESIGN !== "1";
+            if (clean) body += `\nNo overlap with other active designs or open PRs.\n`;
+            const comments = await github.paginate(github.rest.issues.listComments, { ...context.repo, issue_number: context.issue.number, per_page: 100 });
             const mine = comments.find(c => c.body && c.body.startsWith(marker));
             if (mine) await github.rest.issues.updateComment({ ...context.repo, comment_id: mine.id, body });
-            else await github.rest.issues.createComment({ ...context.repo, issue_number: context.issue.number, body });
+            else if (!clean) await github.rest.issues.createComment({ ...context.repo, issue_number: context.issue.number, body });

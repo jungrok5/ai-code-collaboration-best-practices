@@ -54,10 +54,10 @@
 <div class="layer l1">
   <h2>① 규칙 레이어 — 단일 소스 <small>지시 = 컨텍스트 (advisory)</small></h2>
   <div class="row">
-    <div class="box main" style="flex:1.4"><b>AGENTS.md (≤200줄)</b>명령(make setup/check) · 이슈→브랜치→PR→리뷰→머지 · 코딩/테스트/git 규칙 · 보호 경로 · 에이전트 행동</div>
+    <div class="box main" style="flex:1.4"><b>AGENTS.md (약 55줄)</b>명령(make setup/check/overlap) · 일의 크기별 흐름(T0/T1/T2) · 지우면 실수할 규칙만</div>
     <div class="box"><b>얇은 래퍼 (가리키기만)</b>CLAUDE.md(@AGENTS.md) · copilot-instructions.md · .cursor/rules · GEMINI.md · .codex · .aider.conf.yml · .rules</div>
     <div class="box"><b>경로 규칙</b>.claude/rules (paths) · .github/instructions (applyTo) · *.mdc (globs)</div>
-    <div class="box" style="flex:.8"><b>REVIEW.md · ADR</b>리뷰 기준 · 결정 기록(docs/adr)</div>
+    <div class="box" style="flex:.8"><b>설계 · ADR</b>docs/designs (1쪽 + 구조도) · REVIEW.md · docs/adr</div>
   </div>
 </div>
 
@@ -65,7 +65,7 @@
   <div class="layer l2">
     <h2>② 로컬 가드레일 <small>결정적 강제 — 내 PC</small></h2>
     <div class="row">
-      <div class="box"><b>플러그인 team-ai-workflow</b>훅: 보호 경로 차단 · main 커밋/force-push 차단 · 800줄 커밋 차단 · 자동 포맷<br>스킬 8 · 서브에이전트 5</div>
+      <div class="box"><b>플러그인 team-ai-workflow</b>훅: 보호 경로 차단 · main 커밋/force-push 차단 · 자동 포맷<br>스킬 10 (/design · /check-overlap 포함) · 서브에이전트 5</div>
       <div class="box"><b>.claude/settings.json</b>권한 allow/ask/deny · 공동저자 표기 · SessionStart 훅 · 마켓플레이스 등록</div>
       <div class="box"><b>pre-commit · make check</b>gitleaks · actionlint · shellcheck · yamllint · conventional commit · devcontainer</div>
     </div>
@@ -83,6 +83,7 @@
 <div class="layer l4" style="margin-top:10px">
   <h2>④ 자동화 — 에이전트가 이슈/PR을 읽고 쓴다 <small>주황 테두리 = 사람 체크포인트</small></h2>
   <div class="flow">
+    <div class="step h"><b>설계 먼저 (큰 일만)</b>/design → 겹침 확인 → 설계 PR 머지 = 승인</div><span class="to">→</span>
     <div class="step"><b>이슈 생성</b>템플릿: 배경·수용기준·범위·테스트</div><span class="to">→</span>
     <div class="step"><b>AI 트리아지</b>라벨·누락·중복 제안<span class="tag p">닫지 않음</span></div><span class="to">→</span>
     <div class="step h"><b>ai:ready 부여</b>쓰기 권한자만</div><span class="to">→</span>
@@ -93,6 +94,7 @@
     <div class="step h"><b>사람 승인</b>CODEOWNER · 에이전트 승인 게이트</div><span class="to">→</span>
     <div class="step"><b>squash 머지</b>이슈 ai:done · release-please</div>
   </div>
+  <div class="note"><b>팀 작업 보드</b>: work-board가 30분마다 모든 레포의 활성 설계 + 열린 PR 파일을 board.json으로 모음 → 세션 시작 요약 · design-check가 PR 겹침을 댓글로 알림(LLM 없음, 차단 안 함)</div>
   <div class="note">CI 실패 → ci-fix가 로그를 읽고 수정 PR · 언제든 @claude 로 질문/수정 요청 · 주간 유지보수 리포트 · stale 정리 · Dependabot 자동 머지(minor/patch)</div>
 </div>
 

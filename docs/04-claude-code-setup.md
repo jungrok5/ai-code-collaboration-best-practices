@@ -25,7 +25,7 @@ CLAUDE.md                         # @AGENTS.md + Claude 전용 메모
 - `ask`: push, rebase/merge, PR/이슈 생성·수정, 패키지 설치, docker, `rm -r` → 매번 확인.
 - `deny`: `.env*`/비밀/키 읽기, force-push, `reset --hard`, `clean -fd`, `gh secret`, `sudo`, `curl | sh` → 항상 거부.
 - 문법: `Bash(git commit *)`(prefix 매칭, 공백 후 `*`), `Read(./.env)`, `WebFetch(domain:docs.github.com)`, `mcp__github__*`.
-- `defaultMode: default`(첫 사용 시 확인). CI/샌드박스에서는 `--permission-mode dontAsk|acceptEdits`, 격리된 컨테이너에서만 `bypassPermissions`.
+- `defaultMode: default`(첫 사용 시 확인). 최신 모델 기준으로 덜어낸 설정(auto 모드, `ask`는 `rm -r`만, main push·PR 머지 deny)은 사람이 `scripts/apply-lean-permissions.sh`로 적용한다([15](15-lean-harness.md)). CI/샌드박스에서는 `--permission-mode dontAsk|acceptEdits`, 격리된 컨테이너에서만 `bypassPermissions`.
 
 ### attribution
 
@@ -57,6 +57,8 @@ CLAUDE.md                         # @AGENTS.md + Claude 전용 메모
 
 | 스킬 | 용도 | 호출 |
 | --- | --- | --- |
+| `design` | 1쪽 설계 + Mermaid 구조도 작성 → 겹침 확인 → 설계 PR | `/design "결제 재시도"` |
+| `check-overlap` | 내가 건드릴 경로·영역을 팀 보드와 비교 | `/check-overlap src/auth/**` |
 | `implement-issue` | 이슈 → 브랜치 → 테스트 → 구현 → 검증 → 커밋(푸시 전 정지) | `/implement-issue 123` |
 | `create-pr` | 전제 확인 → push → 템플릿 본문 → 초안 PR + 라벨 | `/create-pr` |
 | `review-pr` | 읽기 전용 리뷰, 심각도순 findings | `/review-pr 42` |

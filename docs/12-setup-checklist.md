@@ -18,7 +18,7 @@
 ## B. 새 제품 레포(스포크)
 
 - [ ] `make new-repo REPO=org/name VISIBILITY=private` (또는 GitHub UI "Use this template" 후 `make setup`)
-- [ ] `AGENTS.md` §1 프로젝트 스냅샷 작성, §2 명령 확인(`make check`가 실제로 돌아야 함)
+- [ ] `AGENTS.md`의 Project 섹션 작성, Commands 표 확인(`make check`가 실제로 돌아야 함)
 - [ ] `CODEOWNERS`, `labels.yml`의 `area/*`, `release-please-config.json`의 `release-type`
 - [ ] `ci.yml` 툴체인 버전(`vars.NODE_VERSION`/`PYTHON_VERSION`), `codeql.yml` 언어 매트릭스
 - [ ] AI 백엔드(A와 동일, 선택), `make github-setup`

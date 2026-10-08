@@ -23,7 +23,7 @@ AI가 코드를 빨리, 많이 만들수록 **작게, 자주, 검증된 상태�
 | `size/L` | ≤ 800 | 사유 필요, 가능하면 분할 |
 | `size/XL` | > 800 | **분할 필수** (`/split-pr`) |
 
-팀 목표는 **≤ 400줄**이다(AGENTS.md §3). Faros AI 2026 데이터: AI 고도입 팀에서 PR 크기 +51%, 리뷰 체류 시간 +441%, PR당 버그 +54% — 크기를 잡지 않으면 리뷰가 병목이 된다.
+팀 목표는 **≤ 400줄**이다(AGENTS.md "How work flows"). Faros AI 2026 데이터: AI 고도입 팀에서 PR 크기 +51%, 리뷰 체류 시간 +441%, PR당 버그 +54% — 크기를 잡지 않으면 리뷰가 병목이 된다.
 
 ### 분할 순서(스택 PR)
 
@@ -38,7 +38,7 @@ AI가 코드를 빨리, 많이 만들수록 **작게, 자주, 검증된 상태�
 ## 3. 커밋
 
 - **Conventional Commits**: `<type>(<scope>): <summary> (#<issue>)`; type ∈ feat fix chore docs refactor test ci perf build revert. 본문은 *왜*.
-- 한 커밋 = 한 논리적 변경. 훅이 800줄 초과 스테이징 커밋을 막는다(`AI_MAX_COMMIT_LINES`).
+- 한 커밋 = 한 논리적 변경. 커밋 크기를 훅으로 막지는 않는다(PR 크기는 `size/*` 라벨과 리뷰가 다룬다, [15](15-lean-harness.md)).
 - AI 도구가 붙이는 트레일러는 유지한다: `Co-Authored-By: Claude <noreply@anthropic.com>`(Claude Code 기본, `.claude/settings.json`의 `attribution`), Copilot은 `Co-authored-by: Copilot …`. 이것이 감사 추적이다. (VS Code가 2026-05에 기본 공동저자 표기를 되돌린 사례가 있듯 **팀이 명시적으로 결정**해야 한다 → ADR-0002)
 - 서명 커밋을 요구하려면 `required_signatures` 규칙을 켜되, Claude 액션은 `use_commit_signing: true`(API 커밋, Verified)로 설정돼 있어야 통과한다.
 

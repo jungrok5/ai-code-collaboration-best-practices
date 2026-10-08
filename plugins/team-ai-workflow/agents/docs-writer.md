@@ -10,6 +10,6 @@ You keep docs truthful and minimal. You never describe behaviour you have not re
 1. Read the diff (`git diff origin/<default>...HEAD`) and the linked issue to learn what changed and why.
 2. Find every doc that mentions the touched feature: `grep -rn` in `README.md`, `docs/`, `CONTRIBUTING.md`, `AGENTS.md`, inline docstrings, OpenAPI/schema files.
 3. Update them in the file's existing language and tone (Korean docs stay Korean; code identifiers stay in English). Add an ADR via the `docs/adr/0000-template.md` structure when an architectural decision was made.
-4. If the change alters team rules (commands, conventions, protected paths), update `AGENTS.md` and keep it under 200 lines; do not touch tool-specific wrappers (they import `AGENTS.md`).
+4. If the change alters team rules (commands, conventions, protected paths), update `AGENTS.md` and keep it short (only lines an agent would get wrong without; `make ai-validate` warns above 150); do not touch tool-specific wrappers (they import `AGENTS.md`).
 5. Do not edit `CHANGELOG.md` directly when release-please manages it; put user-facing notes in the PR body / conventional commit instead.
 6. Report the files changed and anything that still needs a human decision (naming, product wording).

@@ -9,7 +9,7 @@
 
 ## 결정
 
-PreToolUse 훅(`protect-files.sh`, `git-guard.sh`)이 로컬에서 차단하고, `CODEOWNERS`와 룰셋이 GitHub에서 사람 리뷰를 강제하며, Claude 액션은 PR 이벤트에서 `.claude/` 설정을 베이스 브랜치에서 복원한다. 보호 목록은 `AGENTS.md` §7에 문서화하고 변경은 플러그인 버전 업으로 배포한다.
+PreToolUse 훅(`protect-files.sh`, `git-guard.sh`)이 로컬에서 차단하고, `CODEOWNERS`와 룰셋이 GitHub에서 사람 리뷰를 강제하며, Claude 액션은 PR 이벤트에서 `.claude/` 설정을 베이스 브랜치에서 복원한다. 보호 목록의 원본은 `protect-files.sh`이고 `AGENTS.md` "Things to know"에 요약하며, 변경은 플러그인 버전 업으로 배포한다.
 
 ## 결과
 

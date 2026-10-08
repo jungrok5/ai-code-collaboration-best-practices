@@ -16,7 +16,7 @@
 
 ## 결정
 
-`AGENTS.md`를 단일 소스로 둔다. `CLAUDE.md`는 `@AGENTS.md` import + Claude 전용 메모, `.github/copilot-instructions.md`·`.cursor/rules/00-team-rules.mdc`·`GEMINI.md`·`.rules`는 포인터 + 도구 전용 메모만 담는다. 경로 규칙은 각 도구의 경로 메커니즘(`.claude/rules`, `*.instructions.md`, `.mdc globs`)으로 같은 내용을 짧게 유지한다. `.claude/rules/ai-config.md`가 "복사 금지"를 에이전트에게 강제하고, `make ai-validate`가 200줄 제한을 검사한다.
+`AGENTS.md`를 단일 소스로 둔다. `CLAUDE.md`는 `@AGENTS.md` import + Claude 전용 메모, `.github/copilot-instructions.md`·`.cursor/rules/00-team-rules.mdc`·`GEMINI.md`·`.rules`는 포인터 + 도구 전용 메모만 담는다. 경로 규칙은 각 도구의 경로 메커니즘(`.claude/rules`, `*.instructions.md`, `.mdc globs`)으로 같은 내용을 짧게 유지한다. `.claude/rules/ai-config.md`가 "복사 금지"를 에이전트에게 강제하고, `make ai-validate`가 길이를 검사한다(ADR-0006 이후: 150줄 초과 시 경고).
 
 ## 결과
 

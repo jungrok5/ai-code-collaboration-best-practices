@@ -1,8 +1,8 @@
 {
   "$schema": "https://www.schemastore.org/claude-code-plugin-manifest.json",
   "name": "team-ai-workflow",
-  "version": "1.1.0",
-  "description": "Team guard rails, skills and subagents for AI-assisted GitHub collaboration: issue → branch → PR → review → merge, with protected paths, small-PR enforcement and consistent review checklists.",
+  "version": "1.1.1",
+  "description": "Team guard rails, skills and subagents for AI-assisted GitHub collaboration: issue → branch → PR → review → merge, with protected paths, git guard rails, design-first and overlap checks, and consistent review checklists.",
   "author": {
     "name": "ai-code-collaboration-best-practices maintainers",
     "url": "https://github.com/jungrok5/ai-code-collaboration-best-practices"

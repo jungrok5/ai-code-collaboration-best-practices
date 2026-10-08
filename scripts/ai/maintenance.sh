@@ -16,7 +16,7 @@ Produce this repository's weekly maintenance report as markdown checklists:
 1. Open issues with no update for > 60 days, and ai:needs-human issues waiting on a decision. Data (JSON): $issues
 2. What merged this week (summarise): $log
 3. TODO/FIXME added this week without an issue number (grep the repo).
-4. Drift: do the commands in AGENTS.md §2 still exist in the Makefile? Any docs/ links broken?
+4. Drift: do the commands in the AGENTS.md Commands table still exist in the Makefile? Any docs/ links broken?
 5. If a package manifest exists, list outdated or vulnerable dependencies (read lockfiles/manifests only; do not install).
 Keep it under 60 lines. No changes to files.
 PROMPT

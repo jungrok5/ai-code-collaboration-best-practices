@@ -36,7 +36,7 @@ jobs:
             1. `gh issue list --state open --limit 200 --json number,title,labels,updatedAt`: list issues with no
                update for > 60 days and `ai:needs-human` issues waiting on a decision.
             2. `git log --since="7 days ago" --stat`: summarise what merged; note TODO/FIXME added without an issue number.
-            3. Check that commands in AGENTS.md §2 still exist in the Makefile; flag drift between AGENTS.md and docs/.
+            3. Check that commands in the AGENTS.md Commands table still exist in the Makefile; flag drift between AGENTS.md and docs/.
             4. If a package manifest exists, list outdated/vulnerable dependencies from its audit command output.
             Create ONE issue titled "Weekly maintenance report — <date>" with the findings as checklists, labelled
             type/chore. Do not modify files, close issues, or comment on PRs.

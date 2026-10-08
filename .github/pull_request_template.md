@@ -3,6 +3,8 @@
 ## Summary
 <!-- What and why, 2–5 lines. Link the issue: -->
 Closes #
+<!-- Larger or cross-area work: link its approved design, e.g. Design: docs/designs/0007-rate-limits.md -->
+Design:
 
 ## Changes
 

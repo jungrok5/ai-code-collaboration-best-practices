@@ -50,13 +50,13 @@ make new-repo REPO=my-org/svc-payments VISIBILITY=private
 #   scripts/setup-github.sh all                              (설정·라벨·룰셋)
 ```
 
-그 다음 사람이 할 일: `AGENTS.md` §1, `CODEOWNERS`, `labels.yml`의 `area/*`, `ci.yml`/`codeql.yml` 언어, 시크릿, Claude 앱 설치(12 문서).
+그 다음 사람이 할 일: `AGENTS.md`의 Project 섹션, `CODEOWNERS`, `labels.yml`의 `area/*`, `ci.yml`/`codeql.yml` 언어, 시크릿, Claude 앱 설치(12 문서).
 
 ## 4. 스포크를 최신으로 유지
 
 - **플러그인**: 허브에서 `plugins/team-ai-workflow` 버전 올리고 태그 → 스포크에서 `claude plugin update team-ai-workflow@ai-collab`(또는 재시작 시 자동).
 - **워크플로/템플릿 파일**: 허브에 `repo-file-sync-action`을 두면 변경된 파일로 각 스포크에 PR을 연다(토큰: App). 또는 Copier로 템플릿을 관리하면 `copier update`가 3-way 병합을 해 준다.
-- **규칙 텍스트**: `AGENTS.md`는 레포마다 다른 §1을 가지므로 통째로 동기화하지 말고 "공통 섹션"만 동기화하거나 `@docs/team-rules.md` import 블록으로 분리한다.
+- **규칙 텍스트**: `AGENTS.md`는 레포마다 다른 Project 섹션을 가지므로 통째로 동기화하지 말고 "공통 섹션"만 동기화하거나 `@docs/team-rules.md` import 블록으로 분리한다.
 
 ## 5. 모노레포 vs 폴리레포 (에이전트 관점)
 

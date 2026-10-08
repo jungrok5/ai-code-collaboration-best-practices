@@ -18,11 +18,11 @@
 | --- | --- | --- |
 | **남김** | 보호 경로 훅, `main` 직접 커밋·force-push 차단, CI, CODEOWNERS·룰셋, 샌드박스 | 결정적 안전장치. 모델이 좋아져도 사고 비용이 크다 |
 | **남김** | 명령어 표, 레포 특유의 함정 | 연구상 실제로 도움 되는 부분 |
-| **풀음** | 일상적인 `git push`/`gh pr create`/`gh issue comment` 등의 `ask` 목록 | auto 모드 분류기가 판단. 매번 묻는 것은 피로만 늘린다 |
+| **풀음** (사람이 §3 스크립트 실행 후) | 일상적인 `git push`/`gh pr create`/`gh issue comment` 등의 `ask` 목록 | auto 모드 분류기가 판단. 매번 묻는 것은 피로만 늘린다 |
 | **풀음** | "반드시/절대" 톤, AGENTS.md 200줄 상한(실패→150줄 경고) | 과잉 반응 방지 |
-| **지움** | 800줄 초과 커밋 차단 훅 | PR 크기는 라벨과 리뷰로 다룬다. 커밋 단위 차단은 작업만 쪼갠다 |
+| **지움** | 800줄 초과 커밋 차단 훅(과 이를 위한 `AI_MAX_*` 환경 변수) | PR 크기는 라벨과 리뷰로 다룬다. 커밋 단위 차단은 작업만 쪼갠다 |
 | **지움** | Stop 훅의 요약 리마인더 | 모델이 이미 한다 |
-| **지움** | 모델 기본 동작을 반복하는 단계별 스킬 본문 | 스킬 8개를 목표·제약 위주로 다시 써서 합계 95줄 |
+| **지움** | 모델 기본 동작을 반복하는 단계별 스킬 본문 | 기존 스킬 8개를 목표·제약 위주로 다시 썼다(새 `/design`, `/check-overlap` 포함 10개 합계 약 100줄) |
 
 AGENTS.md는 120줄 → 55줄, 규칙 파일은 "왜"를 한 줄씩 붙인 짧은 문장으로 바꿨습니다.
 
@@ -34,9 +34,11 @@ auto 모드는 기본 브랜치로의 push를 허용하므로 deny에 명시합�
 
 ```text
 deny 추가: git push origin main, git push origin main *, git push * HEAD:main, gh pr merge *
-deny 제거: gh auth *  (gh auth status는 allow)
-allow 추가: gh auth status, gh repo view *, gh workflow list *, python3 scripts/designs/board.py *
+ask: 기존 목록 전체를 rm -r / rm -rf 두 개로 교체
+deny 유지: 비밀 파일, 파괴적 git, gh auth * (토큰 출력 방지)
+allow 추가: gh repo view *, gh workflow list *, python3 scripts/designs/board.py *
 defaultMode: auto
+env 제거: AI_MAX_COMMIT_LINES, AI_MAX_PR_LINES (읽는 훅이 없음)
 ```
 
 `.claude/settings.json`은 팀 정책 파일이라 에이전트가 직접 고치면 분류기가 "자기 권한 수정"으로 막습니다(의도된 동작). 사람이 실행합니다.

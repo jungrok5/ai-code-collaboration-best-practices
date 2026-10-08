@@ -14,11 +14,12 @@ make check          # 린트 + 타입체크 + 테스트 (커밋 전에 항상)
 ## 2. 작업 흐름
 
 1. **이슈부터**: 템플릿(Task / Bug / Feature)으로 이슈를 만듭니다. 수용 기준(Acceptance criteria)이 테스트가 됩니다.
-2. **브랜치**: `<type>/<issue>-<slug>` (예: `feat/123-rate-limit`). `main`에 직접 커밋하지 않습니다.
-3. **작게**: PR은 400줄 이하를 목표로 합니다. 크면 `/split-pr`로 스택을 만듭니다.
-4. **PR**: 제목은 Conventional Commit, 본문은 템플릿(요약 / 변경 / 테스트 증거 / **AI 사용 공개** / 체크리스트).
-5. **리뷰**: CI + AI 리뷰(참고용) → 사람(CODEOWNERS) 승인 1명 이상. 모든 리뷰 스레드에 답하고 재요청합니다.
-6. **머지**: squash만. PR 제목이 커밋 제목이 됩니다. 브랜치는 자동 삭제됩니다.
+2. **크기 가늠**: 여러 모듈·레포에 걸치거나 영역이 모호하면 코드 전에 1쪽 설계(`/design`, `docs/designs/`)를 작은 PR로 먼저 머지합니다. 시작 전 `make overlap AREAS=...`(또는 `/check-overlap`)로 겹치는 작업이 있는지 봅니다([docs/14](docs/14-design-first-and-overlap.md)).
+3. **브랜치**: `<type>/<issue>-<slug>` (예: `feat/123-rate-limit`). `main`에 직접 커밋하지 않습니다.
+4. **작게**: PR은 400줄 이하를 목표로 합니다. 크면 `/split-pr`로 스택을 만듭니다.
+5. **PR**: 제목은 Conventional Commit, 본문은 템플릿(요약 / 변경 / 테스트 증거 / **AI 사용 공개** / 체크리스트).
+6. **리뷰**: CI + AI 리뷰(참고용) → 사람(CODEOWNERS) 승인 1명 이상. 모든 리뷰 스레드에 답하고 재요청합니다.
+7. **머지**: squash만. PR 제목이 커밋 제목이 됩니다. 브랜치는 자동 삭제됩니다.
 
 ## 3. AI 도구를 쓸 때
 

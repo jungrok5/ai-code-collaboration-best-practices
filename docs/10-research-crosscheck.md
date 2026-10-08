@@ -45,7 +45,7 @@
 
 - 기둥 1 → `AGENTS.md` + 래퍼 + `.claude/rules` + 플러그인 훅(03·04 문서)
 - 기둥 2 → 브랜치 규칙·worktree·룰셋(02 문서)
-- 기둥 3 → size 라벨·`/split-pr`·800줄 커밋 가드·ADR-0002(02 문서)
+- 기둥 3 → size 라벨·`/split-pr`·ADR-0002(02 문서)
 - 기둥 4 → `ci-ok` 필수 체크·AI 리뷰 advisory·`agent-approval-check`·CODEOWNERS(05·06 문서)
 - 기둥 5 → 이슈 폼 3종·트리아지 워크플로·`ai:ready` 사람 체크포인트(05 문서)
 - 누락 10개 → 01·08·09·07 문서와 워크플로 하드닝
