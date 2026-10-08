@@ -37,7 +37,7 @@ def _unquote(v: str) -> str:
 
 def parse_front_matter(text: str) -> dict:
     """Small YAML subset: `key: value`, `key: [a, "b"]`, and block lists (`key:` then `- item` lines)."""
-    m = re.match(r"^---\r?\n(.*?)\r?\n---\r?\n", text, re.S)
+    m = re.match(r"^\ufeff?---\r?\n(.*?)\r?\n---[ \t]*(?:\r?\n|$)", text, re.S)
     if not m:
         return {}
     data: dict = {}
@@ -46,9 +46,9 @@ def parse_front_matter(text: str) -> dict:
         line = re.sub(r"\s+#\s.*$", "", raw).rstrip()  # "# comment" only; keeps "#12" in values
         if not line.strip():
             continue
-        item = re.match(r"^\s+-\s+(.*)$", line)
-        if item and last_key is not None:
-            if not isinstance(data.get(last_key), list):
+        item = re.match(r"^\s*-\s+(.*)$", line)
+        if item and last_key is not None and (data.get(last_key) == "" or isinstance(data.get(last_key), list)):
+            if data[last_key] == "":
                 data[last_key] = []
             data[last_key].append(_unquote(item.group(1)))
             continue
@@ -65,7 +65,10 @@ def parse_front_matter(text: str) -> dict:
 
 def normalize(d: dict, fallback_id: str) -> dict:
     """Fill defaults so every consumer can rely on id/status/areas being present and typed."""
-    d.setdefault("id", fallback_id)
+    if not d.get("id"):
+        d["id"] = fallback_id
+    owner = d.get("owner") or ""
+    d["owner"] = ", ".join(map(str, owner)) if isinstance(owner, list) else str(owner)
     if not d.get("status"):
         d["status"] = "draft"
     areas = d.get("areas") or []
@@ -102,7 +105,8 @@ def areas_overlap(a: str, b: str) -> bool:
     a, b = a.strip(), b.strip()
     if not a or not b:
         return False
-    kind = lambda s: (m.group(1) if (m := re.match(r"^([a-z]+):", s)) else None)
+    a, b = (re.sub(r"^\./|^/", "", x) for x in (a, b))
+    kind = lambda s: (m.group(1).lower() if (m := re.match(r"^([A-Za-z]+):", s)) else None)
     if kind(a) or kind(b):
         if kind(a) != kind(b):
             return False
@@ -123,9 +127,10 @@ def find_overlaps(areas: list[str], designs: list[dict], skip_ids: set[str] = fr
                   author: str | None = None) -> list[tuple[dict, list[str]]]:
     hits = []
     for d in designs:
-        if d.get("status", "draft") not in ACTIVE or d.get("id") in skip_ids:
+        if d.get("status", "draft") not in ACTIVE or d.get("id") in skip_ids or Path(d.get("file") or "-").stem in skip_ids:
             continue
-        if author and d.get("owner", "").lstrip("@").lower() == author.lstrip("@").lower():
+        owners = {o.strip().lstrip("@").lower() for o in str(d.get("owner") or "").split(",")}
+        if author and author.lstrip("@").lower() in owners:
             continue  # your own design or PR is not someone else's claim
         common = sorted({f"{x} ~ {y}" for x in areas for y in d.get("areas", []) if areas_overlap(x, y)})
         if common:
@@ -138,7 +143,8 @@ def load_board(path: str | None) -> list[dict]:
         board = json.loads(Path(path).read_text(encoding="utf-8"))
         seen = {(d["repo"], d["id"]) for d in designs}
         designs += [normalize(d, d.get("id", "?")) for d in board.get("designs", []) if (d.get("repo"), d.get("id")) not in seen]
-        designs += [dict(p, id=f"PR#{p['number']}", status="in-progress", kind="pr") for p in board.get("pull_requests", [])]
+        designs += [normalize(dict(p, id=f"PR#{p.get('number', '?')}", status="in-progress", kind="pr"), "PR")
+                    for p in board.get("pull_requests", []) if isinstance(p, dict)]
     return designs
 
 def cmd_index() -> None:
@@ -156,7 +162,8 @@ def _take_opts(args: list[str]) -> tuple[list[str], set[str], str | None]:
     it = iter(args)
     for a in it:
         if a == "--exclude":
-            skip.add(next(it, ""))
+            if v := next(it, ""):
+                skip.add(v)
         elif a == "--author":
             author = next(it, None)
         else:
@@ -187,7 +194,7 @@ def cmd_overlap(args: list[str]) -> int:
         where = d.get("repo", "")
         label = d.get("title") or d.get("id")
         st = d['status'] + (', stale' if stale(d) else '')
-        print(f"OVERLAP  {where} {d.get('id')} [{st}] {label} — owner {d.get('owner','?')} — {'; '.join(common[:4])}"
+        print(f"OVERLAP  {where} {d.get('id')} [{st}] {label} — owner {d.get('owner') or '?'} — {'; '.join(common[:4])}"
               + (f" — {d['url']}" if d.get("url") else f" — {d.get('file','')}"))
     print("→ Talk to the owner before starting: merge into their design, split the area, or sequence the work.")
     return 1
@@ -198,7 +205,7 @@ def cmd_brief(args: list[str]) -> None:
     for d in load_board(board):
         if d.get("status", "draft") in ACTIVE:
             st = d['status'] + (', stale' if stale(d) else '')
-            lines.append(f"- {d.get('repo','')} {d.get('id')} [{st}] {d.get('owner','?')}: {d.get('title','')} | areas: {', '.join(d.get('areas', [])[:5])}")
+            lines.append(f"- {d.get('repo','')} {d.get('id')} [{st}] {d.get('owner') or '?'}: {d.get('title','')} | areas: {', '.join(d.get('areas', [])[:5])}")
     print("\n".join(lines[:40]) if lines else "(no active designs)")
 
 def gh_json(args: list[str]):
@@ -215,8 +222,11 @@ def cmd_aggregate(repos_file: str, out: str) -> None:
         for path in files or []:
             if path.endswith(("TEMPLATE.md", "INDEX.md", "README.md")):
                 continue
-            raw = subprocess.run(["gh", "api", f"repos/{repo}/contents/{path}", "-H", "Accept: application/vnd.github.raw"], capture_output=True, text=True).stdout
-            d = parse_front_matter(raw)
+            r = subprocess.run(["gh", "api", f"repos/{repo}/contents/{path}", "-H", "Accept: application/vnd.github.raw"], capture_output=True, text=True)
+            if r.returncode != 0:
+                board["errors"].append(f"{repo}: cannot read {path}")
+                continue
+            d = parse_front_matter(r.stdout)
             if d:
                 d = normalize(d, Path(path).stem)
                 d.update(repo=repo, file=path, url=f"https://github.com/{repo}/blob/HEAD/{path}")
@@ -245,6 +255,13 @@ def cmd_aggregate(repos_file: str, out: str) -> None:
     print(f"board: {len(board['designs'])} designs, {len(board['pull_requests'])} open PRs from {len(repos)} repos → {out}")
 
 def main() -> int:
+    try:
+        return run()
+    except Exception as e:  # exit 1 means "overlap found", so a crash must not look like one
+        print(f"error: {type(e).__name__}: {e}", file=sys.stderr)
+        return 2
+
+def run() -> int:
     if len(sys.argv) < 2:
         print(__doc__); return 2
     cmd, args = sys.argv[1], sys.argv[2:]

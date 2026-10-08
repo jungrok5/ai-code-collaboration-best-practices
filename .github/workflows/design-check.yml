@@ -48,14 +48,14 @@ jobs:
           designs="$(git diff --name-only "$BASE"...HEAD -- 'docs/designs/*.md' | grep -vE '(TEMPLATE|INDEX|README)\.md$' || true)"
           # The PR's own designs (changed here or linked from the body) and the author's own claims are not overlaps.
           skip=(--author "$PR_AUTHOR")
-          for id in $( { printf '%s\n' "$designs"; printf '%s' "$BODY" | grep -oE 'docs/designs/[0-9A-Za-z._-]+\.md' || true; } | sed -nE 's#^docs/designs/(.+)\.md$#\1#p' | sort -u); do
-            skip+=(--exclude "$id")
-          done
-          for f in $designs; do
-            [ -f "$f" ] || continue
+          while IFS= read -r id; do
+            [ -n "$id" ] && skip+=(--exclude "$id")
+          done < <( { printf '%s\n' "$designs"; printf '%s' "$BODY" | grep -oE 'docs/designs/[0-9A-Za-z._-]+\.md' || true; } | sed -nE 's#^docs/designs/(.+)\.md$#\1#p' | sort -u)
+          while IFS= read -r f; do
+            [ -n "$f" ] && [ -f "$f" ] || continue
             out="$(python3 scripts/designs/board.py overlap --design "$f" "${skip[@]}")" || [ $? -eq 1 ] || { echo "::error::overlap check failed for $f"; exit 1; }
             case "$out" in *OVERLAP*) report="$report"$'\n'"**$f**"$'\n```\n'"$out"$'\n```' ;; esac
-          done
+          done <<< "$designs"
           code_out="$(python3 scripts/designs/board.py overlap --diff "$BASE" "${skip[@]}")" || [ $? -eq 1 ] || { echo "::error::overlap check failed"; exit 1; }
           case "$code_out" in *OVERLAP*) report="$report"$'\n'"**Changed files**"$'\n```\n'"$code_out"$'\n```' ;; esac
           changed="$(git diff --name-only "$BASE"...HEAD | grep -cvE '^(docs/|.*\.md$|.*(test|spec)[^/]*$|.*/tests?/)' || true)"
