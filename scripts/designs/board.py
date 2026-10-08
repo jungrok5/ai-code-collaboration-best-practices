@@ -69,8 +69,9 @@ def normalize(d: dict, fallback_id: str) -> dict:
         d["id"] = fallback_id
     owner = d.get("owner") or ""
     d["owner"] = ", ".join(map(str, owner)) if isinstance(owner, list) else str(owner)
-    if not d.get("status"):
-        d["status"] = "draft"
+    d["status"] = str(d.get("status") or "draft").strip().lower()
+    issues = d.get("issues") or []
+    d["issues"] = [issues] if isinstance(issues, (str, int)) else list(issues)
     areas = d.get("areas") or []
     d["areas"] = [areas] if isinstance(areas, str) else list(areas)
     if not d["areas"] and d["status"] in ACTIVE:

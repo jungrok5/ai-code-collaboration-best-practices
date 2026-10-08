@@ -10,7 +10,7 @@ AI가 코드를 빨리, 많이 만들수록 **작게, 자주, 검증된 상태�
 | 작업 브랜치 | `<type>/<issue>-<slug>` 예: `fix/142-null-session` | 룰셋 `feature-branches.json`(evaluate 모드)로 패턴 감시 |
 | 에이전트 브랜치 | `ai/issue-<n>-<ts>`(Claude), `copilot/*`(Copilot) | 자동 생성, 패턴 규칙에서 제외 |
 | 수명 | **2일 이내** 머지 또는 분할 (팀 결정, 1차 출처 없음) | 길어지면 충돌·리뷰 지연이 비선형 증가 |
-| 공유 브랜치 | 사람 둘 이상이 커밋한 브랜치는 **절대 rewrite 금지**(merge만) | 훅 `git-guard.sh` |
+| 공유 브랜치 | 사람 둘 이상이 커밋한 브랜치는 **절대 rewrite 금지**(merge만) | 사람의 약속 + 룰셋. 훅 `git-guard.sh`는 `main`/`develop`/`release/*` 등 보호 브랜치와 접두어 없는 브랜치로의 force-push만 막는다(누가 커밋했는지는 모름) |
 | 큰 기능 | feature flag(기본 off) 뒤에서 작은 PR로 나눠 합침 | ADR 기록 |
 
 ## 2. PR 크기

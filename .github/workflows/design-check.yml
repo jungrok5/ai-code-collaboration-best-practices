@@ -30,7 +30,11 @@ jobs:
       - name: Fetch the team board
         env:
           BOARD_URL: ${{ vars.DESIGN_BOARD_URL || format('https://{0}.github.io/{1}/board.json', github.repository_owner, github.event.repository.name) }}
-        run: curl -fsSL "$BOARD_URL" -o board.json || echo '{}' > board.json
+        run: |
+          if ! curl -fsSL "$BOARD_URL" -o board.json || ! jq -e 'type == "object"' board.json >/dev/null 2>&1; then
+            echo "::notice::team board not available at $BOARD_URL; checking this repo's designs only"
+            echo '{}' > board.json
+          fi
       - name: Check
         id: check
         env:

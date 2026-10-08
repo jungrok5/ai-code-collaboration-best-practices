@@ -38,7 +38,7 @@ CLAUDE.md                         # @AGENTS.md + Claude 전용 메모
 | 이벤트 | 훅 | 동작 | 종료 코드 |
 | --- | --- | --- | --- |
 | PreToolUse `Edit\|Write\|MultiEdit\|NotebookEdit` | `protect-files.sh` | 보호 경로 편집 차단 | 2 = 차단(사유를 stderr로 Claude에 전달) |
-| PreToolUse `Bash` | `git-guard.sh` → `git_guard.py` | 명령을 셸처럼 토큰화(`&&`, `;`, `$(…)`, `cd`, `-C`, `--git-dir`)해 보호 브랜치 커밋, 공유 브랜치 force-push(`+refspec`, `--mirror` 포함)·삭제 차단. 크기 제한은 없앰([15](15-lean-harness.md)) | 2 |
+| PreToolUse `Bash` | `git-guard.sh` → `git_guard.py` | 명령을 셸처럼 토큰화(`&&`, `;`, `$(…)`, `cd`, `-C`, `--git-dir`)해 보호 브랜치 커밋과, 기능 접두어(`feat/`, `fix/`, `ai/` …)가 아닌 브랜치로의 force-push(`+refspec`, `--mirror` 포함)·삭제를 차단. 쉘 키워드(`if`/`for`/`{ }`)·서브셸 `cd`·`GIT_DIR=`도 해석. 크기 제한은 없앰([15](15-lean-harness.md)) | 2 |
 | PostToolUse `Edit\|Write\|MultiEdit` | `format-after-edit.sh` | prettier/ruff/gofmt 등 자동 포맷 | 항상 0 |
 | SessionStart | `.claude/hooks/session-start.sh` | 의존성 설치, pre-commit 설치, 팀의 활성 설계·작업 영역 요약(`board.py brief`)을 컨텍스트에 주입 | 0 |
 

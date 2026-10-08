@@ -4,7 +4,7 @@
 Two team rules, enforced deterministically:
   - never commit directly on main/master/develop/release/*
   - never force-push (--force, -f, --force-with-lease, +refspec, --mirror) or delete a branch,
-    except your own feature branch
+    except a feature-prefixed branch (feat/, fix/, ..., ai/, copilot/)
 
 Reads the hook JSON on stdin; exit 2 blocks the command and stderr is shown to the agent.
 This is a guard rail, not a sandbox: branch protection on GitHub is the real boundary.
@@ -19,8 +19,13 @@ import subprocess
 import sys
 
 PROTECTED = re.compile(r"^(main|master|develop|release/.*)$")
-FEATURE = re.compile(r"^(feat|fix|chore|docs|refactor|test|ci|perf)/")
+# Force-push is allowed to feature-prefixed branches (team naming, plus agent branches). It cannot know who
+# else committed there; GitHub rulesets and review are the real protection for shared branches.
+FEATURE = re.compile(r"^(feat|fix|chore|docs|refactor|test|ci|perf|build|style|revert|ai|copilot)/")
 PREFIX_CMDS = {"sudo", "env", "command", "exec", "time", "nohup", "nice", "xargs"}
+# Shell keywords that can precede a command in the same segment: `if x; then git commit; fi`.
+SHELL_WORDS = {"if", "then", "else", "elif", "do", "while", "until", "{", "}", "!", "fi", "done"}
+PREFIX_OPTS_WITH_VALUE = {"-u", "-g", "-C", "-D", "-n"}  # sudo -u user, nice -n 5, ...
 GIT_OPTS_WITH_VALUE = {"-C", "-c", "--git-dir", "--work-tree", "--namespace", "--super-prefix", "--config-env"}
 PUSH_OPTS_WITH_VALUE = {"-o", "--push-option", "--repo", "--receive-pack", "--exec"}
 SEPARATORS = re.compile(r"^[;&|()]+$")
@@ -32,7 +37,9 @@ def strip_heredocs(cmd: str) -> str:
     while i < len(lines):
         line = lines[i]
         out.append(line)
-        for m in re.finditer(r"<<-?\s*(['\"]?)([A-Za-z_][A-Za-z0-9_]*)\1", line):
+        for m in re.finditer(r"(?<!<)<<-?(?!<)\s*(['\"]?)([A-Za-z_][A-Za-z0-9_]*)\1", line):
+            if line[: m.start()].count("'") % 2 or line[: m.start()].count('"') % 2:
+                continue  # "<<" inside a quoted string is text, not a heredoc
             end = m.group(2)
             i += 1
             while i < len(lines) and lines[i].strip() != end:
@@ -41,7 +48,7 @@ def strip_heredocs(cmd: str) -> str:
     return "\n".join(out)
 
 
-def segments(cmd: str) -> list[list[str]]:
+def segments(cmd: str) -> list:
     cmd = strip_heredocs(cmd.replace("\\\n", " "))
     # Command substitution and newlines start new commands.
     cmd = cmd.replace("$(", " ( ").replace("`", " ; ").replace("\n", " ; ")
@@ -51,12 +58,15 @@ def segments(cmd: str) -> list[list[str]]:
         tokens = list(lex)
     except ValueError:  # unbalanced quotes: fall back to plain splitting
         tokens = cmd.split()
-    segs, cur = [], []
+    # Simple commands are lists of words; separators are kept as strings so "(" / ")" can scope `cd`.
+    segs: list = []
+    cur: list[str] = []
     for t in tokens:
         if SEPARATORS.match(t):
             if cur:
                 segs.append(cur)
             cur = []
+            segs.append(t)
         else:
             cur.append(t)
     if cur:
@@ -131,32 +141,51 @@ def check_push(args: list[str], branch: str) -> None:
         if delete and (PROTECTED.match(dst) or not FEATURE.match(dst)):
             block(f"deleting branch '{dst}' is not allowed from an agent session.")
         if force and (PROTECTED.match(dst) or not FEATURE.match(dst)):
-            block(f"force-push is only allowed to your own feature branch (target: '{dst}'). Merge instead of rewriting shared history.")
+            block(f"force-push is only allowed to feature-prefixed branches like feat/… or fix/… (target: '{dst}'). Merge instead of rewriting shared history.")
 
 
 def main() -> int:
     try:
-        cmd = json.load(sys.stdin).get("tool_input", {}).get("command") or ""
+        payload = json.load(sys.stdin)
+        cmd = payload.get("tool_input", {}).get("command") or ""
     except (ValueError, AttributeError):
         return 0
-    if "git" not in cmd:
+    if not isinstance(cmd, str) or "git" not in cmd:
         return 0
-    cwd = os.getcwd()
+    cwd = payload.get("cwd") if isinstance(payload.get("cwd"), str) and os.path.isdir(payload["cwd"]) else os.getcwd()
+    saved: list[str] = []
     for seg in segments(cmd):
-        i = 0
-        while i < len(seg) and (seg[i] in PREFIX_CMDS or re.match(r"^[A-Za-z_][A-Za-z0-9_]*=", seg[i]) or
-                                (i > 0 and seg[i - 1] in PREFIX_CMDS and seg[i].startswith("-"))):
-            i += 1
+        if isinstance(seg, str):  # separator: a subshell's `cd` does not outlive it
+            for ch in seg:
+                if ch == "(":
+                    saved.append(cwd)
+                elif ch == ")" and saved:
+                    cwd = saved.pop()
+            continue
+        i, env_git_dir = 0, None
+        while i < len(seg):
+            w = seg[i]
+            if w in PREFIX_CMDS or w in SHELL_WORDS:
+                i += 1
+                while i < len(seg) and seg[i].startswith("-"):  # options of sudo/env/nice ...
+                    i += 2 if seg[i] in PREFIX_OPTS_WITH_VALUE else 1
+            elif re.match(r"^[A-Za-z_][A-Za-z0-9_]*=", w):
+                if w.startswith("GIT_DIR="):
+                    env_git_dir = os.path.normpath(os.path.join(cwd, os.path.expanduser(w[8:])))
+                i += 1
+            else:
+                break
         if i >= len(seg):
             continue
         if seg[i] == "cd":
             target = seg[i + 1] if i + 1 < len(seg) else os.path.expanduser("~")
-            cwd = os.path.normpath(os.path.join(cwd, os.path.expanduser(target)))
+            if target != "-":  # `cd -` cannot be resolved here; keep the current guess
+                cwd = os.path.normpath(os.path.join(cwd, os.path.expanduser(target)))
             continue
         if os.path.basename(seg[i]) != "git":
             continue
         i += 1
-        dir_, git_dir = cwd, None
+        dir_, git_dir = cwd, env_git_dir
         while i < len(seg) and seg[i].startswith("-"):
             name, has_eq, val = seg[i].partition("=")
             if name in GIT_OPTS_WITH_VALUE and not has_eq:
