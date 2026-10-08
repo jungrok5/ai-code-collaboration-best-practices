@@ -5,7 +5,7 @@
 | 워크플로 | 트리거 | 하는 일 | 쓰기 권한 | 비용 상한 |
 | --- | --- | --- | --- | --- |
 | `ci.yml` | PR, main push, merge_group | `make setup-ci → lint → typecheck → test → build`; 필수 체크 `ci-ok` | 없음 | — |
-| `pr-checks.yml` | pull_request_target(메타데이터만) | 제목 Conventional 검사, `size/*`, `area/*` 라벨, **AI 공개 체크박스** 검증 → `ai:assisted`/`ai:generated` | PR 라벨 | — |
+| `pr-checks.yml` | pull_request_target(메타데이터만) | 제목 Conventional 검사, `size/*`, `area/*` 라벨, **AI 공개 체크박스** 검증 → `ai:assisted`/`ai:generated`; `review-load`: 1인당 리뷰 대기 PR 상한(`MAX_OPEN_PRS_PER_AUTHOR`, 기본 3)·Reviewer guide 알림(프로토타입 프로필에선 끔) | PR 라벨·코멘트 | — |
 | `validate-ai-config.yml` | 설정 파일 변경 | `scripts/check-ai-config.sh`(플러그인·스키마·actionlint·shellcheck·yamllint·markdownlint) + zizmor | SARIF 업로드 | — |
 | `ai-local-runner.yml` | 이슈·PR·댓글·CI 실패·주간(`AI_BACKEND=local`) | self-hosted 러너 + 로컬 LLM에서 `scripts/ai/dispatch.sh` 실행 | contents/PR/issues | 스크립트별 턴 상한 |
 | `claude.yml` | `@claude` 멘션(이슈/PR 댓글/리뷰) | 질문 답변, 요청한 변경을 커밋·푸시, "Create PR" 링크 | contents/PR/issues | 30턴 |
@@ -16,6 +16,7 @@
 | `agent-approval-check.yml` | PR, 리뷰, 댓글 | 에이전트 커밋이 포함된 PR에 **사람 승인 N명** 상태 체크 `agent-approval-check` | statuses | — |
 | `issue-state-sync.yml` | PR opened/closed | 에이전트 PR에 `ai:generated`; 머지 시 연결 이슈 `ai:done` | issues/PR | — |
 | `claude-maintenance.yml` | 매주 월요일 | 유지보수 리포트 이슈 1개 생성 | issues | 20턴 |
+| `contract-check.yml` | PR(계약 파일 변경 시만) | API/이벤트/스키마 파일 변경을 알리고 OpenAPI(oasdiff)·protobuf(buf) 깨지는 변경 탐지. `breaking-change` 라벨 없으면 실패 | PR 코멘트 | — |
 | `design-check.yml` | PR | 변경 파일·설계를 팀 보드(`board.json`)와 비교해 겹치면 스티키 댓글, 큰 PR에 설계 링크 없으면 알림(차단 안 함, `no-design`으로 끔). LLM 없음 | PR 코멘트 | — |
 | `work-board.yml` | 30분마다, main의 설계·사이트 변경, 수동 | 등록된 레포의 활성 설계 + 열린 PR 변경 파일을 모아 `board.json` 생성, 해설 페이지와 함께 Pages 배포. LLM 없음 | pages | — |
 | `labels-sync.yml` | labels.yml 변경 | 라벨 동기화(PR에서는 dry-run) | issues | — |

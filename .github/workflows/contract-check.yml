@@ -1,0 +1,97 @@
+# Contracts first: when a PR changes an API/event/schema contract, say so loudly and catch breaking changes.
+#  - OpenAPI (openapi*.yaml|yml|json, *.openapi.*) → oasdiff breaking, base vs head
+#  - Protobuf (*.proto with a buf.yaml)              → buf breaking against the base commit
+#  - Anything under contracts/ or *.schema.json      → listed for the reviewer (no automatic diff)
+# A breaking change fails this check unless the PR carries the `breaking-change` label (and, by team rule,
+# links the design that plans the migration). Nothing runs when no contract file changed.
+name: Contract check
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened, labeled, unlabeled, ready_for_review]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: contract-check-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
+jobs:
+  contracts:
+    name: Contract changes
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    permissions:
+      contents: read
+      pull-requests: write
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - name: Find and diff contract files
+        id: check
+        env:
+          BASE_SHA: ${{ github.event.pull_request.base.sha }}
+          LABELS: ${{ join(github.event.pull_request.labels.*.name, ',') }}
+          BODY: ${{ github.event.pull_request.body }}
+        run: |
+          base="$(git merge-base "$BASE_SHA" HEAD)"
+          changed="$(git diff --name-only "$base" HEAD | grep -E '(^|/)contracts/|\.proto$|(^|/)openapi[^/]*\.(ya?ml|json)$|\.openapi\.(ya?ml|json)$|\.schema\.json$|(^|/)asyncapi[^/]*\.(ya?ml|json)$' || true)"
+          if [ -z "$changed" ]; then
+            echo "No contract files changed."
+            echo "found=0" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          breaking=""
+          openapi="$(printf '%s\n' "$changed" | grep -E '(^|/)openapi[^/]*\.(ya?ml|json)$|\.openapi\.(ya?ml|json)$' || true)"
+          if [ -n "$openapi" ]; then
+            go install github.com/oasdiff/oasdiff@v1.32.1
+            while IFS= read -r f; do
+              [ -f "$f" ] || { breaking="$breaking"$'\n'"- \`$f\` was deleted"; continue; }
+              git cat-file -e "$base:$f" 2>/dev/null || continue   # new contract: nothing to break
+              git show "$base:$f" > "$RUNNER_TEMP/base-${f//\//_}"
+              out="$("$(go env GOPATH)/bin/oasdiff" breaking "$RUNNER_TEMP/base-${f//\//_}" "$f" --fail-on ERR 2>&1)" || breaking="$breaking"$'\n'"- \`$f\`:"$'\n```\n'"$out"$'\n```'
+            done <<< "$openapi"
+          fi
+          if printf '%s\n' "$changed" | grep -q '\.proto$' && [ -f buf.yaml ]; then
+            go install github.com/bufbuild/buf/cmd/buf@v1.72.0
+            out="$("$(go env GOPATH)/bin/buf" breaking --against ".git#ref=$base" 2>&1)" || breaking="$breaking"$'\n'"- protobuf:"$'\n```\n'"$out"$'\n```'
+          fi
+          design=0
+          if printf '%s' "$BODY" | grep -q 'docs/designs/'; then design=1; fi
+          allowed=0
+          if printf '%s' "$LABELS" | grep -q 'breaking-change'; then allowed=1; fi
+          {
+            echo "found=1"; echo "design=$design"; echo "allowed=$allowed"
+            echo "files<<EOF"; printf '%s\n' "$changed" | awk '{print "- \x60" $0 "\x60"}'; echo "EOF"
+            if [ -n "$breaking" ]; then echo "breaking<<EOF"; printf '%s\n' "$breaking"; echo "EOF"; fi
+          } >> "$GITHUB_OUTPUT"
+          printf 'contract files:\n%s\nbreaking:%s\n' "$changed" "${breaking:- none}"
+      - name: Comment
+        if: steps.check.outputs.found == '1'
+        continue-on-error: true
+        uses: actions/github-script@3a2844b7e9c422d3c10d287c895573f7108da1b3 # v9
+        env:
+          FILES: ${{ steps.check.outputs.files }}
+          BREAKING: ${{ steps.check.outputs.breaking }}
+          DESIGN: ${{ steps.check.outputs.design }}
+          ALLOWED: ${{ steps.check.outputs.allowed }}
+        with:
+          script: |
+            const marker = "<!-- contract-check -->";
+            const brk = process.env.BREAKING.trim();
+            let body = `${marker}\n### Contract change\nThis PR changes a contract other code or other repos depend on:\n${process.env.FILES}\n`;
+            body += brk ? `\n**Breaking changes detected**\n${brk}\n` : `\nNo breaking change detected by the automatic diff (only OpenAPI and protobuf are diffed).\n`;
+            if (process.env.DESIGN !== "1") body += `\nLink the design that lists the consumers and the rollout order (\`docs/designs/…\`, section "계약 변화"). Contract PRs merge before their implementations.\n`;
+            if (brk && process.env.ALLOWED !== "1") body += `\nThis check fails until the break is removed or the PR is labelled \`breaking-change\` with a migration plan agreed with the consumers.\n`;
+            const comments = await github.paginate(github.rest.issues.listComments, { ...context.repo, issue_number: context.issue.number, per_page: 100 });
+            const mine = comments.find(c => c.body && c.body.startsWith(marker));
+            if (mine) await github.rest.issues.updateComment({ ...context.repo, comment_id: mine.id, body });
+            else await github.rest.issues.createComment({ ...context.repo, issue_number: context.issue.number, body });
+      - name: Fail on unapproved breaking change
+        if: steps.check.outputs.found == '1' && steps.check.outputs.breaking != '' && steps.check.outputs.allowed != '1'
+        run: |
+          echo "::error::Breaking contract change without the breaking-change label. See the PR comment."
+          exit 1

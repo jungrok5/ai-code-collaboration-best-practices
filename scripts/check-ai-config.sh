@@ -74,6 +74,14 @@ if [ -f .github/labels.yml ]; then
   [ "$bad_labels" = 0 ] && pass "all label descriptions ≤ 100 chars"
 fi
 
+section "Skill eval coverage (a warning, not a rule; make ai-eval runs them)"
+for d in plugins/*/skills/*/; do
+  [ -d "$d" ] || continue
+  plugin="${d%%/skills/*}"; name="$(basename "$d")"
+  if grep -rqsF "$name\"" "$plugin/evals" 2>/dev/null; then pass "$name has an eval case"
+  else echo "  ! $plugin skill '$name' has no eval case (plugins/*/evals/, docs/16-team-scale-ai.md)"; fi
+done
+
 section "AGENTS.md size (a warning sign, not a rule)"
 if [ -f AGENTS.md ]; then
   n=$(wc -l < AGENTS.md)

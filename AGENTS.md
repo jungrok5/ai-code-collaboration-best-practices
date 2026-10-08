@@ -18,6 +18,7 @@ everything else lives in `docs/`. Hard limits are enforced by hooks, CI and bran
 | Validate AI / automation config | `make ai-validate` |
 | Is anyone already working on this area? | `make overlap AREAS="src/auth/** api:/login"` |
 | AI tasks from your own seat (uses your `claude` login, no API key) | `make ai-triage ISSUE=1` · `make ai-review PR=2` · `make ai-implement ISSUE=1` |
+| Test team skills (positive + negative cases) | `make ai-eval` |
 
 `make` targets detect the stack (`scripts/stack.sh`); fix the Makefile rather than inventing other commands.
 
@@ -47,9 +48,9 @@ PRs: Conventional Commit title (it becomes the squash commit), the template's AI
 ## Labels that drive automation
 
 Issues: `ai:ready` (a human says an agent may take it) → `ai:in-progress` → `ai:review` | `ai:needs-human` → `ai:done`.
-PRs: `ai:assisted` / `ai:generated` (provenance), `size/*` (automatic), `no-design` (skip the design reminder).
+PRs: `ai:assisted` / `ai:generated` (provenance), `size/*` (automatic), `no-design` (skip the design reminder), `breaking-change` (a contract break the consumers agreed to).
 Server-side AI jobs run only when the repo variable `AI_BACKEND` is set; otherwise people run the same tasks with `make ai-*`.
 
 ## More
 
-`docs/01-playbook.md` · `docs/14-design-first-and-overlap.md` · `docs/15-lean-harness.md` · `docs/05-github-automation.md`
+`docs/01-playbook.md` · `docs/14-design-first-and-overlap.md` · `docs/15-lean-harness.md` · `docs/16-team-scale-ai.md` · `docs/05-github-automation.md`

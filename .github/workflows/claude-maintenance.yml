@@ -38,8 +38,11 @@ jobs:
             2. `git log --since="7 days ago" --stat`: summarise what merged; note TODO/FIXME added without an issue number.
             3. Check that commands in the AGENTS.md Commands table still exist in the Makefile; flag drift between AGENTS.md and docs/.
             4. If a package manifest exists, list outdated/vulnerable dependencies from its audit command output.
+            5. Recurring review findings: run `scripts/ai/review-comments.sh 7` (last week's PR review comments as JSON
+               lines). Group them by theme; for each theme seen in 2+ different PRs propose ONE durable fix — prefer a
+               lint rule or test, else one line for AGENTS.md or .claude/rules/ — with the PR numbers and exact text.
             Create ONE issue titled "Weekly maintenance report — <date>" with the findings as checklists, labelled
             type/chore. Do not modify files, close issues, or comment on PRs.
           claude_args: |
             --max-turns 20
-            --allowedTools "Read,Glob,Grep,Bash(git log:*),Bash(gh issue list:*),Bash(gh issue create:*),Bash(npm audit:*),Bash(npm outdated:*),Bash(uv pip list:*),Bash(go list:*)"
+            --allowedTools "Read,Glob,Grep,Bash(git log:*),Bash(gh issue list:*),Bash(gh issue create:*),Bash(scripts/ai/review-comments.sh:*),Bash(npm audit:*),Bash(npm outdated:*),Bash(uv pip list:*),Bash(go list:*)"

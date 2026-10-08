@@ -109,3 +109,41 @@ jobs:
             }
             if (assisted) await add("ai:assisted");
             if (generated) await add("ai:generated");
+
+  review-load:
+    # Advisory. AI makes PRs cheap to open but reviews stay expensive; this keeps the queue honest.
+    name: Review load
+    if: github.event.pull_request.draft == false && vars.REVIEW_PROFILE != 'prototype'
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    permissions:
+      pull-requests: write
+    steps:
+      - uses: actions/github-script@3a2844b7e9c422d3c10d287c895573f7108da1b3 # v9
+        env:
+          MAX_OPEN: ${{ vars.MAX_OPEN_PRS_PER_AUTHOR || '3' }}
+        with:
+          script: |
+            const pr = context.payload.pull_request;
+            const author = pr.user.login;
+            const max = Number(process.env.MAX_OPEN) || 3;
+            const open = (await github.paginate(github.rest.pulls.list, { ...context.repo, state: "open", per_page: 100 }))
+              .filter(p => p.user.login === author && !p.draft);
+            const notes = [];
+            if (open.length > max) {
+              notes.push(`@${author} has ${open.length} PRs open for review (team limit ${max}). ` +
+                `Reviews are the bottleneck once agents write code: land or close one of ${open.filter(p => p.number !== pr.number).map(p => "#" + p.number).join(", ")} before asking for more review time.`);
+            }
+            const body = pr.body || "";
+            const guide = (body.split(/^## Reviewer guide/m)[1] || "").split(/^## /m)[0];
+            const filled = guide.split("\n").filter(l => /^- [^:]+:\s*\S/.test(l)).length;
+            if (/- \[x\] AI-generated/i.test(body) && filled < 2) {
+              notes.push("This PR is AI-generated but the **Reviewer guide** is mostly empty. Say where to look first, what you verified yourself, and what you could not verify — reviewers then spend their time where it matters.");
+            }
+            const marker = "<!-- review-load -->";
+            const comments = await github.paginate(github.rest.issues.listComments, { ...context.repo, issue_number: pr.number, per_page: 100 });
+            const mine = comments.find(c => c.body && c.body.startsWith(marker));
+            const text = `${marker}\n### Review load (advisory)\n` + (notes.length ? notes.map(n => `- ${n}`).join("\n") : "- All good.");
+            if (mine) await github.rest.issues.updateComment({ ...context.repo, comment_id: mine.id, body: text });
+            else if (notes.length) await github.rest.issues.createComment({ ...context.repo, issue_number: pr.number, body: text });
+            notes.forEach(n => core.warning(n));

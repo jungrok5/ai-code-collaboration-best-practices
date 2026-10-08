@@ -146,12 +146,12 @@ footer{margin-top:56px;padding-top:18px;border-top:1px solid var(--line);font-si
     <span class="fact">API 키 없이 동작</span>
     <span class="fact">규칙 파일 1개(AGENTS.md)</span>
     <span class="fact">사람 승인 없이는 머지 불가</span>
-    <span class="fact">워크플로 21개 · 스킬 12개 · 서브에이전트 5개</span>
+    <span class="fact">워크플로 22개 · 스킬 12개 · 서브에이전트 5개</span>
   </div>
 </header>
 
 <nav class="toc" aria-label="목차">
-  <a href="#overview">한눈에</a><a href="#terms">용어</a><a href="#layers">6개 층 상세</a><a href="#flow">이슈→머지 흐름</a><a href="#design">설계 먼저·겹침</a><a href="#labels">라벨 상태</a><a href="#backend">AI 실행 주체</a><a href="#guards">막히는 것들</a><a href="#lean">가벼운 하네스</a><a href="#multi">여러 레포</a><a href="#start">시작하기</a><a href="#files">파일 지도</a><a href="#faq">FAQ</a>
+  <a href="#overview">한눈에</a><a href="#terms">용어</a><a href="#layers">6개 층 상세</a><a href="#flow">이슈→머지 흐름</a><a href="#design">설계 먼저·겹침</a><a href="#labels">라벨 상태</a><a href="#backend">AI 실행 주체</a><a href="#guards">막히는 것들</a><a href="#lean">가벼운 하네스</a><a href="#multi">여러 레포</a><a href="#scale">팀 규모 운영</a><a href="#start">시작하기</a><a href="#files">파일 지도</a><a href="#faq">FAQ</a>
 </nav>
 
 <!-- ============ 1. overview ============ -->
@@ -250,7 +250,7 @@ footer{margin-top:56px;padding-top:18px;border-top:1px solid var(--line);font-si
     <div class="term"><dt>스킬(skill)</dt><dd>자주 하는 일의 절차서. AI가 <code>/이름</code>으로 불러 그대로 따릅니다.</dd><dd class="eg">예: <code>/implement-issue 12</code>, <code>/review-pr 34</code></dd></div>
     <div class="term"><dt>서브에이전트</dt><dd>특정 역할만 맡는 별도 AI. 작업한 AI와 다른 눈으로 검토하게 할 때 씁니다.</dd><dd class="eg">예: code-reviewer, security-reviewer</dd></div>
     <div class="term"><dt>플러그인 · 마켓플레이스</dt><dd>훅·스킬·서브에이전트를 묶은 꾸러미가 플러그인, 그 목록을 올려두는 곳이 마켓플레이스입니다.</dd><dd class="eg">이 레포 자체가 마켓플레이스 "ai-collab"입니다.</dd></div>
-    <div class="term"><dt>워크플로(GitHub Actions)</dt><dd>GitHub에서 이벤트(이슈 생성, PR, 푸시)가 생기면 자동으로 도는 작업.</dd><dd class="eg"><code>.github/workflows/*.yml</code> 21개</dd></div>
+    <div class="term"><dt>워크플로(GitHub Actions)</dt><dd>GitHub에서 이벤트(이슈 생성, PR, 푸시)가 생기면 자동으로 도는 작업.</dd><dd class="eg"><code>.github/workflows/*.yml</code> 22개</dd></div>
     <div class="term"><dt>룰셋 · CODEOWNERS</dt><dd>룰셋은 브랜치 보호 규칙(승인·CI 필수 등), CODEOWNERS는 경로별 책임 리뷰어 목록입니다.</dd><dd class="eg"><code>scripts/rulesets/main.json</code>, <code>.github/CODEOWNERS</code></dd></div>
     <div class="term"><dt>라벨 상태</dt><dd>이슈가 어느 단계인지 라벨로 표시합니다. 자동화가 라벨을 보고 움직입니다.</dd><dd class="eg"><code>ai:ready → ai:in-progress → ai:review → ai:done</code></dd></div>
     <div class="term"><dt>claude -p (헤드리스)</dt><dd>대화창 없이 명령 한 줄로 Claude Code를 실행하는 방식. 스크립트와 자동화에 씁니다.</dd><dd class="eg"><code>make ai-review PR=34</code>가 내부에서 이걸 씁니다.</dd></div>
@@ -325,6 +325,7 @@ footer{margin-top:56px;padding-top:18px;border-top:1px solid var(--line);font-si
           <tr><td><code>labels-sync</code> · <code>stale</code> · <code>codeql</code> · <code>dependabot-auto-merge</code> · <code>validate-ai-config</code></td><td>각각</td><td>라벨 동기화, 오래된 이슈 정리, 보안 스캔, 의존성 소규모 갱신 자동 머지, 설정 파일 검증</td><td>아니오</td></tr>
           <tr><td><code>work-board.yml</code></td><td>30분마다, main 변경</td><td>등록된 레포들의 활성 설계와 열린 PR 변경 파일을 모아 <code>board.json</code>으로, 이 해설 페이지와 함께 Pages에 배포</td><td>아니오</td></tr>
           <tr><td><code>design-check.yml</code></td><td>PR</td><td>PR이 건드리는 영역을 팀 보드와 비교해 겹치면 댓글. 큰 PR에 설계 링크가 없으면 알림(막지 않음)</td><td>아니오</td></tr>
+          <tr><td><code>contract-check.yml</code></td><td>PR (계약 파일 변경 시)</td><td>API·이벤트·스키마 변경을 알리고, 깨지는 변경(OpenAPI·protobuf)이면 <code>breaking-change</code> 라벨 없이는 실패</td><td>아니오</td></tr>
           <tr><td><code>copilot-setup-steps</code> · <code>bootstrap-repo</code></td><td>각각</td><td>Copilot 에이전트 환경 준비 · 레포 설정·라벨·룰셋 적용(수동)</td><td>아니오</td></tr>
           <tr><td><code>claude-issue-triage.yml</code></td><td>이슈 생성</td><td>라벨 제안, 빠진 정보·중복 댓글. 이슈를 닫지 않음</td><td>예</td></tr>
           <tr><td><code>claude-implement-issue.yml</code></td><td><code>ai:ready</code> 라벨</td><td>브랜치 생성 → 테스트·구현 → 검사 통과 커밋 → 초안 PR</td><td>예</td></tr>
@@ -581,6 +582,32 @@ flowchart LR
   </div>
 </section>
 
+<!-- ============ 8b. scale ============ -->
+<section id="scale">
+  <div class="sec-head">
+    <h2>팀 규모로 쓸 때</h2>
+    <p>AI가 코드를 빨리 만들수록 병목은 리뷰, 레포 사이의 약속, 반복되는 실수, 스킬 품질로 옮겨 갑니다. 레포 성격에 따라 사람 리뷰를 어디에 둘지도 정합니다.</p>
+  </div>
+  <div class="tbl"><table>
+    <thead><tr><th>병목</th><th>장치</th><th>막나?</th></tr></thead>
+    <tbody>
+      <tr><td>리뷰 대기</td><td>1인당 리뷰 대기 PR 상한(기본 3), PR 템플릿의 Reviewer guide("먼저 볼 곳 / 확인한 것 / 못 한 것")</td><td>알림만</td></tr>
+      <tr><td>레포 간 약속</td><td>설계의 "계약 변화" 절, <code>contract:</code> 영역, <code>contract-check.yml</code>이 OpenAPI·protobuf 깨지는 변경 탐지</td><td>깨지는 변경은 <code>breaking-change</code> 라벨 필요</td></tr>
+      <tr><td>같은 지적 반복</td><td>주간 리포트가 지난주 리뷰 댓글을 묶어 2번 이상 나온 주제마다 린트·테스트·규칙 한 줄을 제안</td><td>제안만</td></tr>
+      <tr><td>스킬 품질</td><td>스킬별 평가(써야 할 때 쓰는가 + 쓰지 말아야 할 때 안 쓰는가), <code>make ai-eval</code></td><td>평가 없는 스킬은 경고</td></tr>
+    </tbody>
+  </table></div>
+  <div class="tbl" style="margin-top:12px"><table>
+    <thead><tr><th></th><th>프로토타입 <code>PROFILE=prototype</code></th><th>운영(기본)</th></tr></thead>
+    <tbody>
+      <tr><td>PR · CI · 히스토리 보호 · 비밀 훅</td><td>유지</td><td>유지</td></tr>
+      <tr><td>사람 승인 · CODEOWNER · 에이전트 게이트</td><td>없음</td><td>1명 이상</td></tr>
+      <tr><td>운영 전환 조건</td><td colspan="2">실사용자·실데이터, 다른 레포가 API에 의존, 장애 호출, 운영 권한 — 하나라도 생기면 운영으로 바꾸고 위험 구간 중심으로 한 번 전체 리뷰</td></tr>
+    </tbody>
+  </table></div>
+  <p class="muted" style="margin-top:10px">코드를 읽는 리뷰는 사라지기보다 위로 이동합니다: 의도(설계·계약), 검증(테스트·계약 diff·평가), 위험 구간 표본 리뷰. 자세히는 <code>docs/16-team-scale-ai.md</code>.</p>
+</section>
+
 <!-- ============ 9. start ============ -->
 <section id="start">
   <div class="sec-head">
@@ -639,7 +666,7 @@ flowchart LR
 │   ├── ISSUE_TEMPLATE/ · pull_request_template.md   <span class="c">③ 양식</span>
 │   ├── CODEOWNERS · labels.yml · dependabot.yml     <span class="c">③ 책임자 · 라벨 · 의존성</span>
 │   ├── copilot-instructions.md · instructions/ · agents/   <span class="c">① Copilot용</span>
-│   └── workflows/               <span class="c">④ 자동화 21개 (work-board · design-check 포함)</span>
+│   └── workflows/               <span class="c">④ 자동화 22개 (work-board · design-check · contract-check 포함)</span>
 ├── .cursor/ · .gemini/ · .codex/ · .aider.conf.yml   <span class="c">① 각 도구 설정</span>
 ├── scripts/
 │   ├── ai/                      <span class="c">⑤ 키 없는 AI 작업 (triage · review · implement · fix-ci …)</span>

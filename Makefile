@@ -2,7 +2,7 @@
 SHELL := /bin/bash
 .DEFAULT_GOAL := help
 
-.PHONY: designs overlap help setup setup-ci lint typecheck test build check ai-validate labels github-setup new-repo hooks ai-check ai-triage ai-review ai-implement ai-fix-ci ai-respond ai-maintenance ai-queue ai-local-check
+.PHONY: ai-eval designs overlap help setup setup-ci lint typecheck test build check ai-validate labels github-setup new-repo hooks ai-check ai-triage ai-review ai-implement ai-fix-ci ai-respond ai-maintenance ai-queue ai-local-check
 
 help: ## Show this help
 	@grep -E '^[a-zA-Z_-]+:.*?## ' $(MAKEFILE_LIST) | awk 'BEGIN {FS = ":.*?## "}; {printf "  \033[36m%-14s\033[0m %s\n", $$1, $$2}'
@@ -36,8 +36,8 @@ hooks: ## (Re)install git hooks via pre-commit
 labels: ## Sync GitHub labels from .github/labels.yml (needs gh auth)
 	@scripts/setup-github.sh labels
 
-github-setup: ## Apply repo settings, labels and rulesets to the current GitHub repo (needs gh auth, admin)
-	@scripts/setup-github.sh all
+github-setup: ## Apply repo settings, labels and rulesets (needs gh auth, admin). PROFILE=prototype drops human-approval gates
+	@PROFILE="$(or $(PROFILE),production)" scripts/setup-github.sh all
 
 new-repo: ## Create a new repo from this template: make new-repo REPO=owner/name [VISIBILITY=private]
 	@scripts/new-repo.sh "$(REPO)" --$(or $(VISIBILITY),private)
@@ -72,6 +72,9 @@ ai-queue: ## Implement every ai:ready issue from this seat: make ai-queue [POST=
 
 ai-local-check: ## Verify a local LLM endpoint (ANTHROPIC_BASE_URL) speaks the Anthropic Messages API
 	@scripts/ai/local-llm-check.sh
+
+ai-eval: ## Run the team plugin's skill evals with your own claude login (no API key). CASE=<glob> to filter
+	@claude plugin eval plugins/team-ai-workflow --trust-plugin --no-publish --runs $(or $(RUNS),1) --threshold $(or $(THRESHOLD),0.67) $(if $(CASE),--case "$(CASE)")
 
 # ---- Design-first and overlap (deterministic, no LLM) ----
 designs: ## Rebuild docs/designs/INDEX.md and board.json from design front matter

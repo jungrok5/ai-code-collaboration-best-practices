@@ -10,6 +10,13 @@ Design:
 
 -
 
+## Reviewer guide
+<!-- Where should a reviewer look first, and what did YOU check? Required for AI-generated PRs:
+     reviewers spend their attention where you could not verify. -->
+- Look first at:
+- I verified:
+- I did not verify / not sure about:
+
 ## How it was tested
 <!-- Exact commands and results. Screenshots/recordings for UI. CI must be green before review. -->
 ```

@@ -21,7 +21,8 @@
 - [ ] `AGENTS.md`의 Project 섹션 작성, Commands 표 확인(`make check`가 실제로 돌아야 함)
 - [ ] `CODEOWNERS`, `labels.yml`의 `area/*`, `release-please-config.json`의 `release-type`
 - [ ] `ci.yml` 툴체인 버전(`vars.NODE_VERSION`/`PYTHON_VERSION`), `codeql.yml` 언어 매트릭스
-- [ ] AI 백엔드(A와 동일, 선택), `make github-setup`
+- [ ] AI 백엔드(A와 동일, 선택), `make github-setup` — 프로토타입 레포면 `make github-setup PROFILE=prototype`(사람 승인 게이트 없음, 운영 전환 조건은 docs/16 §5)
+- [ ] 선택 변수: `MAX_OPEN_PRS_PER_AUTHOR`(기본 3). API/이벤트를 다른 레포에 제공하면 계약 파일을 `contracts/`에 두고 OpenAPI면 그대로, protobuf면 `buf.yaml` 추가
 - [ ] 변수 `DESIGN_BOARD_URL`=허브의 `https://<owner>.github.io/<hub>/board.json` (PR 겹침 확인과 세션 시작 요약이 팀 전체 보드를 봄), 허브의 `work-board-repos.txt`에 이 레포 추가
 - [ ] 첫 PR을 열어 `ci-ok`, `pr-checks`, `Claude Code Review`가 도는지 확인
 - [ ] 이슈 하나로 `make ai-triage ISSUE=1`, `make ai-implement ISSUE=1 POST=1`을 끝까지 확인(초안 PR + `ai:review`)

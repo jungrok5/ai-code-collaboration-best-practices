@@ -1,6 +1,6 @@
 ---
 name: design
-description: Write a one-page design doc with a Mermaid structure diagram for work that is ambiguous, spans several areas or repos, changes an interface, or will take more than a day — check it against the team board for overlap, and open it as its own small PR for human approval before any code is written. Use when the user asks to design, plan, propose, or "think before building", or when /implement-issue finds the issue too vague.
+description: Write a one-page design doc with a Mermaid structure diagram for work that is ambiguous, spans several areas or repos, changes an interface, or will take more than a day — check it against the team board for overlap, and open it as its own small PR for human approval before any code is written. Use when the user asks to design, plan, propose, kick off or "get started on" work whose scope is still undecided or that spans several services, teams or repos, or when /implement-issue finds the issue too vague.
 ---
 
 # Design before building

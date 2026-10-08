@@ -3,6 +3,8 @@
 #   settings  : squash-only merges, auto-merge, delete-branch-on-merge, update-branch, secret scanning + push protection
 #   labels    : create/update every label in .github/labels.yml (idempotent)
 #   rulesets  : create or update rulesets from scripts/rulesets/*.json (main.json + feature-branches.json)
+#               PROFILE=prototype applies main.json without the human-approval gates (PR + CI + history rules stay);
+#               see docs/16-team-scale-ai.md for when a repo should switch back (PROFILE=production, the default)
 #   check     : print the current state without changing anything
 #   all       : settings + labels + rulesets
 # Requires: gh (authenticated as a repo admin) and jq. Usage: scripts/setup-github.sh <what> [owner/repo]
@@ -10,6 +12,8 @@ set -euo pipefail
 cd "$(git rev-parse --show-toplevel 2>/dev/null || pwd)" || exit 1
 
 WHAT="${1:-check}"
+PROFILE="${PROFILE:-production}"
+case "$PROFILE" in production|prototype) ;; *) echo "PROFILE must be production or prototype"; exit 2 ;; esac
 REPO="${2:-${GITHUB_REPOSITORY:-}}"
 command -v gh >/dev/null || { echo "gh is required: https://cli.github.com"; exit 1; }
 command -v jq >/dev/null || { echo "jq is required"; exit 1; }
@@ -61,20 +65,37 @@ do_labels() {
 }
 
 do_rulesets() {
-  bold "Rulesets from scripts/rulesets/"
-  local existing
+  bold "Rulesets from scripts/rulesets/ (profile: $PROFILE)"
+  local existing tmp
   existing="$(api "/repos/$REPO/rulesets" 2>/dev/null || echo '[]')"
+  tmp="$(mktemp)"
   for f in scripts/rulesets/main.json scripts/rulesets/feature-branches.json; do
     [ -f "$f" ] || continue
-    local rname rid
+    local rname rid src="$f"
     rname="$(jq -r .name "$f")"
+    if [ "$PROFILE" = prototype ] && [ "$f" = scripts/rulesets/main.json ]; then
+      # Prototype: keep PR-only, CI, squash, no force-push/deletion; drop human-approval gates.
+      jq '(.rules[] | select(.type == "pull_request") | .parameters) |= (.required_approving_review_count = 0
+            | .require_code_owner_review = false | .require_last_push_approval = false | .required_review_thread_resolution = false)
+          | (.rules[] | select(.type == "required_status_checks") | .parameters.required_status_checks)
+            |= map(select(.context != "agent-approval-check"))' "$f" > "$tmp"
+      src="$tmp"
+    fi
     rid="$(printf '%s' "$existing" | jq -r --arg n "$rname" '.[] | select(.name==$n) | .id' | head -1)"
     if [ -n "$rid" ]; then
-      api --method PUT "/repos/$REPO/rulesets/$rid" --input "$f" >/dev/null && ok "updated ruleset: $rname (id $rid)"
+      api --method PUT "/repos/$REPO/rulesets/$rid" --input "$src" >/dev/null && ok "updated ruleset: $rname (id $rid)"
     else
-      api --method POST "/repos/$REPO/rulesets" --input "$f" >/dev/null && ok "created ruleset: $rname"
+      api --method POST "/repos/$REPO/rulesets" --input "$src" >/dev/null && ok "created ruleset: $rname"
     fi
   done
+  rm -f "$tmp"
+  if [ "$PROFILE" = prototype ]; then
+    api --method POST "/repos/$REPO/actions/variables" -f name=REVIEW_PROFILE -f value=prototype >/dev/null 2>&1 \
+      || api --method PATCH "/repos/$REPO/actions/variables/REVIEW_PROFILE" -f value=prototype >/dev/null 2>&1 || true
+    warn "prototype profile: human approval is optional on $REPO. Switch back with: make github-setup PROFILE=production"
+  else
+    api --method DELETE "/repos/$REPO/actions/variables/REVIEW_PROFILE" >/dev/null 2>&1 || true
+  fi
   warn "Optional: scripts/rulesets/optional-copilot-review.json (apply with: gh api --method POST /repos/$REPO/rulesets --input scripts/rulesets/optional-copilot-review.json)"
   warn "Rulesets need GitHub Pro/Team/Enterprise for private repos (free for public repos)."
 }

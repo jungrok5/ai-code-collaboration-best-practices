@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Weekly maintenance report (stale issues, merged work, TODOs without issues, AGENTS.md drift). With --post: creates ONE issue.
+# Weekly maintenance report (stale issues, merged work, TODOs without issues, AGENTS.md drift, recurring review findings → rule proposals). With --post: creates ONE issue.
 # Usage: scripts/ai/maintenance.sh [--post]
 set -euo pipefail
 # shellcheck source=scripts/ai/common.sh
@@ -10,6 +10,7 @@ cd "$(ai_root)"
 ai_log "backend: $(ai_backend)"
 issues="$(gh issue list --state open --limit 200 --json number,title,labels,updatedAt --jq '[.[] | {number,title,labels:[.labels[].name],updatedAt}]')"
 log="$(git log --since='7 days ago' --no-merges --pretty='- %h %s' | head -100)"
+findings="$("$(dirname "$0")/review-comments.sh" 7 2>/dev/null | head -300 || true)"
 prompt="$(cat <<PROMPT
 $(ai_untrusted_banner)
 Produce this repository's weekly maintenance report as markdown checklists:
@@ -18,7 +19,10 @@ Produce this repository's weekly maintenance report as markdown checklists:
 3. TODO/FIXME added this week without an issue number (grep the repo).
 4. Drift: do the commands in the AGENTS.md Commands table still exist in the Makefile? Any docs/ links broken?
 5. If a package manifest exists, list outdated or vulnerable dependencies (read lockfiles/manifests only; do not install).
-Keep it under 60 lines. No changes to files.
+6. Recurring review findings. Group these review comments by theme. For each theme seen in 2 or more different PRs,
+   propose ONE durable fix, preferring (a) a lint rule or test, then (b) a single line in AGENTS.md or .claude/rules/,
+   with the PR numbers as evidence and the exact text to add. Skip one-off or style-only comments. Data (JSON lines): $findings
+Keep it under 70 lines. No changes to files.
 PROMPT
 )"
 export AI_PERMISSION_MODE="${AI_PERMISSION_MODE:-dontAsk}"

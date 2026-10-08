@@ -17,7 +17,8 @@
 | **GitHub 템플릿·거버넌스** | 에이전트 친화 이슈 폼 3종, PR 템플릿(AI 공개 필수), CODEOWNERS, 라벨-as-code, Dependabot, 룰셋 JSON(브랜치 보호), squash-only 설정 스크립트 |
 | **설계 먼저 + 팀 작업 보드** | 일의 크기별 T0/T1/T2. 큰 일은 1쪽 설계 + 구조도(`docs/designs/`, `/design`)를 먼저 머지. 여러 레포의 활성 설계·열린 PR 파일을 모은 `board.json`을 세션 시작 때 한 줄 요약으로 보여 주고, PR마다 겹침을 댓글로 알림(LLM 토큰 0) — [docs/14](docs/14-design-first-and-overlap.md) |
 | **가벼운 하네스** | 최신 모델 기준으로 규칙·스킬·훅을 덜어냄(AGENTS.md 55줄, 스킬 10개 합계 약 100줄). 결정적 안전장치만 남김. 권한을 auto + 좁은 deny로 바꾸는 것은 사람이 `scripts/apply-lean-permissions.sh`로 적용 — [docs/15](docs/15-lean-harness.md) |
-| **자동화 21개 워크플로** | CI(스택 자동 감지) · PR 위생(제목/크기/라벨/AI 공개) · `@claude` 응답 · AI 코드 리뷰(참고용) · 이슈 트리아지 · **`ai:ready` 라벨 → 에이전트 구현 → 초안 PR** · CI 실패 자동 수정 PR · 에이전트 커밋 사람 승인 게이트 · 라벨 상태 동기화 · 주간 유지보수 리포트 · release-please · CodeQL · Dependabot 자동 머지 · stale · Copilot 환경 · 레포 부트스트랩 · 설정 검증 · 설계 겹침 확인 · 작업 보드/Pages |
+| **팀 규모 운영** | 1인당 리뷰 대기 PR 상한·Reviewer guide, 계약(API/스키마) 먼저 + 깨지는 변경 자동 탐지(`contract-check`), 반복되는 리뷰 지적 → 규칙 제안, 스킬 평가(`make ai-eval`), 프로토타입/운영 레포 프로필 — [docs/16](docs/16-team-scale-ai.md) |
+| **자동화 22개 워크플로** | CI(스택 자동 감지) · PR 위생(제목/크기/라벨/AI 공개) · `@claude` 응답 · AI 코드 리뷰(참고용) · 이슈 트리아지 · **`ai:ready` 라벨 → 에이전트 구현 → 초안 PR** · CI 실패 자동 수정 PR · 에이전트 커밋 사람 승인 게이트 · 라벨 상태 동기화 · 주간 유지보수 리포트 · release-please · CodeQL · Dependabot 자동 머지 · stale · Copilot 환경 · 레포 부트스트랩 · 설정 검증 · 설계 겹침 확인 · 작업 보드/Pages · 계약 변경 검사 |
 | **키 없는 AI 실행 경로** | `make ai-triage/ai-review/ai-implement/ai-fix-ci/ai-queue`: 개인 자리에서 `claude -p`(헤드리스)로 이슈 트리아지·PR 리뷰·구현·CI 수정·주간 리포트. 서버는 `infra/local-llm/`(llama.cpp/Ollama) + self-hosted 러너(`ai-local-runner.yml`). GitHub 호스티드 러너에서 Anthropic을 쓰는 것은 선택(`AI_BACKEND=anthropic`) |
 | **로컬 재현 환경** | `Makefile`(스택 무관 `make check`), `scripts/bootstrap.sh`, pre-commit(gitleaks·actionlint·shellcheck·yamllint·markdownlint·conventional commit), devcontainer, EditorConfig, VS Code 권장 확장·MCP |
 | **문서(한국어)** | 플레이북, 브랜치/PR, 컨텍스트 파일, Claude 설정, 자동화, 리뷰 정책, 멀티 레포, 보안, 지표, 교차검증, 도구 매트릭스, 체크리스트, AI 백엔드, 설계 먼저·겹침, 가벼운 하네스, ADR 7건 |
@@ -188,7 +189,7 @@ CI가 실패하면 `claude-ci-fix.yml`이 로그를 읽고 PR 브랜치를 향�
 │   ├── CODEOWNERS · labels.yml · labeler.yml · dependabot.yml
 │   ├── copilot-instructions.md · instructions/*.instructions.md · agents/*.agent.md
 │   ├── zizmor.yml                 # 워크플로 보안 감사 설정
-│   └── workflows/                 # 21개 (아래 표)
+│   └── workflows/                 # 22개 (아래 표)
 ├── .cursor/ (rules/*.mdc, BUGBOT.md) · .gemini/ (settings.json, config.yaml, styleguide.md) · .codex/config.toml
 ├── .aider.conf.yml · .coderabbit.yaml · .mcp.json · .vscode/ (settings, extensions, mcp.json)
 ├── scripts/
@@ -204,7 +205,7 @@ CI가 실패하면 `claude-ci-fix.yml`이 로그를 읽고 PR 브랜치를 향�
 │   ├── build-site.sh · render-diagram.mjs  # 해설 페이지 · 구조도 PNG 생성
 │   └── rulesets/*.json            # 브랜치 보호 룰셋 (main · feature-branches · optional copilot review)
 ├── infra/local-llm/               # llama.cpp/Ollama 로컬 LLM 서버 + self-hosted 러너 가이드
-├── docs/                          # 한국어 문서 01~15 + adr/ + designs/(설계 문서) + site/(해설 페이지)
+├── docs/                          # 한국어 문서 01~16 + adr/ + designs/(설계 문서) + site/(해설 페이지)
 ├── Makefile · .pre-commit-config.yaml · .devcontainer/ · .editorconfig · .gitattributes · .gitmessage.txt
 ├── release-please-config.json · .release-please-manifest.json · version.txt
 └── CONTRIBUTING.md · SECURITY.md · SUPPORT.md · CODE_OF_CONDUCT.md · LICENSE (MIT)
@@ -228,6 +229,7 @@ CI가 실패하면 `claude-ci-fix.yml`이 로그를 읽고 PR 브랜치를 향�
 | `issue-state-sync.yml` | PR 생성/머지 | 에이전트 PR 라벨, 머지 시 이슈 `ai:done` |
 | `claude-maintenance.yml` | 매주 | 유지보수 리포트 이슈 |
 | `validate-ai-config.yml` | 설정 변경 | `check-ai-config.sh` + zizmor |
+| `contract-check.yml` | PR (계약 파일 변경 시) | OpenAPI/protobuf 깨지는 변경 탐지, `breaking-change` 라벨 없으면 실패, 소비자·설계 링크 안내 |
 | `work-board.yml` · `design-check.yml` | 30분마다·main / PR | 팀 작업 보드(`board.json`)와 해설 페이지를 Pages에 배포 · PR의 설계/영역 겹침을 댓글로 알림(차단 안 함, LLM 없음) |
 | `labels-sync.yml` · `release-please.yml` · `dependabot-auto-merge.yml` · `codeql.yml` · `stale.yml` · `copilot-setup-steps.yml` · `bootstrap-repo.yml` | 각각 | 라벨 동기화 · 릴리스 · 의존성 자동 머지 · 코드 스캐닝 · 정리 · Copilot 환경 · 레포 설정 적용 |
 
@@ -252,7 +254,7 @@ CI가 실패하면 `claude-ci-fix.yml`이 로그를 읽고 PR 브랜치를 향�
 
 ## 문서
 
-[docs/README.md](docs/README.md) — 01 플레이북 · 02 브랜치/PR · 03 컨텍스트 파일 · 04 Claude Code 설정 · 05 GitHub 자동화 · 06 리뷰 정책 · 07 멀티 레포 · 08 보안/거버넌스 · 09 지표 · 10 교차검증 · 11 도구 매트릭스 · 12 셋업 체크리스트 · 13 AI 백엔드 · 14 설계 먼저·겹침 · 15 가벼운 하네스 · ADR
+[docs/README.md](docs/README.md) — 01 플레이북 · 02 브랜치/PR · 03 컨텍스트 파일 · 04 Claude Code 설정 · 05 GitHub 자동화 · 06 리뷰 정책 · 07 멀티 레포 · 08 보안/거버넌스 · 09 지표 · 10 교차검증 · 11 도구 매트릭스 · 12 셋업 체크리스트 · 13 AI 백엔드 · 14 설계 먼저·겹침 · 15 가벼운 하네스 · 16 팀 규모 운영 · ADR
 
 ## 커스터마이즈 포인트
 
