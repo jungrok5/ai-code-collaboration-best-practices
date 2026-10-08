@@ -2,7 +2,7 @@
 SHELL := /bin/bash
 .DEFAULT_GOAL := help
 
-.PHONY: help setup setup-ci lint typecheck test build check ai-validate labels github-setup new-repo hooks ai-check ai-triage ai-review ai-implement ai-fix-ci ai-respond ai-maintenance ai-queue ai-local-check
+.PHONY: designs overlap help setup setup-ci lint typecheck test build check ai-validate labels github-setup new-repo hooks ai-check ai-triage ai-review ai-implement ai-fix-ci ai-respond ai-maintenance ai-queue ai-local-check
 
 help: ## Show this help
 	@grep -E '^[a-zA-Z_-]+:.*?## ' $(MAKEFILE_LIST) | awk 'BEGIN {FS = ":.*?## "}; {printf "  \033[36m%-14s\033[0m %s\n", $$1, $$2}'
@@ -72,3 +72,10 @@ ai-queue: ## Implement every ai:ready issue from this seat: make ai-queue [POST=
 
 ai-local-check: ## Verify a local LLM endpoint (ANTHROPIC_BASE_URL) speaks the Anthropic Messages API
 	@scripts/ai/local-llm-check.sh
+
+# ---- Design-first and overlap (deterministic, no LLM) ----
+designs: ## Rebuild docs/designs/INDEX.md and board.json from design front matter
+	@python3 scripts/designs/board.py index
+
+overlap: ## Who else is working here? make overlap AREAS="src/auth/** api:/login"  (or DIFF=origin/main)
+	@if [ -n "$(DIFF)" ]; then python3 scripts/designs/board.py overlap --diff "$(DIFF)"; else python3 scripts/designs/board.py overlap $(AREAS); fi

@@ -1,0 +1,52 @@
+# Site + team work board (single GitHub Pages deploy). Every 30 minutes (and on design changes) collect active designs (docs/designs/*.md front matter)
+# and open PRs (with their changed files) from every repo in .github/work-board-repos.txt into one board.json,
+# published with the explainer site at /board.json. Agents and design PRs check overlap against it — no LLM, no tokens.
+name: Site and work board
+
+on:
+  schedule:
+    - cron: "*/30 * * * *"
+  push:
+    branches: [main]
+    paths: ["docs/designs/**", "docs/site/**", "docs/images/**", ".github/work-board-repos.txt", ".github/workflows/work-board.yml"]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: work-board
+  cancel-in-progress: true
+
+jobs:
+  board:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      contents: read
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          persist-credentials: false
+      - name: Aggregate designs and open PRs
+        env:
+          GH_TOKEN: ${{ secrets.BOARD_TOKEN || github.token }}
+        run: |
+          mkdir -p _site/images
+          python3 scripts/designs/board.py aggregate .github/work-board-repos.txt _site/board.json
+          python3 scripts/designs/board.py brief --board _site/board.json > _site/board.txt
+          cat _site/board.txt
+      - name: Build site
+        run: |
+          scripts/build-site.sh
+          cp docs/site/index.html _site/index.html
+          cp docs/images/architecture.png _site/images/
+      - uses: actions/configure-pages@983d7736d9b0ae728b81ab479565c72886d7745b # v5
+      - uses: actions/upload-pages-artifact@56afc609e74202658d3ffba0e8f6dda462b719fa # v3
+        with:
+          path: _site
+      - uses: actions/deploy-pages@d6db90164ac5ed86f2b6aed7e0febac5b3c0c03e # v4

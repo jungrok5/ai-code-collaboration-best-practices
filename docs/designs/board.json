@@ -1,0 +1,25 @@
+{
+ "generated": "2026-10-08",
+ "designs": [
+  {
+   "id": "0001-design-first-and-work-board",
+   "title": "Design-first tiers and a cross-repo work board",
+   "status": "approved",
+   "owner": "@jungrok5",
+   "repos": [
+    "jungrok5/ai-code-collaboration-best-practices"
+   ],
+   "areas": [
+    "docs/designs/**",
+    "scripts/designs/**",
+    ".github/workflows/work-board.yml",
+    ".github/workflows/design-check.yml",
+    "plugins/team-ai-workflow/skills/design/**"
+   ],
+   "issues": [],
+   "updated": "2026-10-08",
+   "file": "docs/designs/0001-design-first-and-work-board.md",
+   "repo": "ai-code-collaboration-best-practices"
+  }
+ ]
+}

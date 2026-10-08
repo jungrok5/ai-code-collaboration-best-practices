@@ -10,6 +10,9 @@
 - [ ] `.github/CODEOWNERS`의 `@OWNER` 교체, `ISSUE_TEMPLATE/config.yml`의 `OWNER/REPO` 교체
 - [ ] `.claude/settings.json`의 `extraKnownMarketplaces.ai-collab.source.repo`를 허브 경로로
 - [ ] 플러그인 릴리스: `plugins/team-ai-workflow/.claude-plugin/plugin.json`과 `marketplace.json` 버전 동일 → `claude plugin tag plugins/team-ai-workflow`
+- [ ] Settings → Pages → Source: **GitHub Actions**, Environments → `github-pages`에서 `main` 배포 허용 (`work-board.yml`이 해설 페이지와 `board.json` 게시)
+- [ ] 팀 작업 보드: `.github/work-board-repos.txt`에 팀 레포 나열. 비공개 레포가 있으면 해당 레포를 읽을 수 있는 PAT를 시크릿 `BOARD_TOKEN`으로
+- [ ] 권한 다이어트 적용: `scripts/apply-lean-permissions.sh` 실행 후 PR (`docs/15-lean-harness.md`)
 - [ ] 선택: Copilot 자동 리뷰 룰셋(`scripts/rulesets/optional-copilot-review.json`), CodeRabbit/Codex 앱
 
 ## B. 새 제품 레포(스포크)
@@ -19,6 +22,7 @@
 - [ ] `CODEOWNERS`, `labels.yml`의 `area/*`, `release-please-config.json`의 `release-type`
 - [ ] `ci.yml` 툴체인 버전(`vars.NODE_VERSION`/`PYTHON_VERSION`), `codeql.yml` 언어 매트릭스
 - [ ] AI 백엔드(A와 동일, 선택), `make github-setup`
+- [ ] 변수 `DESIGN_BOARD_URL`=허브의 `https://<owner>.github.io/<hub>/board.json` (PR 겹침 확인과 세션 시작 요약이 팀 전체 보드를 봄), 허브의 `work-board-repos.txt`에 이 레포 추가
 - [ ] 첫 PR을 열어 `ci-ok`, `pr-checks`, `Claude Code Review`가 도는지 확인
 - [ ] 이슈 하나로 `make ai-triage ISSUE=1`, `make ai-implement ISSUE=1 POST=1`을 끝까지 확인(초안 PR + `ai:review`)
 

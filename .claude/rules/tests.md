@@ -8,9 +8,7 @@ paths:
   - "**/*_test.go"
 ---
 
-# Rules for test code
+# Tests
 
-- Tests encode acceptance criteria from the issue; name them after the behaviour, and after the issue for regressions (`issue_123_*`).
-- Never use focus/only/skip markers or disable a failing test to get CI green; fix the cause or open an issue and reference it in a comment.
-- No real network, clock, or filesystem side effects without fakes; tests must pass in parallel and in any order.
-- Assert behaviour, not implementation details; avoid snapshot tests for logic.
+Tests encode the issue's acceptance criteria; name regression tests after the issue (`issue_123_*`) so the link survives.
+If a test fails, fix the cause — a skipped or loosened test hides the bug from the next person. Use fakes for network and time so tests run in any order.

@@ -38,10 +38,9 @@ CLAUDE.md                         # @AGENTS.md + Claude 전용 메모
 | 이벤트 | 훅 | 동작 | 종료 코드 |
 | --- | --- | --- | --- |
 | PreToolUse `Edit\|Write\|MultiEdit\|NotebookEdit` | `protect-files.sh` | 보호 경로 편집 차단 | 2 = 차단(사유를 stderr로 Claude에 전달) |
-| PreToolUse `Bash` + `if: Bash(git *)` | `git-guard.sh` | 보호 브랜치 커밋, 공유 브랜치 force-push, 800줄 초과 커밋 차단 | 2 |
+| PreToolUse `Bash` + `if: Bash(git *)` | `git-guard.sh` | 보호 브랜치 커밋, 공유 브랜치 force-push 차단 (크기 제한은 없앰, [15](15-lean-harness.md)) | 2 |
 | PostToolUse `Edit\|Write\|MultiEdit` | `format-after-edit.sh` | prettier/ruff/gofmt 등 자동 포맷 | 항상 0 |
-| Stop | `stop-summary.sh` | 미커밋 변경이 있으면 검증·요약 리마인드 | 0 |
-| SessionStart | `.claude/hooks/session-start.sh` | 의존성 설치, pre-commit 설치, 브랜치/규칙 안내를 컨텍스트에 주입 | 0 |
+| SessionStart | `.claude/hooks/session-start.sh` | 의존성 설치, pre-commit 설치, 팀의 활성 설계·작업 영역 요약(`board.py brief`)을 컨텍스트에 주입 | 0 |
 
 훅 입력은 stdin JSON(`tool_name`, `tool_input.file_path`/`command` …). `type: command` 외에 `prompt`(LLM 판정), `agent`(검증 에이전트), `http` 훅도 있다. 지원 이벤트: PreToolUse, PostToolUse, PostToolUseFailure, PermissionRequest, UserPromptSubmit, Notification, Stop, SubagentStart/Stop, PreCompact/PostCompact, SessionStart/End, TaskCompleted, ConfigChange, WorktreeCreate/Remove 등(`settings` JSON 스키마 참조).
 

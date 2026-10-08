@@ -13,12 +13,14 @@
 | --- | --- |
 | **규칙(컨텍스트) 단일화** | `AGENTS.md` 하나가 사람과 모든 에이전트의 규칙. `CLAUDE.md` · Copilot · Cursor · Gemini · Codex · Aider · Zed용 파일은 얇은 포인터 |
 | **Claude Code 팀 설정** | `.claude/settings.json`(권한 allow/ask/deny, 공동저자 표기, 세션 시작 훅, 플러그인 자동 등록), 경로별 규칙 |
-| **플러그인 + 마켓플레이스** | `plugins/team-ai-workflow`: 보호 경로·git 규칙·자동 포맷 **훅**, `/implement-issue` `/create-pr` `/review-pr` `/fix-ci` `/split-pr` `/triage-issue` `/write-adr` `/onboard` **스킬**, `code-reviewer` `security-reviewer` `test-writer` `issue-triager` `docs-writer` **서브에이전트**. 이 레포 자체가 마켓플레이스(`.claude-plugin/marketplace.json`) |
+| **플러그인 + 마켓플레이스** | `plugins/team-ai-workflow`: 보호 경로·git 규칙·자동 포맷 **훅**, `/design` `/check-overlap` `/implement-issue` `/create-pr` `/review-pr` `/fix-ci` `/split-pr` `/triage-issue` `/write-adr` `/onboard` **스킬**, `code-reviewer` `security-reviewer` `test-writer` `issue-triager` `docs-writer` **서브에이전트**. 이 레포 자체가 마켓플레이스(`.claude-plugin/marketplace.json`) |
 | **GitHub 템플릿·거버넌스** | 에이전트 친화 이슈 폼 3종, PR 템플릿(AI 공개 필수), CODEOWNERS, 라벨-as-code, Dependabot, 룰셋 JSON(브랜치 보호), squash-only 설정 스크립트 |
-| **자동화 19개 워크플로** | CI(스택 자동 감지) · PR 위생(제목/크기/라벨/AI 공개) · `@claude` 응답 · AI 코드 리뷰(참고용) · 이슈 트리아지 · **`ai:ready` 라벨 → 에이전트 구현 → 초안 PR** · CI 실패 자동 수정 PR · 에이전트 커밋 사람 승인 게이트 · 라벨 상태 동기화 · 주간 유지보수 리포트 · release-please · CodeQL · Dependabot 자동 머지 · stale · Copilot 환경 · 레포 부트스트랩 · 설정 검증 |
+| **설계 먼저 + 팀 작업 보드** | 일의 크기별 T0/T1/T2. 큰 일은 1쪽 설계 + 구조도(`docs/designs/`, `/design`)를 먼저 머지. 여러 레포의 활성 설계·열린 PR 파일을 모은 `board.json`을 세션 시작 때 한 줄 요약으로 보여 주고, PR마다 겹침을 댓글로 알림(LLM 토큰 0) — [docs/14](docs/14-design-first-and-overlap.md) |
+| **가벼운 하네스** | 최신 모델 기준으로 규칙·스킬·훅을 덜어냄(AGENTS.md 55줄, 스킬 합계 95줄). 결정적 안전장치만 남기고 권한은 auto + 좁은 deny — [docs/15](docs/15-lean-harness.md) |
+| **자동화 21개 워크플로** | CI(스택 자동 감지) · PR 위생(제목/크기/라벨/AI 공개) · `@claude` 응답 · AI 코드 리뷰(참고용) · 이슈 트리아지 · **`ai:ready` 라벨 → 에이전트 구현 → 초안 PR** · CI 실패 자동 수정 PR · 에이전트 커밋 사람 승인 게이트 · 라벨 상태 동기화 · 주간 유지보수 리포트 · release-please · CodeQL · Dependabot 자동 머지 · stale · Copilot 환경 · 레포 부트스트랩 · 설정 검증 · 설계 겹침 확인 · 작업 보드/Pages |
 | **키 없는 AI 실행 경로** | `make ai-triage/ai-review/ai-implement/ai-fix-ci/ai-queue`: 개인 자리에서 `claude -p`(헤드리스)로 이슈 트리아지·PR 리뷰·구현·CI 수정·주간 리포트. 서버는 `infra/local-llm/`(llama.cpp/Ollama) + self-hosted 러너(`ai-local-runner.yml`). GitHub 호스티드 러너에서 Anthropic을 쓰는 것은 선택(`AI_BACKEND=anthropic`) |
 | **로컬 재현 환경** | `Makefile`(스택 무관 `make check`), `scripts/bootstrap.sh`, pre-commit(gitleaks·actionlint·shellcheck·yamllint·markdownlint·conventional commit), devcontainer, EditorConfig, VS Code 권장 확장·MCP |
-| **문서(한국어)** | 플레이북, 브랜치/PR, 컨텍스트 파일, Claude 설정, 자동화, 리뷰 정책, 멀티 레포, 보안, 지표, 교차검증, 도구 매트릭스, 체크리스트, ADR 5건 |
+| **문서(한국어)** | 플레이북, 브랜치/PR, 컨텍스트 파일, Claude 설정, 자동화, 리뷰 정책, 멀티 레포, 보안, 지표, 교차검증, 도구 매트릭스, 체크리스트, AI 백엔드, 설계 먼저·겹침, 가벼운 하네스, ADR 7건 |
 
 ## 빠른 시작
 
@@ -45,7 +47,7 @@ make ai-queue POST=1               # ai:ready 이슈를 순서대로 처리
 
 ## 전체 구조도
 
-> **처음 보는 분은 해설 페이지부터 보세요:** 6개 층 상세, 이슈→머지 단계별 예시, 라벨 상태, 막히는 것들, 역할별 시작법, 파일 지도. 원본은 [docs/site/](docs/site/)이고 GitHub Pages(Settings → Pages → Source: GitHub Actions)를 켜면 `pages.yml`이 자동 배포합니다.
+> **처음 보는 분은 해설 페이지부터 보세요:** 6개 층 상세, 이슈→머지 단계별 예시, 라벨 상태, 막히는 것들, 역할별 시작법, 파일 지도. 원본은 [docs/site/](docs/site/)이고 GitHub Pages(Settings → Pages → Source: GitHub Actions)를 켜면 `work-board.yml`이 페이지와 팀 작업 보드(`board.json`)를 함께 배포합니다.
 
 ![AI 협업 템플릿 전체 구조도](docs/images/architecture.png)
 
@@ -175,8 +177,8 @@ CI가 실패하면 `claude-ci-fix.yml`이 로그를 읽고 PR 브랜치를 향�
 │   └── skills/                    # 레포 전용 스킬: /new-repo, /validate-ai-config
 ├── .claude-plugin/marketplace.json# 이 레포 = 팀 마켓플레이스 "ai-collab"
 ├── plugins/team-ai-workflow/      # 공유 플러그인 (모든 레포에 배포)
-│   ├── hooks/hooks.json + scripts/# protect-files · git-guard · format-after-edit · stop-summary
-│   ├── skills/                    # implement-issue · create-pr · review-pr · fix-ci · split-pr · triage-issue · write-adr · onboard
+│   ├── hooks/hooks.json + scripts/# protect-files · git-guard · format-after-edit
+│   ├── skills/                    # design · check-overlap · implement-issue · create-pr · review-pr · fix-ci · split-pr · triage-issue · write-adr · onboard
 │   └── agents/                    # code-reviewer · security-reviewer · test-writer · issue-triager · docs-writer
 ├── .github/
 │   ├── ISSUE_TEMPLATE/            # Task(AI-ready) · Bug · Feature + config.yml
@@ -184,7 +186,7 @@ CI가 실패하면 `claude-ci-fix.yml`이 로그를 읽고 PR 브랜치를 향�
 │   ├── CODEOWNERS · labels.yml · labeler.yml · dependabot.yml
 │   ├── copilot-instructions.md · instructions/*.instructions.md · agents/*.agent.md
 │   ├── zizmor.yml                 # 워크플로 보안 감사 설정
-│   └── workflows/                 # 19개 (아래 표)
+│   └── workflows/                 # 21개 (아래 표)
 ├── .cursor/ (rules/*.mdc, BUGBOT.md) · .gemini/ (settings.json, config.yaml, styleguide.md) · .codex/config.toml
 ├── .aider.conf.yml · .coderabbit.yaml · .mcp.json · .vscode/ (settings, extensions, mcp.json)
 ├── scripts/
@@ -221,6 +223,7 @@ CI가 실패하면 `claude-ci-fix.yml`이 로그를 읽고 PR 브랜치를 향�
 | `issue-state-sync.yml` | PR 생성/머지 | 에이전트 PR 라벨, 머지 시 이슈 `ai:done` |
 | `claude-maintenance.yml` | 매주 | 유지보수 리포트 이슈 |
 | `validate-ai-config.yml` | 설정 변경 | `check-ai-config.sh` + zizmor |
+| `work-board.yml` · `design-check.yml` | 30분마다·main / PR | 팀 작업 보드(`board.json`)와 해설 페이지를 Pages에 배포 · PR의 설계/영역 겹침을 댓글로 알림(차단 안 함, LLM 없음) |
 | `labels-sync.yml` · `release-please.yml` · `dependabot-auto-merge.yml` · `codeql.yml` · `stale.yml` · `copilot-setup-steps.yml` · `bootstrap-repo.yml` | 각각 | 라벨 동기화 · 릴리스 · 의존성 자동 머지 · 코드 스캐닝 · 정리 · Copilot 환경 · 레포 설정 적용 |
 
 ## 사람이 남아 있는 지점(의도적)
@@ -244,7 +247,7 @@ CI가 실패하면 `claude-ci-fix.yml`이 로그를 읽고 PR 브랜치를 향�
 
 ## 문서
 
-[docs/README.md](docs/README.md) — 01 플레이북 · 02 브랜치/PR · 03 컨텍스트 파일 · 04 Claude Code 설정 · 05 GitHub 자동화 · 06 리뷰 정책 · 07 멀티 레포 · 08 보안/거버넌스 · 09 지표 · 10 교차검증 · 11 도구 매트릭스 · 12 셋업 체크리스트 · 13 AI 백엔드 · ADR
+[docs/README.md](docs/README.md) — 01 플레이북 · 02 브랜치/PR · 03 컨텍스트 파일 · 04 Claude Code 설정 · 05 GitHub 자동화 · 06 리뷰 정책 · 07 멀티 레포 · 08 보안/거버넌스 · 09 지표 · 10 교차검증 · 11 도구 매트릭스 · 12 셋업 체크리스트 · 13 AI 백엔드 · 14 설계 먼저·겹침 · 15 가벼운 하네스 · ADR
 
 ## 커스터마이즈 포인트
 

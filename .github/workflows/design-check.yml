@@ -1,0 +1,80 @@
+# Design gate + overlap check on pull requests (deterministic, no LLM).
+#  - Design PRs (docs/designs/*.md): report overlap with other active designs and open PRs on the team board.
+#  - Code PRs: report overlap of the changed files with active designs/PRs, and remind (not block) when a large
+#    change links no approved design. Label `no-design` silences the reminder (hotfix, chore, obvious change).
+name: Design check
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened, ready_for_review, labeled, unlabeled, edited]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: design-check-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    permissions:
+      contents: read
+      pull-requests: write
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - name: Fetch the team board
+        env:
+          BOARD_URL: ${{ vars.DESIGN_BOARD_URL || format('https://{0}.github.io/{1}/board.json', github.repository_owner, github.event.repository.name) }}
+        run: curl -fsSL "$BOARD_URL" -o board.json || echo '{}' > board.json
+      - name: Check
+        id: check
+        env:
+          BASE: origin/${{ github.event.pull_request.base.ref }}
+          BODY: ${{ github.event.pull_request.body }}
+          LABELS: ${{ join(github.event.pull_request.labels.*.name, ',') }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+          DESIGN_BOARD: board.json
+        run: |
+          set -u
+          report=""
+          # board entries for this very PR are not overlaps
+          jq --argjson n "$PR_NUMBER" --arg r "$GITHUB_REPOSITORY" '.pull_requests |= [ .[]? | select(.number != $n or .repo != $r) ]' board.json > b.json && mv b.json board.json
+          designs="$(git diff --name-only "$BASE"...HEAD -- 'docs/designs/*.md' | grep -vE '(TEMPLATE|INDEX|README)\.md$' || true)"
+          for f in $designs; do
+            [ -f "$f" ] || continue
+            out="$(python3 scripts/designs/board.py overlap --design "$f" || true)"
+            case "$out" in *OVERLAP*) report="$report"$'\n'"**$f**"$'\n```\n'"$out"$'\n```' ;; esac
+          done
+          code_out="$(python3 scripts/designs/board.py overlap --diff "$BASE" || true)"
+          case "$code_out" in *OVERLAP*) report="$report"$'\n'"**Changed files**"$'\n```\n'"$code_out"$'\n```' ;; esac
+          changed="$(git diff --name-only "$BASE"...HEAD | grep -cvE '^(docs/|.*\.md$|.*(test|spec)[^/]*$|.*/tests?/)' || true)"
+          need_design=0
+          if [ -z "$designs" ] && [ "$changed" -ge 15 ] && ! printf '%s' "$BODY" | grep -q 'docs/designs/' && ! printf '%s' "$LABELS" | grep -q 'no-design'; then need_design=1; fi
+          {
+            echo "report<<EOF"; printf '%s\n' "$report"; echo "EOF"
+            echo "need_design=$need_design"; echo "changed=$changed"
+          } >> "$GITHUB_OUTPUT"
+          printf '%s\n' "$report"
+      - name: Comment (advisory)
+        if: steps.check.outputs.report != '' || steps.check.outputs.need_design == '1'
+        continue-on-error: true
+        uses: actions/github-script@3a2844b7e9c422d3c10d287c895573f7108da1b3 # v9
+        env:
+          REPORT: ${{ steps.check.outputs.report }}
+          NEED_DESIGN: ${{ steps.check.outputs.need_design }}
+          CHANGED: ${{ steps.check.outputs.changed }}
+        with:
+          script: |
+            const marker = "<!-- design-check -->";
+            let body = `${marker}\n### Design check (advisory)\n`;
+            if (process.env.REPORT.trim()) body += `\nThis PR touches areas that other active designs or open PRs also touch. Talk to their owners before going further — merge the work, split the area, or agree on an order.\n${process.env.REPORT}\n`;
+            if (process.env.NEED_DESIGN === "1") body += `\nThis PR changes ${process.env.CHANGED} code files but links no design. For work this size, write a 1-page design first (\`/design\` or \`docs/designs/TEMPLATE.md\`), get it approved in its own small PR, then link it here. Add the \`no-design\` label if a design is not useful for this change.\n`;
+            const { data: comments } = await github.rest.issues.listComments({ ...context.repo, issue_number: context.issue.number, per_page: 100 });
+            const mine = comments.find(c => c.body && c.body.startsWith(marker));
+            if (mine) await github.rest.issues.updateComment({ ...context.repo, comment_id: mine.id, body });
+            else await github.rest.issues.createComment({ ...context.repo, issue_number: context.issue.number, body });

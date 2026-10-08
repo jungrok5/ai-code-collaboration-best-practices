@@ -42,3 +42,4 @@ Thumbs.db
 !.vscode/settings.json
 !.vscode/extensions.json
 !.vscode/mcp.json
+.claude/board.json

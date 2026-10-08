@@ -1,0 +1,3 @@
+# Repositories whose designs and open PRs appear on the team work board (one owner/repo per line).
+# Private repos need the BOARD_TOKEN secret (fine-grained PAT or GitHub App token with contents:read, pull_requests:read).
+jungrok5/ai-code-collaboration-best-practices

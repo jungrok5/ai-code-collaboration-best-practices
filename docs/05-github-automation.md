@@ -16,6 +16,8 @@
 | `agent-approval-check.yml` | PR, 리뷰, 댓글 | 에이전트 커밋이 포함된 PR에 **사람 승인 N명** 상태 체크 `agent-approval-check` | statuses | — |
 | `issue-state-sync.yml` | PR opened/closed | 에이전트 PR에 `ai:generated`; 머지 시 연결 이슈 `ai:done` | issues/PR | — |
 | `claude-maintenance.yml` | 매주 월요일 | 유지보수 리포트 이슈 1개 생성 | issues | 20턴 |
+| `design-check.yml` | PR | 변경 파일·설계를 팀 보드(`board.json`)와 비교해 겹치면 스티키 댓글, 큰 PR에 설계 링크 없으면 알림(차단 안 함, `no-design`으로 끔). LLM 없음 | PR 코멘트 | — |
+| `work-board.yml` | 30분마다, main의 설계·사이트 변경, 수동 | 등록된 레포의 활성 설계 + 열린 PR 변경 파일을 모아 `board.json` 생성, 해설 페이지와 함께 Pages 배포. LLM 없음 | pages | — |
 | `labels-sync.yml` | labels.yml 변경 | 라벨 동기화(PR에서는 dry-run) | issues | — |
 | `release-please.yml` | main push | 릴리스 PR/태그 | contents/PR | — |
 | `dependabot-auto-merge.yml` | Dependabot PR | minor/patch 자동 승인·자동 머지 | contents/PR | — |

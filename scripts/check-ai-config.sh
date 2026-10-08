@@ -74,10 +74,10 @@ if [ -f .github/labels.yml ]; then
   [ "$bad_labels" = 0 ] && pass "all label descriptions ≤ 100 chars"
 fi
 
-section "AGENTS.md size (≤ 200 lines recommended)"
+section "AGENTS.md size (a warning sign, not a rule)"
 if [ -f AGENTS.md ]; then
   n=$(wc -l < AGENTS.md)
-  if [ "$n" -le 200 ]; then pass "AGENTS.md is $n lines"; else bad "AGENTS.md is $n lines (> 200): move details to docs/"; fi
+  if [ "$n" -le 150 ]; then pass "AGENTS.md is $n lines"; else echo "  ! AGENTS.md is $n lines: check each line still prevents a real mistake (docs/15-lean-harness.md)"; fi
 fi
 
 echo; if [ "$fail" = 0 ]; then echo "ALL CHECKS PASSED"; else echo "SOME CHECKS FAILED"; fi

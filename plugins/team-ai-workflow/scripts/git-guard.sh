@@ -3,7 +3,6 @@
 # Enforces team git rules before Claude commits or pushes:
 #  - never commit directly on main/master/develop
 #  - never push with --force to a shared branch
-#  - block commits when the staged diff is huge (keep PRs small)
 set -uo pipefail
 
 input="$(cat)"
@@ -24,12 +23,4 @@ if printf '%s' "$cmd" | grep -Eq '(^|\s)git\s+push.*(--force|-f\b|--force-with-l
   exit 2
 fi
 
-if printf '%s' "$cmd" | grep -Eq '(^|\s)git\s+commit'; then
-  changed="$(git diff --cached --numstat 2>/dev/null | awk '{a+=$1; d+=$2} END {print a+d+0}')"
-  limit="${AI_MAX_COMMIT_LINES:-800}"
-  if [ "${changed:-0}" -gt "$limit" ]; then
-    echo "BLOCKED: staged diff is ${changed} lines (> ${limit}). Split the work into smaller commits/PRs (see AGENTS.md 'PR size')." >&2
-    exit 2
-  fi
-fi
 exit 0
