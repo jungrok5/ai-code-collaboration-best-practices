@@ -45,6 +45,8 @@ make ai-queue POST=1               # ai:ready 이슈를 순서대로 처리
 
 ## 전체 구조도
 
+> **처음 보는 분은 해설 페이지부터 보세요:** 6개 층 상세, 이슈→머지 단계별 예시, 라벨 상태, 막히는 것들, 역할별 시작법, 파일 지도. 원본은 [docs/site/](docs/site/)이고 GitHub Pages(Settings → Pages → Source: GitHub Actions)를 켜면 `pages.yml`이 자동 배포합니다.
+
 ![AI 협업 템플릿 전체 구조도](docs/images/architecture.png)
 
 > 이미지 원본: [docs/images/architecture.html](docs/images/architecture.html) · 다시 그리기: `node scripts/render-diagram.mjs` · 아래는 같은 내용의 Mermaid 버전입니다.
