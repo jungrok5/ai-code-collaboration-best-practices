@@ -49,7 +49,11 @@
 
 ## 4. 비용·플랜 메모(변동 잦음, 각 사이트 확인)
 
-Copilot 리뷰 Lite $0.05–1 / Balanced $0.25–5(크레딧) · Claude Code Review 관리형 $15–25/리뷰(Team/Enterprise) · CodeRabbit $24–72/dev/월(공개 레포 무료) · Codex Plus 이상 · Gemini Code Assist 엔터프라이즈 시트.
+- Copilot 리뷰: Lite $0.05–1 / Balanced $0.25–5(크레딧)
+- Claude Code Review 관리형: $15–25/리뷰(Team/Enterprise)
+- CodeRabbit: $24–72/dev/월(공개 레포 무료)
+- Codex: Plus 이상
+- Gemini Code Assist: 엔터프라이즈 시트
 
 ## 출처
 
