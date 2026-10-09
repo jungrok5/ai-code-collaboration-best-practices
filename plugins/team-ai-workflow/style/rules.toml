@@ -68,7 +68,7 @@ suggest = "돼요 / 누가 하는지 주어를 쓰세요"
 id = "ko-ni-isseoseo"
 lang = "ko"
 severity = "error"
-pattern = '에\s?있어서?\s'
+pattern = '(?<![안속위밑곳])에\s?있어서?\s'  # "파일 안에 있어서"(=because it is in) is fine
 message = "번역투 '~에 있어(서)'"
 suggest = "~에서, ~할 때"
 
