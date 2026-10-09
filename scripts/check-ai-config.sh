@@ -38,7 +38,12 @@ fi
 
 section "settings.json against JSON schema"
 if command -v check-jsonschema >/dev/null 2>&1 && [ -f .claude/settings.json ]; then
-  if check-jsonschema --schemafile https://www.schemastore.org/claude-code-settings.json .claude/settings.json >/tmp/cjs.out 2>&1; then pass ".claude/settings.json"; else bad ".claude/settings.json"; cat /tmp/cjs.out; fi
+  # Fetch with curl (honours the system/proxy CA store), then validate offline.
+  schema="$(mktemp)"
+  if curl -fsSL --max-time 20 https://www.schemastore.org/claude-code-settings.json -o "$schema"; then
+    if check-jsonschema --schemafile "$schema" .claude/settings.json >/tmp/cjs.out 2>&1; then pass ".claude/settings.json"; else bad ".claude/settings.json"; cat /tmp/cjs.out; fi
+  else skip "settings.json schema not reachable (offline?)"; fi
+  rm -f "$schema"
 else skip "check-jsonschema not installed (pip install check-jsonschema)"; fi
 
 section "GitHub workflows (actionlint)"

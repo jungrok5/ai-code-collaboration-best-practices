@@ -13,7 +13,7 @@ api() {
 
 # repo_from_remote: owner/name parsed from the origin remote (no network), or empty.
 repo_from_remote() {
-  git remote get-url origin 2>/dev/null | sed -E 's#^(git@github.com:|https://github.com/|ssh://git@github.com/)##; s#\.git$##' \
+  git remote get-url origin 2>/dev/null | sed -E 's#^(git@github.com:|https?://([^@/]*@)?github.com/|ssh://git@github.com/)##; s#\.git$##' \
     | grep -E '^[^/]+/[^/]+$' || true
 }
 
@@ -46,3 +46,6 @@ ruleset_for_profile() {
     cat "$f"
   fi
 }
+
+# apiq <args...>: like api, but prints nothing and returns 1 on any HTTP/proxy error (so callers never parse error JSON).
+apiq() { local o; o="$(api "$@" 2>/dev/null)" || return 1; printf '%s' "$o"; }

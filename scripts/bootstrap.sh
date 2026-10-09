@@ -148,11 +148,11 @@ bold "6/6 Validate"
 scripts/check-ai-config.sh || warn "validation reported problems (see above)"
 
 echo
-bold "Next steps (one-time, by a repo admin):"
+bold "What is left: scripts/doctor.sh (make doctor) checks this machine and the GitHub repo and prints each open item"
+scripts/doctor.sh || true
 cat <<'TXT'
-  1. GitHub settings, labels, rulesets:     make github-setup            (needs: gh auth login, admin rights)
-  2. Secrets for AI workflows:              gh secret set ANTHROPIC_API_KEY   (or CLAUDE_CODE_OAUTH_TOKEN from `claude setup-token`)
-  3. Install the Claude GitHub App:         run `/install-github-app` inside Claude Code, or https://github.com/apps/claude
-  4. Fill in: AGENTS.md Project section, .github/CODEOWNERS, .github/labels.yml (area/* labels)
-  5. Optional: enable Copilot code review / Dependabot / CodeQL default setup in repository settings
+
+  GitHub settings, labels, rulesets need a repo admin once: make github-setup (TEMPLATE=1 in the hub).
+  The AI backend is optional. With none set, AI workflows skip and people run make ai-* with their own claude login
+  (docs/13-ai-backends.md). An agent can walk the rest with you: run claude, then /onboard.
 TXT

@@ -2,7 +2,7 @@
 SHELL := /bin/bash
 .DEFAULT_GOAL := help
 
-.PHONY: style ai-eval designs overlap help setup setup-ci lint typecheck test build check ai-validate labels github-setup new-repo hooks ai-check ai-triage ai-review ai-implement ai-fix-ci ai-respond ai-maintenance ai-queue ai-local-check
+.PHONY: new-skill style ai-eval designs overlap help setup setup-ci lint typecheck test build check ai-validate labels github-setup new-repo hooks ai-check ai-triage ai-review ai-implement ai-fix-ci ai-respond ai-maintenance ai-queue ai-local-check
 
 help: ## Show this help
 	@grep -E '^[a-zA-Z_-]+:.*?## ' $(MAKEFILE_LIST) | awk 'BEGIN {FS = ":.*?## "}; {printf "  \033[36m%-14s\033[0m %s\n", $$1, $$2}'
@@ -32,6 +32,9 @@ style: ## Writing + UI style check (AI tone / AI look; docs/17). FILES="a.md b.t
 	@if [ -z "$(STYLE_CHECK)" ]; then echo "style: team-ai-workflow plugin not found, skipped"; \
 	else python3 "$(STYLE_CHECK)" $(or $(FILES),$$(git ls-files '*.md' '*.mdx' '*.html' '*.css' '*.scss' '*.tsx' '*.jsx' '*.vue' '*.svelte' '*.astro' | grep -v '^docs/site/index.html$$' | grep -v '/evals/')); fi
 
+doctor: ## What is set up and what is left (tools, auth, plugin, GitHub settings). SCOPE=local|github JSON=1 FIX=1
+	@scripts/doctor.sh --scope $(or $(SCOPE),all) $(if $(JSON),--json) $(if $(FIX),--fix-safe)
+
 ai-validate: ## Validate AI/automation config (plugin manifests, settings schema, workflows, hooks)
 	@scripts/check-ai-config.sh
 
@@ -41,7 +44,7 @@ hooks: ## (Re)install git hooks via pre-commit
 labels: ## Sync GitHub labels from .github/labels.yml (needs gh auth)
 	@scripts/setup-github.sh labels
 
-github-setup: ## Apply repo settings, labels and rulesets (needs gh auth, admin). PROFILE=prototype drops human-approval gates
+github-setup: ## Apply repo settings, labels, rulesets (+Pages in the hub; needs admin). PROFILE=prototype drops approval gates, TEMPLATE=1 marks the hub as template
 	@PROFILE="$(or $(PROFILE),production)" scripts/setup-github.sh all
 
 new-repo: ## Create a new repo from this template: make new-repo REPO=owner/name [VISIBILITY=private]
@@ -77,6 +80,9 @@ ai-queue: ## Implement every ai:ready issue from this seat: make ai-queue [POST=
 
 ai-local-check: ## Verify a local LLM endpoint (ANTHROPIC_BASE_URL) speaks the Anthropic Messages API
 	@scripts/ai/local-llm-check.sh
+
+new-skill: ## Scaffold a skill: make new-skill NAME=my-skill TIER=personal|community|team DESC="what + when"
+	@scripts/new-skill.sh "$(NAME)" "$(TIER)" "$(DESC)"
 
 ai-eval: ## Run the team plugin's skill evals with your own claude login (no API key). CASE=<glob> to filter
 	@claude plugin eval plugins/team-ai-workflow --trust-plugin --no-publish --runs $(or $(RUNS),1) --threshold $(or $(THRESHOLD),0.67) $(if $(CASE),--case "$(CASE)")

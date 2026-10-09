@@ -36,4 +36,4 @@ fi
 scripts/setup-github.sh all || echo "(setup-github reported problems; re-run: make github-setup)"
 echo
 echo "Done: https://github.com/$NAME"
-echo "Remaining manual steps: add ANTHROPIC_API_KEY secret, install the Claude GitHub App, edit the AGENTS.md Project section and CODEOWNERS."
+echo "What is left (each line says who acts): cd $DIR && make doctor. The AI backend is optional (docs/13-ai-backends.md)."
