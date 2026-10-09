@@ -5,7 +5,7 @@
 
 ## 맥락
 
-AI 보조로 커밋 수가 늘고 메시지 품질이 들쭉날쭉해요. 릴리스 노트 자동화(release-please)와 AI 기여 감사 추적이 필요해요. 공동저자 트레일러는 의견이 갈려요(VS Code가 2026-05에 기본 표기를 되돌림).
+AI 보조로 커밋 수가 늘고 메시지 품질이 일정하지 않습니다. 릴리스 노트 자동화(release-please)와 AI 기여 감사 추적이 필요합니다. 공동저자 트레일러에 대해서는 의견이 갈립니다(VS Code가 2026-05에 기본 표기를 되돌림).
 
 ## 고려한 선택지
 
@@ -16,7 +16,7 @@ AI 보조로 커밋 수가 늘고 메시지 품질이 들쭉날쭉해요. 릴리
 
 ## 결정
 
-squash 머지만 허용하고 PR 제목을 Conventional Commit 형식으로 강제해요(`pr-checks.yml`, 룰셋 `commit_message_pattern`). Claude Code의 `attribution` 기본값(`Co-Authored-By: Claude <noreply@anthropic.com>`)을 유지하고, PR 본문의 AI 사용 표시와 `ai:assisted`/`ai:generated` 라벨로 출처를 이중 기록해요. 릴리스는 release-please로 해요.
+squash 머지만 허용하고 PR 제목을 Conventional Commit 형식으로 강제합니다(`pr-checks.yml`, 룰셋 `commit_message_pattern`). Claude Code의 `attribution` 기본값(`Co-Authored-By: Claude <noreply@anthropic.com>`)을 유지하고, PR 본문의 AI 사용 표시와 `ai:assisted`/`ai:generated` 라벨로 출처를 이중 기록합니다. 릴리스는 release-please로 관리합니다.
 
 ## 결과
 

@@ -2,11 +2,11 @@
 
 ## 1. 원칙
 
-1. AI 리뷰는 참고(advisory)로 시작해요. 2–4주 보정한 뒤 신호 품질이 확인된 보안·정확성 카테고리만 필수 체크로 올려요. 스타일은 올리지 않아요. 처음부터 blocking으로 두면 오탐 때문에 팀이 봇을 믿지 않게 돼요. 반대 의견(Codacy)도 있어요. "참고용 리뷰는 아무것도 강제하지 않는다"는 지적이에요. 그래서 강제해야 하는 기준은 결정적 도구(린트·타입·테스트·CodeQL)로 CI에 넣어요.
-2. AI 승인은 승인이 아니에요. Copilot 기본값과 Claude Code Review 모두 승인으로 집계되지 않아요. 사람 CODEOWNER 1명 이상이 승인해요.
-3. 에이전트 커밋에는 사람 검토를 더 붙여요. `agent-approval-check`가 에이전트 커밋을 포함한 PR에 사람 승인 N명(기본 1, 권장 2)을 요구해요. GitHub 룰셋에는 "attribution 없는 Copilot PR에 추가 승인 요구"가 기본으로 켜져 있어요.
-4. 작성자는 자기 코드를 전부 읽어요. AI가 썼더라도 설명하지 못하는 줄은 올리지 않아요(Simon Willison이 말한 vibe coding과 agentic engineering의 경계). PR 본문에 AI 사용을 반드시 밝혀요.
-5. 리뷰어 피로는 구조로 막아요. PR은 400줄 이하, 첫 리뷰는 24시간 SLO, 스타일은 CI가 맡고, 봇은 하나로 시작해요.
+1. AI 리뷰는 참고(advisory)로 시작합니다. 2–4주 보정한 뒤 신호 품질이 확인된 보안·정확성 카테고리만 필수 체크로 승격합니다. 스타일은 승격하지 않습니다. 처음부터 blocking으로 두면 오탐이 누적되어 팀이 봇을 신뢰하지 않게 됩니다. "참고용 리뷰는 아무것도 강제하지 않는다"는 반론(Codacy)도 있습니다. 따라서 강제해야 하는 기준은 결정적 도구(린트·타입·테스트·CodeQL)로 CI에 넣습니다.
+2. AI 승인은 승인으로 인정하지 않습니다. Copilot 기본값과 Claude Code Review 모두 승인으로 집계되지 않으며, 사람 CODEOWNER 1명 이상의 승인이 필요합니다.
+3. 에이전트 커밋에는 사람 검토를 추가로 요구합니다. `agent-approval-check`가 에이전트 커밋을 포함한 PR에 사람 승인 N명(기본 1, 권장 2)을 요구합니다. GitHub 룰셋에는 "attribution 없는 Copilot PR에 추가 승인 요구"가 기본으로 켜져 있습니다.
+4. 작성자는 자기 코드를 전부 읽습니다. AI가 작성했더라도 설명하지 못하는 줄은 올리지 않습니다(Simon Willison이 구분한 vibe coding과 agentic engineering의 경계). PR 본문에는 AI 사용 여부를 반드시 밝힙니다.
+5. 리뷰어 피로는 구조로 방지합니다. PR은 400줄 이하, 첫 리뷰는 24시간 SLO로 운영합니다. 스타일 검사는 CI가 담당하고 리뷰 봇은 하나로 시작합니다.
 
 ## 2. 리뷰 체크리스트(REVIEW.md 요약)
 
@@ -20,7 +20,7 @@
 | 6 | 가독성·관례 | 모듈 패턴 위반, 중복, *왜*가 없는 주석 |
 | 7 | 문서·운영 | README/ADR/CHANGELOG 누락, 로깅·지표 없음 |
 
-AI 코멘트는 주장부터 검증해요. 지적한 경로가 실제로 일어나면 고치고, 아니면 스레드에 이유를 적고 resolve해요. 보안 finding은 사람이 결정할 때까지 열어 둬요.
+AI 코멘트는 주장부터 검증합니다. 지적한 경로가 실제로 발생하면 수정하고 발생하지 않으면 스레드에 근거를 적고 resolve합니다. 보안 finding은 사람이 결정할 때까지 열어 둡니다.
 
 ## 3. 리뷰 봇 고르기
 
@@ -34,20 +34,20 @@ AI 코멘트는 주장부터 검증해요. 지적한 경로가 실제로 일어�
 | Gemini Code Assist | 리뷰 코멘트 | `.gemini/config.yaml` | 엔터프라이즈 시트 | 소비자용 종료(2026-07) |
 | Cursor Bugbot | 리뷰 코멘트 | `.cursor/BUGBOT.md` | 사용량 | "Fix in Cursor" |
 
-권장 조합은 Claude(또는 Copilot) 1개 + CodeQL/linters(결정적)예요. 봇을 추가할 때마다 소음 대비 수정률을 2주 동안 재요.
+권장 조합은 Claude(또는 Copilot) 1개 + CodeQL/linters(결정적)입니다. 봇을 추가할 때마다 소음 대비 수정률을 2주 동안 측정합니다.
 
 ## 4. 승격 기준(advisory → required)
 
 - 4주 동안 봇 코멘트 중 수정으로 이어진 비율 ≥ 30%, 오탐 불만 < 10%
-- 승격 대상은 `security`, `correctness` 카테고리뿐이에요. 봇 결과를 `--json-schema`로 받아 심각도가 high 이상일 때만 실패하는 별도 잡을 만들어 구현해요. 현재 워크플로는 neutral이에요.
+- 승격 대상: `security`, `correctness` 카테고리만. 구현 방법은 봇 결과를 `--json-schema`로 받아 심각도가 high 이상일 때만 실패하는 별도 잡 추가. 현재 워크플로는 neutral
 
 ## 5. 자동 머지 (선택, 기본 꺼짐)
 
-다음 조건이 모두 참일 때만 자동 머지해요: `risk/low` 라벨(사람이 부여) ∧ CI 초록 ∧ 사람 승인 ∧ `agent-approval-check` 통과. 구현 예시는 [`docs/05`](05-github-automation.md)의 gh-aw/`gh pr merge --auto` 패턴이에요. Dependabot minor/patch는 이미 자동 머지해요.
+다음 조건이 모두 참일 때만 자동 머지합니다: `risk/low` 라벨(사람이 부여) ∧ CI 초록 ∧ 사람 승인 ∧ `agent-approval-check` 통과. 구현 예시는 [`docs/05`](05-github-automation.md)의 gh-aw/`gh pr merge --auto` 패턴입니다. Dependabot minor/patch는 `dependabot-auto-merge.yml`이 이미 자동 머지합니다.
 
 ## 6. 측정
 
-time-to-first-review, time-in-review, 리뷰 라운드 수, 사람 리뷰 없이 머지된 PR 비율, 봇 코멘트 수정률, 되돌림(revert) 비율을 재요. 수집 방법은 [09](09-metrics.md)에 있어요.
+측정 항목은 time-to-first-review, time-in-review, 리뷰 라운드 수, 사람 리뷰 없이 머지된 PR 비율, 봇 코멘트 수정률, 되돌림(revert) 비율입니다. 수집 방법은 [09](09-metrics.md)에 정리되어 있습니다.
 
 ## 출처
 

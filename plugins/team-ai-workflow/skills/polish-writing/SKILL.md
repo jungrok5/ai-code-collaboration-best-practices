@@ -26,9 +26,11 @@ regex cannot judge.
 
 1. **Reader and job.** Who reads this and what must they do or decide after? Product page: what the product does
    for them. API docs: how to call it and what can go wrong. Team doc: what to do and why.
-2. **One speech level per surface.** Team default 해요체 for product UI, sites and team docs; 합니다체 only where the
-   surface already uses it consistently (e.g. legal text). Lists and table cells may be noun phrases (개조식).
-   English: plain, sentence-case headings.
+2. **One speech level: 합니다체.** Team docs, README, sites and design docs use 합니다체 in a written, documentary
+   register: subject and verb explicit, no conversational endings (`~거예요`, `~잖아요`), no talking to the reader
+   (`걱정하지 마세요`, `살펴볼까요`), no personifying work or tools (`일이 흘러가요`, `알아서 챙겨요` → name who does
+   what). Lists and table cells are noun phrases (개조식). A product UI that decides on 해요체 turns `ko-haeyo` off in
+   its `.style/rules.toml`. English: plain, sentence-case headings.
 3. **Concrete over impressive.** Replace every adjective of praise with what it means: a number with a unit
    (`1 ms`, `64 KB`, `50,000원`), a condition, or an action. If you cannot, delete the adjective.
 4. **Headlines say the user outcome; buttons say what happens next** (`API 키 발급`, `결제하기`, `Save changes`),

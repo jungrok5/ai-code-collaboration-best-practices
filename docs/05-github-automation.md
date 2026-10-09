@@ -23,13 +23,13 @@
 | `release-please.yml` | main push | 릴리스 PR/태그 | contents/PR | 없음 |
 | `dependabot-auto-merge.yml` | Dependabot PR | minor/patch 자동 승인·자동 머지 | contents/PR | 없음 |
 | `codeql.yml` | PR, main, 주간 | 코드 스캐닝(기본은 Actions 워크플로, 언어는 추가) | security-events | 없음 |
-| `stale.yml` | 매일 | 60일 무활동 → 7일 후 닫힘(`ai:in-progress`, p0, blocked 제외) | issues/PR | 없음 |
+| `stale.yml` | 매일 | 60일 무활동 → 7일 후 닫힘(`ai:in-progress`, p0 제외. 이슈는 `status/blocked`도 제외) | issues/PR | 없음 |
 | `copilot-setup-steps.yml` | 자기 파일 변경 | Copilot 클라우드 에이전트 환경 준비 | 없음 | 없음 |
 | `bootstrap-repo.yml` | 수동 | 레포 설정·라벨·룰셋 적용(`REPO_ADMIN_TOKEN`) | admin 토큰 | 없음 |
 
-`claude*.yml`은 `AI_BACKEND=anthropic`, `ai-local-runner.yml`은 `AI_BACKEND=local`일 때만 돌아요. 변수가 비어 있으면 skipped예요.
+`claude*.yml`은 `AI_BACKEND=anthropic`, `ai-local-runner.yml`은 `AI_BACKEND=local`일 때만 실행됩니다. 변수가 비어 있으면 skipped로 처리됩니다.
 
-모든 워크플로는 최상위에 `permissions: contents: read`를 두고 잡 단위로만 권한을 넓혀요. `timeout-minutes`를 걸고, PR 잡에는 `concurrency`를 둬요. 서드파티 액션은 SHA로 핀하고(`scripts/pin-actions.sh`) Dependabot이 갱신해요.
+모든 워크플로는 최상위에 `permissions: contents: read`를 두고, 권한은 잡 단위로만 넓힙니다. 모든 잡에 `timeout-minutes`를 설정하고 PR 잡에는 `concurrency`를 설정합니다. 서드파티 액션은 SHA로 핀하며(`scripts/pin-actions.sh`) Dependabot이 갱신합니다.
 
 ## 2. 라벨 상태 머신
 
@@ -46,19 +46,19 @@ stateDiagram-v2
   ai_done --> [*]
 ```
 
-루프를 막는 장치예요.
+무한 루프는 다음 장치로 방지합니다.
 
-- 워크플로는 `GITHUB_TOKEN`으로 라벨을 바꿔요. 이 토큰으로 생긴 이벤트는 다른 워크플로를 다시 트리거하지 않아요.
-- Claude 액션은 봇이 건 트리거를 거부해요(`allowed_bots` 비움).
-- CI-fix는 자기 브랜치(`ai/ci-fix-*`)를 제외해요.
+- 워크플로가 `GITHUB_TOKEN`으로 라벨을 변경합니다. 이 토큰으로 발생한 이벤트는 다른 워크플로를 트리거하지 않습니다.
+- Claude 액션이 봇의 트리거를 거부합니다(`allowed_bots` 비움).
+- CI-fix 워크플로는 자신이 만든 브랜치(`ai/ci-fix-*`)를 대상에서 제외합니다.
 
 ## 3. 일부러 남긴 사람 체크포인트
 
-1. `ai:ready` 라벨은 쓰기 권한자만 붙일 수 있어요. 액션이 라벨을 붙인 사람의 권한을 한 번 더 검사해요.
-2. 에이전트 PR은 초안으로 열려요. 리뷰어가 ready로 바꿔요.
-3. AI 리뷰는 승인으로 집계되지 않아요(Copilot은 기본값이 그렇고, Claude Code Review는 항상 neutral).
-4. 에이전트 커밋이 포함된 PR은 `agent-approval-check`가 사람 승인 N명을 요구해요(Anthropic 내부와 같은 게이트).
-5. `risk/low` + `ai:generated` + 승인 완료일 때 자동 머지하는 기능은 옵션이고 기본으로 꺼져 있어요([06](06-code-review-policy.md)).
+1. `ai:ready` 라벨은 쓰기 권한자만 부여할 수 있습니다. 액션이 라벨을 부여한 사람의 권한을 한 번 더 검사합니다.
+2. 에이전트 PR은 초안으로 생성되며, 리뷰어가 ready로 전환합니다.
+3. AI 리뷰는 승인으로 집계되지 않습니다(Copilot은 기본값, Claude Code Review는 항상 neutral).
+4. 에이전트 커밋이 포함된 PR에는 `agent-approval-check`가 사람 승인 N명을 요구합니다(Anthropic 내부와 같은 게이트).
+5. `risk/low` + `ai:generated` + 승인 완료 조건의 자동 머지는 선택 기능이며 기본값은 꺼짐입니다([06](06-code-review-policy.md)).
 
 ## 4. 백엔드 선택(기본값은 설정 없음)
 
@@ -68,7 +68,7 @@ stateDiagram-v2
 | `anthropic` | `claude*.yml`이 공식 액션으로 실행. 시크릿 `CLAUDE_CODE_OAUTH_TOKEN`(구독, `claude setup-token`) 또는 `ANTHROPIC_API_KEY` 필요 |
 | `local` | `ai-local-runner.yml`이 self-hosted 러너에서 `scripts/ai/dispatch.sh` 실행. 변수 `AI_BASE_URL`, `AI_MODEL`(로컬 LLM) |
 
-백엔드와 상관없이 개발자는 자기 자리에서 `make ai-triage ISSUE=1` 같은 명령으로 같은 작업을 돌릴 수 있어요. 구독 로그인을 쓰고 API 키는 필요 없어요. 백엔드를 고르는 기준은 [`docs/13-ai-backends.md`](13-ai-backends.md)에 있어요.
+백엔드 설정과 관계없이 개발자는 자기 자리에서 `make ai-triage ISSUE=1` 등의 명령으로 같은 작업을 실행할 수 있습니다. 이 명령은 구독 로그인을 사용하므로 API 키가 필요하지 않습니다. 백엔드 선택 기준은 [`docs/13-ai-backends.md`](13-ai-backends.md)에 정리되어 있습니다.
 
 ```bash
 # ③ Anthropic 모드일 때만
@@ -82,17 +82,17 @@ make github-setup                            # 설정·라벨·룰셋
 gh secret set RELEASE_PLEASE_TOKEN           # 선택: 릴리스 태그로 배포 워크플로를 트리거할 때
 ```
 
-- 구독 토큰은 개인에게 묶여요. 조직 레포에는 API 키나 Workload Identity Federation(정적 키 없음)을 권해요. Bedrock/Vertex/Foundry는 `use_bedrock|use_vertex|use_foundry` + OIDC + 커스텀 GitHub App을 써요.
-- 공개 레포에서 쓰기 권한이 없는 사용자의 이슈를 트리아지하려면 `allowed_non_write_users: "*"` + `github_token: ${{ secrets.GITHUB_TOKEN }}`을 써요(워크플로 주석 참고). PAT는 넣지 않아요.
+- 구독 토큰은 개인 계정에 귀속됩니다. 조직 레포에는 API 키 또는 Workload Identity Federation(정적 키 없음)을 권장합니다. Bedrock/Vertex/Foundry는 `use_bedrock|use_vertex|use_foundry` + OIDC + 커스텀 GitHub App으로 구성합니다.
+- 공개 레포에서 쓰기 권한이 없는 사용자의 이슈를 트리아지하려면 `allowed_non_write_users: "*"` + `github_token: ${{ secrets.GITHUB_TOKEN }}`을 설정합니다(워크플로 주석 참고). PAT는 사용하지 않습니다.
 
 ## 5. 액션 동작(anthropics/claude-code-action@v1)
 
-- `prompt`가 있으면 자동화 모드예요(멘션 불필요, 추적 댓글 없음). 없으면 태그 모드예요(`@claude`, `label_trigger`, `assignee_trigger`, 추적 댓글과 안전한 push 래퍼). `track_progress: true`를 주면 prompt를 쓰면서도 태그 모드로 돌아요.
-- 기본 도구는 파일 읽기/편집, 댓글, 기본 GitHub 조작뿐이에요. Bash는 `--allowedTools "Bash(make test)"`처럼 명시해야 해요.
+- `prompt`가 있으면 자동화 모드로 동작합니다(멘션 불필요, 추적 댓글 없음). 없으면 태그 모드로 동작합니다(`@claude`, `label_trigger`, `assignee_trigger`, 추적 댓글과 안전한 push 래퍼). `track_progress: true`를 지정하면 prompt를 쓰면서 태그 모드로 동작합니다.
+- 기본 도구는 파일 읽기/편집, 댓글, 기본 GitHub 조작으로 한정됩니다. Bash는 `--allowedTools "Bash(make test)"`처럼 명시해야 사용할 수 있습니다.
 - 내장 MCP: `mcp__github_comment__*`, `mcp__github_inline_comment__create_inline_comment`(PR 승인 불가), `mcp__github_ci__*`(actions: read), `mcp__github__*`(공식 GitHub MCP 서버 v0.17.1. `get_issue`, `update_issue`, `add_issue_comment`, `create_pull_request` 등 구 이름)
-- PR 이벤트에서는 `.claude/`, `CLAUDE.md`, `.mcp.json`, 훅을 베이스 브랜치에서 복원해요. 그래서 PR이 Claude 설정을 바꿀 수 없어요. 훅은 `npm run` 대신 바이너리를 직접 불러요.
-- 기본 동작에서 Claude는 PR을 열지 않고 "Create PR" 링크를 남겨요. 이 레포는 액션 출력 `branch_name`/`github_token`을 받아 결정적 단계가 초안 PR을 열어요.
-- `use_commit_signing: true`면 API로 커밋해서 Verified가 붙고, 서명 커밋 규칙과 호환돼요.
+- PR 이벤트에서는 액션이 `.claude/`, `CLAUDE.md`, `.mcp.json`, 훅을 베이스 브랜치에서 복원합니다. 따라서 PR로 Claude 설정을 변경할 수 없습니다. 훅은 `npm run` 대신 바이너리를 직접 호출합니다.
+- 기본 동작에서 Claude는 PR을 생성하지 않고 "Create PR" 링크를 남깁니다. 이 레포에서는 액션 출력 `branch_name`/`github_token`을 받은 결정적 단계가 초안 PR을 생성합니다.
+- `use_commit_signing: true`이면 API로 커밋하므로 Verified 표시가 붙고 서명 커밋 규칙과 호환됩니다.
 - 비용 제어: `--max-turns`, `timeout-minutes`, `concurrency`, `--model`(예: `claude-sonnet-5-5`), `--max-budget-usd`(CLI)
 
 ## 6. 다른 에이전트와 리뷰 봇
@@ -108,13 +108,13 @@ gh secret set RELEASE_PLEASE_TOKEN           # 선택: 릴리스 태그로 배�
 | Cursor Bugbot | 자동, `bugbot run` | `.cursor/BUGBOT.md`, `.cursor/config/bugbot.yaml` | 사용량 과금 |
 | GitHub Agentic Workflows(gh-aw) | `.github/workflows/*.md` → `gh aw compile` | 프런트매터 + 마크다운, `safe-outputs` | 읽기 전용 에이전트 + 검증된 쓰기(프리뷰) |
 
-리뷰 봇을 여러 개 동시에 켜면 소음이 커져요. 하나(기본: Claude)로 시작해 2–4주 보정한 뒤 늘려요([06](06-code-review-policy.md)).
+리뷰 봇을 여러 개 동시에 켜면 코멘트 소음이 늘어납니다. 봇 하나(기본: Claude)로 시작해 2–4주 보정한 뒤 추가합니다([06](06-code-review-policy.md)).
 
 ## 7. 끄거나 바꾸기
 
-- 쓰지 않는 워크플로는 파일을 지우거나 `on:`에 `workflow_dispatch`만 남겨요.
-- 모델·턴·도구는 각 워크플로의 `claude_args`에서 바꿔요. 프롬프트도 워크플로 파일 안에 있으므로 PR로 리뷰돼요.
-- 조직 전체에 같은 워크플로를 강제하려면 `workflow_call`로 재사용 워크플로를 만들고 조직 룰셋 "Require workflows to pass"로 요구해요([07](07-multi-repo-strategy.md)).
+- 사용하지 않는 워크플로는 파일을 삭제하거나 `on:`에 `workflow_dispatch`만 남깁니다.
+- 모델·턴·도구는 각 워크플로의 `claude_args`에서 변경합니다. 프롬프트도 워크플로 파일 안에 있으므로 변경 시 PR 리뷰를 거칩니다.
+- 조직 전체에 같은 워크플로를 강제하려면 `workflow_call`로 재사용 워크플로를 만들고 조직 룰셋 "Require workflows to pass"로 요구합니다([07](07-multi-repo-strategy.md)).
 
 ## 출처
 

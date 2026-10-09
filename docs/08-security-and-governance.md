@@ -14,36 +14,36 @@
 | 비용 폭주 | 무한 루프 에이전트 | `--max-turns`, `timeout-minutes`, `concurrency`, 모델 고정, `--max-budget-usd` |
 | 무단 자율 머지 | 봇이 승인·머지 | 인라인 코멘트 서버는 승인 불가, AI 승인 미집계, `agent-approval-check`, `allowed_merge_methods: squash` |
 
-OWASP 대응 항목:
+OWASP 대응 항목은 다음과 같습니다.
 
 - LLM Top 10(2025): LLM01 프롬프트 인젝션, LLM02 민감정보 노출, LLM05 출력 처리, LLM06 과도한 에이전시
 - Agentic Top 10(2026): ASI01 목표 탈취, ASI02 도구 오용, ASI03 권한 남용, ASI05 예기치 않은 코드 실행
 
 ## 2. GitHub Actions 하드닝 규칙(`.claude/rules/github-workflows.md`와 같음)
 
-1. `permissions`는 최소로, 기본 토큰은 읽기 전용으로 둬요(레포 설정).
-2. `${{ github.event.* }}` 텍스트를 `run:`에 직접 넣지 않고 `env:`로 넘겨요.
-3. `pull_request_target`에서 PR 코드를 체크아웃하지 않아요(checkout v7은 기본으로 거부해요).
-4. 서드파티 액션은 SHA로 핀해요. CI에서 `zizmor`·`actionlint`가 검사해요.
-5. 시크릿은 `${{ secrets.X }}`로만 쓰고, `show_full_output`/`display_report`는 꺼요.
-6. 에이전트 잡에는 `concurrency`·`timeout-minutes`·`--max-turns`를 걸어요.
+1. `permissions`는 최소로 지정하고, 기본 토큰은 읽기 전용으로 설정합니다(레포 설정).
+2. `${{ github.event.* }}` 텍스트는 `run:`에 직접 넣지 않고 `env:`로 전달합니다.
+3. `pull_request_target`에서는 PR 코드를 체크아웃하지 않습니다(checkout v7은 기본으로 거부합니다).
+4. 서드파티 액션은 SHA로 핀합니다. CI에서 `zizmor`·`actionlint`가 검사합니다.
+5. 시크릿은 `${{ secrets.X }}`로만 참조하고, `show_full_output`/`display_report`는 끕니다.
+6. 에이전트 잡에는 `concurrency`·`timeout-minutes`·`--max-turns`를 설정합니다.
 
 ## 3. 팀 AI 정책(DORA 2025의 1번 역량: "명확히 소통된 AI 스탠스")
 
-템플릿을 쓰는 팀은 아래 항목을 채워 `docs/`에 두고, `AGENTS.md`의 Project 섹션에서 링크해요.
+템플릿을 사용하는 팀은 아래 항목을 작성해 `docs/`에 두고, `AGENTS.md`의 Project 섹션에서 링크합니다.
 
 - 허용 도구: (예) Claude Code, Copilot, Cursor. 회사 데이터 정책에 맞는 플랜/엔드포인트(Bedrock/Vertex 등).
 - 공개 의무: PR 본문 체크박스 + `ai:assisted`/`ai:generated` 라벨 + 공동저자 트레일러(ADR-0002).
 - 에이전트가 하지 않는 것: 머지·승인, 보호 경로 수정, 권한 확대, 비밀 접근, 프로덕션 조작.
 - 사람 승인이 필요한 영역(Metacto 게이트 목록 참고): 인증, 비밀, IAM, 결제, 마이그레이션, 의존성 메이저 업그레이드, 파괴적 명령, 고객 데이터 경로 → CODEOWNERS로 강제.
-- 코드 출처·라이선스: Copilot의 공개 코드 매칭 참조 표시를 켜요. 미국 저작권청(2025-01)은 순수 AI 생성물을 저작권 보호 대상으로 보지 않아요. 그래서 사람의 실질 기여를 PR에 남겨요. 외부 OSS에 기여할 때는 그 프로젝트 정책을 따라요(QEMU·NetBSD·Gentoo는 AI 생성 기여를 거부하거나 제한하고, Ghostty는 공개를 의무로 하고, curl은 AI 슬롭 보고 때문에 버그바운티를 끝냈어요).
-- 규제: EU AI Act 투명성 의무(2026-08-02~)는 주로 모델 제공자와 규제 분야 배치자에게 해당해요. 팀은 승인 도구 목록과 세션 로그를 보관하면 충분해요(법률 자문 아님).
+- 코드 출처·라이선스: Copilot의 공개 코드 매칭 참조 표시 활성화. 미국 저작권청(2025-01)은 순수 AI 생성물을 저작권 보호 대상으로 보지 않으므로, 사람의 실질 기여를 PR에 기록. 외부 OSS 기여 시 해당 프로젝트 정책 준수(QEMU·NetBSD·Gentoo는 AI 생성 기여를 거부하거나 제한, Ghostty는 AI 사용 공개 의무화, curl은 AI 슬롭 보고 때문에 버그바운티 종료).
+- 규제: EU AI Act 투명성 의무(2026-08-02~)는 주로 모델 제공자와 규제 분야 배치자에게 적용. 팀은 승인 도구 목록과 세션 로그 보관으로 충분(법률 자문 아님).
 
 ## 4. 사고 대응
 
 - 에이전트가 비밀을 노출했을 때: 즉시 키 폐기·회전, 워크플로 비활성화, 세션/실행 로그 보존, SECURITY.md 경로로 보고.
 - 에이전트 PR에서 악성 변경을 발견했을 때: PR 닫기, 브랜치 보존(증거), `ai:ready` 부여자·트리거 댓글 작성자 확인, 프롬프트/허용 도구 축소.
-- 재발 방지책은 규칙 파일이 아니라 훅·CI·룰셋(결정적 통제)에 넣어요.
+- 재발 방지책: 규칙 파일이 아니라 훅·CI·룰셋(결정적 통제)에 반영.
 
 ## 출처
 

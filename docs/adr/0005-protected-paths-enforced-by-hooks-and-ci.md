@@ -5,13 +5,13 @@
 
 ## 맥락
 
-지시 파일은 에이전트에게 "컨텍스트"일 뿐 강제력이 없어요(Anthropic 문서). 에이전트가 비밀·락파일·정책 파일을 바꾸면 보안 사고나 CI 붕괴로 이어져요.
+지시 파일은 에이전트에게 "컨텍스트"일 뿐 강제력이 없습니다(Anthropic 문서). 에이전트가 비밀·락파일·정책 파일을 변경하면 보안 사고나 CI 붕괴로 이어집니다.
 
 ## 결정
 
-PreToolUse 훅(`protect-files.sh`, `git-guard.sh`)이 로컬에서 막고, `CODEOWNERS`와 룰셋이 GitHub에서 사람 리뷰를 강제해요. Claude 액션은 PR 이벤트에서 `.claude/` 설정을 베이스 브랜치 것으로 복원해요. 보호 목록의 원본은 `protect-files.sh`이고 `AGENTS.md` "Things to know"에 요약해요. 목록을 바꾸면 플러그인 버전을 올려 배포해요.
+PreToolUse 훅(`protect-files.sh`, `git-guard.sh`)이 로컬에서 차단하고, `CODEOWNERS`와 룰셋이 GitHub에서 사람 리뷰를 강제합니다. Claude 액션은 PR 이벤트에서 `.claude/` 설정을 베이스 브랜치의 것으로 복원합니다. 보호 목록의 원본은 `protect-files.sh`이며 `AGENTS.md` "Things to know"에 요약합니다. 목록을 변경하면 플러그인 버전을 올려 배포합니다.
 
 ## 결과
 
-- 긍정: 모델이 지시를 무시해도 결정적으로 막힘.
+- 긍정: 모델이 지시를 무시해도 결정적으로 차단됨.
 - 부정: 정당한 변경도 사람이 직접 해야 함(의도된 마찰).

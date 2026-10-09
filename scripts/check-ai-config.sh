@@ -74,12 +74,22 @@ if [ -f .github/labels.yml ]; then
   [ "$bad_labels" = 0 ] && pass "all label descriptions ≤ 100 chars"
 fi
 
-section "Skill eval coverage (a warning, not a rule; make ai-eval runs them)"
-for d in plugins/*/skills/*/; do
+section "Skills by tier (docs/18-adding-skills.md)"
+for f in plugins/*/skills/*/SKILL.md .claude/skills/*/SKILL.md; do
+  [ -f "$f" ] || continue
+  name="$(basename "$(dirname "$f")")"
+  fm_name="$(sed -n '2,10p' "$f" | sed -nE 's/^name:[[:space:]]*//p' | head -1)"
+  desc_len="$(sed -n '2,20p' "$f" | sed -nE 's/^description:[[:space:]]*//p' | head -1 | wc -m)"
+  if [ "$fm_name" != "$name" ]; then bad "$f: frontmatter name '$fm_name' must equal the directory name '$name'"; fi
+  if [ "$desc_len" -lt 40 ] || [ "$desc_len" -gt 1536 ]; then bad "$f: description must say what it does and when to use it (40-1536 chars, now $desc_len)"; fi
+done
+pass "skill frontmatter (name = directory, description length)"
+# Team tier: the default plugin needs positive and negative evals (warning until every existing skill has them).
+for d in plugins/team-ai-workflow/skills/*/; do
   [ -d "$d" ] || continue
-  plugin="${d%%/skills/*}"; name="$(basename "$d")"
-  if grep -rqsF "$name\"" "$plugin/evals" 2>/dev/null; then pass "$name has an eval case"
-  else echo "  ! $plugin skill '$name' has no eval case (plugins/*/evals/, docs/16-team-scale-ai.md)"; fi
+  name="$(basename "$d")"
+  if grep -rqsF "$name\"" plugins/team-ai-workflow/evals 2>/dev/null; then pass "team skill $name has an eval case"
+  else echo "  ! team skill '$name' has no eval case (make new-skill scaffolds them; docs/18-adding-skills.md)"; fi
 done
 
 section "AGENTS.md size (a warning sign, not a rule)"

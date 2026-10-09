@@ -50,26 +50,26 @@ make new-repo REPO=my-org/svc-payments VISIBILITY=private
 #   scripts/setup-github.sh all                              (설정·라벨·룰셋)
 ```
 
-그다음 사람이 채울 것: `AGENTS.md`의 Project 섹션, `CODEOWNERS`, `labels.yml`의 `area/*`, `ci.yml`/`codeql.yml` 언어, 시크릿, Claude 앱 설치([12](12-setup-checklist.md)).
+생성 후 사람이 채우는 항목: `AGENTS.md`의 Project 섹션, `CODEOWNERS`, `labels.yml`의 `area/*`, `ci.yml`/`codeql.yml` 언어, 시크릿, Claude 앱 설치([12](12-setup-checklist.md)).
 
 ## 4. 스포크를 최신으로 유지하기
 
-- 플러그인: 허브에서 `plugins/team-ai-workflow` 버전을 올리고 태그를 달아요. 스포크에서는 `claude plugin update team-ai-workflow@ai-collab`으로 받아요(재시작할 때 자동으로 받기도 해요).
-- 워크플로·템플릿 파일: 허브에 `repo-file-sync-action`을 두면 바뀐 파일로 각 스포크에 PR을 열어요(토큰: App). Copier로 템플릿을 관리하면 `copier update`가 3-way 병합을 해 줘요.
-- 규칙 텍스트: `AGENTS.md`의 Project 섹션은 레포마다 달라요. 그래서 파일을 통째로 동기화하지 말고 "공통 섹션"만 동기화하거나 `@docs/team-rules.md` import 블록으로 분리해요.
+- 플러그인: 허브에서 `plugins/team-ai-workflow` 버전을 올리고 태그를 답니다. 스포크에서는 `claude plugin update team-ai-workflow@ai-collab`으로 갱신합니다(재시작 시 자동으로 갱신되기도 합니다).
+- 워크플로·템플릿 파일: 허브에 `repo-file-sync-action`을 두면 이 액션이 변경된 파일로 각 스포크에 PR을 생성합니다(토큰: App). Copier로 템플릿을 관리하면 `copier update`가 3-way 병합을 수행합니다.
+- 규칙 텍스트: `AGENTS.md`의 Project 섹션은 레포마다 다릅니다. 따라서 파일 전체를 동기화하지 않고 "공통 섹션"만 동기화하거나 `@docs/team-rules.md` import 블록으로 분리합니다.
 
 ## 5. 모노레포와 폴리레포(에이전트 관점)
 
-- 에이전트는 현재 레포 밖을 보지 못해요. 폴리레포에서 여러 레포를 함께 바꿀 때는 Claude `--add-dir ../other`(`permissions.additionalDirectories`)로 형제 체크아웃을 열어 주거나, 작업 디렉터리에 관련 레포를 나란히 클론하고 루트에 지시 파일을 둬요("virtual monorepo").
-- 모노레포에서는 패키지 디렉터리에서 세션을 시작하고 패키지마다 `AGENTS.md`를 둬요(가장 가까운 파일이 우선). 빌드·테스트 명령도 패키지 단위로 좁혀요.
-- GitHub 공식 가이드에 따르면 여러 레포에 걸친 리팩터링은 클라우드 에이전트에 맞지 않아요. 사람이 작업을 쪼개요.
-- 병렬 에이전트는 서로 다른 파일을 맡도록 작업을 나누고, worktree로 체크아웃을 분리해요.
+- 에이전트는 현재 레포 밖을 볼 수 없습니다. 폴리레포에서 여러 레포를 함께 변경할 때는 Claude `--add-dir ../other`(`permissions.additionalDirectories`)로 형제 체크아웃을 추가하거나, 작업 디렉터리에 관련 레포를 나란히 클론하고 루트에 지시 파일을 둡니다("virtual monorepo").
+- 모노레포에서는 패키지 디렉터리에서 세션을 시작하고 패키지마다 `AGENTS.md`를 둡니다(가장 가까운 파일이 우선). 빌드·테스트 명령도 패키지 단위로 좁힙니다.
+- GitHub 공식 가이드는 여러 레포에 걸친 리팩터링을 클라우드 에이전트에 맞지 않는 작업으로 분류합니다. 이런 작업은 사람이 분할합니다.
+- 병렬 에이전트에는 서로 다른 파일을 배정하고, worktree로 체크아웃을 분리합니다.
 
 ## 6. 버전 관리 규칙
 
-- 플러그인은 semver를 따라요. 훅 동작 변경(차단 규칙 추가)은 minor, 기존 스킬 제거는 major예요. CI에서 `claude plugin validate --strict`가 돌아요.
-- 룰셋·라벨·워크플로 변경은 ADR이나 CHANGELOG(릴리스 PR)에 기록해요.
-- 스포크는 재사용 워크플로를 참조할 때 허브의 릴리스 태그(`vX.Y.Z`)로 핀해요.
+- 플러그인은 semver를 따릅니다. 훅 동작 변경(차단 규칙 추가)은 minor, 기존 스킬 제거는 major입니다. CI에서 `claude plugin validate --strict`를 실행합니다.
+- 룰셋·라벨·워크플로 변경은 ADR 또는 CHANGELOG(릴리스 PR)에 기록합니다.
+- 스포크는 재사용 워크플로를 참조할 때 허브의 릴리스 태그(`vX.Y.Z`)로 핀합니다.
 
 ## 출처
 

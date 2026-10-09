@@ -1,0 +1,8 @@
+{
+  "name": "team-ai-community",
+  "version": "0.1.0",
+  "description": "Opt-in skills contributed by team members. Lighter review than the core team-ai-workflow plugin; promote a skill there once the team relies on it.",
+  "author": { "name": "ai-code-collaboration-best-practices contributors" },
+  "license": "MIT",
+  "keywords": ["skills", "community"]
+}

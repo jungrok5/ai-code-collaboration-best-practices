@@ -39,22 +39,22 @@
 </style></head>
 <body>
 <h1>AI Code Collaboration Template 전체 구조도</h1>
-<p class="sub">git clone 후 <code>make setup</code>을 한 번 실행하면 규칙, 가드레일, GitHub 거버넌스, 자동화, 여러 레포 배포가 갖춰져요. API 키 없이도 전체가 동작해요.</p>
+<p class="sub">git clone 후 <code>make setup</code>을 한 번 실행하면 규칙, 가드레일, GitHub 거버넌스, 자동화, 여러 레포 배포가 구성됩니다. API 키 없이도 전체가 동작합니다.</p>
 
 <div class="people">
   <b>사람 + AI 도구</b>
   <span class="chip">개발자 · 리뷰어 · CODEOWNERS</span>
   <span class="chip">Claude Code</span><span class="chip">GitHub Copilot</span><span class="chip">Cursor</span>
   <span class="chip">OpenAI Codex</span><span class="chip">Gemini CLI</span><span class="chip">Aider · Zed · Jules …</span>
-  <span style="margin-left:auto;font-size:13.5px;color:var(--muted)">모두 같은 규칙을 읽어요</span>
+  <span style="margin-left:auto;font-size:13.5px;color:var(--muted)">모든 도구가 같은 규칙 참조</span>
 </div>
-<div class="conn">지시는 ①에서 읽고, 강제는 ②·③에서 해요</div>
+<div class="conn">지시는 ①, 강제는 ②·③</div>
 
 <div class="layer l1">
   <h2><span class="n">①</span> 규칙 레이어: 단일 원본 <small>지시 = 맥락(advisory)</small></h2>
   <div class="row">
-    <div class="box main" style="flex:1.4"><b>AGENTS.md (약 60줄)</b>명령(make setup/check/overlap) · 일의 크기별 흐름(T0/T1/T2) · 지우면 실수할 규칙만</div>
-    <div class="box"><b>얇은 래퍼 (가리키기만)</b>CLAUDE.md(@AGENTS.md) · copilot-instructions.md · .cursor/rules · GEMINI.md · .codex · .aider.conf.yml · .rules</div>
+    <div class="box main" style="flex:1.4"><b>AGENTS.md (약 60줄)</b>명령(make setup/check/overlap) · 작업 크기별 절차(T0/T1/T2) · 삭제하면 실수가 생기는 규칙만</div>
+    <div class="box"><b>얇은 래퍼 (참조만)</b>CLAUDE.md(@AGENTS.md) · copilot-instructions.md · .cursor/rules · GEMINI.md · .codex · .aider.conf.yml · .rules</div>
     <div class="box"><b>경로 규칙</b>.claude/rules (paths) · .github/instructions (applyTo) · *.mdc (globs). 워크플로 · 테스트 · 글과 화면</div>
     <div class="box" style="flex:.8"><b>설계 · ADR</b>docs/designs (1쪽 + 구조도) · REVIEW.md · docs/adr</div>
   </div>
@@ -80,7 +80,7 @@
 </div>
 
 <div class="layer l4" style="margin-top:10px">
-  <h2><span class="n">④</span> 자동화: 에이전트가 이슈와 PR을 읽고 써요 <small>굵은 주황 테두리 = 사람 체크포인트</small></h2>
+  <h2><span class="n">④</span> 자동화: 에이전트의 이슈·PR 처리 <small>굵은 주황 테두리 = 사람 체크포인트</small></h2>
   <div class="flow">
     <div class="step h"><b>설계 먼저 (큰 일만)</b>/design, 겹침 확인, 설계 PR 머지 = 승인</div><span class="to">→</span>
     <div class="step"><b>이슈 생성</b>템플릿: 배경·수용 기준·범위·테스트</div><span class="to">→</span>
@@ -93,8 +93,8 @@
     <div class="step h"><b>사람 승인</b>CODEOWNER · 에이전트 승인 게이트</div><span class="to">→</span>
     <div class="step"><b>squash 머지</b>이슈 ai:done · release-please</div>
   </div>
-  <p class="note"><b>팀 작업 보드</b>: work-board가 30분마다 모든 레포의 활성 설계와 열린 PR 파일을 board.json으로 모아 세션 시작 요약에 넣어요. design-check는 PR 겹침을 댓글로 알려요(LLM 없음, 막지 않음).</p>
-  <p class="note">CI가 실패하면 ci-fix가 로그를 읽고 수정 PR을 열어요. 언제든 @claude로 질문하거나 수정을 요청해요. 주간 유지보수 리포트, stale 정리, Dependabot 자동 머지(minor/patch).</p>
+  <p class="note"><b>팀 작업 보드</b>: work-board가 30분마다 모든 레포의 활성 설계와 열린 PR 파일을 board.json으로 모아 세션 시작 요약에 넣습니다. design-check는 PR 겹침을 댓글로 알립니다(LLM 없음, 차단 없음).</p>
+  <p class="note">CI가 실패하면 ci-fix가 로그를 읽고 수정 PR을 엽니다. @claude 댓글로 질문하거나 수정을 요청할 수 있습니다. 주간 유지보수 리포트, stale 정리, Dependabot 자동 머지(minor/patch).</p>
 </div>
 
 <div class="grid2" style="margin-top:10px">
@@ -105,7 +105,7 @@
       <div class="box"><b>② 로컬 LLM 서버</b>llama.cpp / Ollama (/v1/messages)<br>+ self-hosted 러너 · AI_BACKEND=local</div>
       <div class="box"><b>③ Anthropic (선택)</b>구독 토큰 또는 API 키<br>공식 액션 · AI_BACKEND=anthropic</div>
     </div>
-    <p class="note">변수가 없으면 AI 잡은 skipped. CI, 검사, 라벨, 릴리스는 그대로 동작해요.</p>
+    <p class="note">변수가 없으면 AI 잡은 skipped 처리됩니다. CI, 검사, 라벨, 릴리스는 그대로 동작합니다.</p>
   </div>
   <div class="layer l6">
     <h2><span class="n">⑥</span> 여러 레포 배포 <small>허브 1개, 서비스 레포 N개</small></h2>

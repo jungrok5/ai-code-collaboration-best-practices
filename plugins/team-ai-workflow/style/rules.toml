@@ -204,8 +204,41 @@ kind = "register"
 lang = "ko"
 severity = "error"
 pattern = '(니다|니까)[.?!]|[^니]요[.?!]'
-message = "한 문서 안에서 말투(합니다체·해요체·한다체)가 섞였어요"
-suggest = "문서 하나는 한 가지 말투로 (팀 기본: 해요체)"
+message = "한 문서 안에서 종결 어미(합니다체·해요체·한다체)가 섞였습니다"
+suggest = "문서 하나는 한 가지 문체로 작성합니다 (팀 기본: 합니다체)"
+
+[[rule]]
+id = "ko-haeyo"
+lang = "ko"
+severity = "error"
+pattern = '[가-힣](?<!니)(어요|아요|예요|에요|해요|돼요|죠|세요\?)[.?!]'
+message = "해요체 문장 (팀 문서 기본은 합니다체)"
+suggest = "합니다체로: ~해요 → ~합니다, ~돼요 → ~됩니다. 제품 UI가 해요체를 쓰기로 했다면 레포의 .style/rules.toml에서 이 규칙을 끕니다"
+max_per_file = 2
+
+[[rule]]
+id = "ko-colloquial"
+lang = "ko"
+severity = "error"
+pattern = '거예요|거에요|잖아요|잖습니까|해\s?줘요|해\s?드려요|\s딱\s|\s그냥\s|\s되게\s|엄청'
+message = "구어체 표현"
+suggest = "문서체로 바꾸거나 삭제합니다"
+
+[[rule]]
+id = "ko-personify"
+lang = "ko"
+severity = "error"
+pattern = '흘러가|알아서\s?(챙|처리|해)|일이\s?(돌아|굴러)|척척|술술|뚝딱'
+message = "일·도구를 사람처럼 쓰는 구어 표현"
+suggest = "주체와 동작을 명시합니다 (예: 워크플로가 라벨을 변경합니다)"
+
+[[rule]]
+id = "ko-reader-talk"
+lang = "ko"
+severity = "error"
+pattern = '걱정하지\s?마세요|어렵지\s?않(아요|습니다)|한번\s?볼까요|살펴볼까요|함께\s?(알아|살펴)보|궁금하시죠'
+message = "독자에게 말을 거는 문장"
+suggest = "삭제하고 바로 내용으로 들어갑니다"
 
 # ───────────────────────── English prose ─────────────────────────
 

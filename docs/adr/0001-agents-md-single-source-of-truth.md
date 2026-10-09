@@ -5,7 +5,7 @@
 
 ## 맥락
 
-팀원이 Claude Code, Copilot, Cursor, Codex, Gemini CLI를 섞어 써요. 도구마다 규칙 파일을 복사하면 금방 어긋나요. 일부 도구(Copilot, Augment, Claude `claude-md-and-agents-md` 모드)는 여러 파일을 동시에 읽어서 중복이 토큰 낭비와 모순을 만들어요. `AGENTS.md`는 2025-12부터 Linux Foundation AAIF가 관리하는 열린 표준이고 주요 도구가 네이티브로 읽어요.
+팀원이 Claude Code, Copilot, Cursor, Codex, Gemini CLI를 함께 사용합니다. 도구마다 규칙 파일을 복사하면 내용이 빠르게 어긋납니다. 일부 도구(Copilot, Augment, Claude `claude-md-and-agents-md` 모드)는 여러 파일을 동시에 읽으므로 중복이 토큰 낭비와 모순을 유발합니다. `AGENTS.md`는 2025-12부터 Linux Foundation AAIF가 관리하는 열린 표준이며 주요 도구가 네이티브로 읽습니다.
 
 ## 고려한 선택지
 
@@ -16,7 +16,7 @@
 
 ## 결정
 
-`AGENTS.md`를 단일 소스로 둬요. `CLAUDE.md`는 `@AGENTS.md` import와 Claude 전용 메모만, `.github/copilot-instructions.md`·`.cursor/rules/00-team-rules.mdc`·`GEMINI.md`·`.rules`는 포인터와 도구 전용 메모만 담아요. 경로 규칙은 각 도구의 경로 기능(`.claude/rules`, `*.instructions.md`, `.mdc globs`)으로 같은 내용을 짧게 유지해요. `.claude/rules/ai-config.md`가 에이전트에게 "도구 파일은 `AGENTS.md`를 가리키기만 한다"는 규칙을 알려 주고, `make ai-validate`가 길이를 검사해요(ADR-0006 이후: 150줄 초과 시 경고).
+`AGENTS.md`를 단일 소스로 둡니다. `CLAUDE.md`는 `@AGENTS.md` import와 Claude 전용 메모만, `.github/copilot-instructions.md`·`.cursor/rules/00-team-rules.mdc`·`GEMINI.md`·`.rules`는 포인터와 도구 전용 메모만 담습니다. 경로 규칙은 각 도구의 경로 기능(`.claude/rules`, `*.instructions.md`, `.mdc globs`)으로 같은 내용을 짧게 유지합니다. `.claude/rules/ai-config.md`가 에이전트에게 "도구 파일은 `AGENTS.md`를 가리키기만 한다"는 규칙을 제공하고, `make ai-validate`가 길이를 검사합니다(ADR-0006 이후: 150줄 초과 시 경고).
 
 ## 결과
 
