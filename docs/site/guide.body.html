@@ -2,15 +2,10 @@
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&amp;family=Noto+Sans+KR:wght@400;500;700&amp;display=swap">
 <style>
 /* Page styles on top of the team design system "Clear" (tokens.css + components.css, inlined by scripts/build-site.sh).
-   Only tokens here: no raw colors or font stacks. One accent (blue) marks a person's decision; layers are told
-   apart by number and position, not by color. */
+   Tokens only. Every section has the same shape: heading, one lead paragraph, then the form the content needs
+   (diagram, steps, table, command). The one accent marks a person's decision. */
 .wrap{max-width:var(--page);margin:0 auto;padding:var(--space-6) var(--space-4) var(--space-8)}
 @media (min-width:720px){.wrap{padding-inline:var(--space-5)}}
-.lede{font-size:var(--text-l);color:var(--muted);max-width:var(--measure)}
-.stack{display:grid;gap:var(--space-4)}
-.muted{color:var(--muted)}
-.small{font-size:var(--text-s)}
-.mt{margin-top:var(--space-3)}
 
 /* header + index */
 header.top{display:grid;gap:var(--space-3);padding-bottom:var(--space-5)}
@@ -22,24 +17,32 @@ nav.toc{position:sticky;top:0;z-index:5;background:var(--bg);border-block:var(--
 nav.toc a{display:inline-flex;align-items:center;min-height:44px;padding:0 8px;font-size:var(--text-s);text-decoration:none;color:var(--muted)}
 nav.toc a:hover{color:var(--fg)}
 nav.toc a:focus-visible{outline-offset:-3px}
+
+/* sections */
 section{padding-top:var(--space-7);scroll-margin-top:52px}
 .sec-head{display:grid;gap:var(--space-2);margin-bottom:var(--space-5);max-width:var(--measure)}
 .sec-head p{color:var(--muted)}
+.sec{display:grid;gap:var(--space-4)}
+.sec h3{margin-top:var(--space-4)}
+.sec > p{max-width:var(--measure)}
+.ds-table{min-width:620px}
+.ds-table tbody th{font-weight:700;min-width:7em}
+.ds-table code{white-space:nowrap}
+.ds-figure pre.mermaid{margin:0;background:transparent;font-family:var(--font-sans)}
 
-/* layer map */
+/* overview map */
 .map{display:grid;gap:var(--space-2)}
 .who{background:var(--surface);border:var(--border);border-radius:var(--radius-l);padding:var(--space-3) var(--space-4);display:flex;flex-wrap:wrap;gap:6px;align-items:center}
 .who strong{margin-right:6px}
 .tool{background:var(--bg);border:var(--border);border-radius:4px;padding:1px 8px;font-size:var(--text-s)}
-.conn{color:var(--subtle);font-size:13px;text-align:center;padding:2px 0}
-.layer{background:var(--bg);border:var(--border);border-radius:var(--radius-l);padding:var(--space-4);display:grid;gap:var(--space-3);min-width:0}
+.conn{color:var(--subtle);font-size:13px;text-align:center}
+.layer{border:var(--border);border-radius:var(--radius-l);padding:var(--space-4);display:grid;gap:var(--space-3);min-width:0}
 .layer-h{display:flex;flex-wrap:wrap;gap:2px 10px;align-items:baseline}
-.layer-h .n{font-weight:700}
 .layer-h h3{font-size:var(--text-m)}
-.layer-h .q{font-size:13px;color:var(--subtle)}
-.cells{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:6px}
+.layer-h span{font-size:13px;color:var(--subtle)}
+.cells{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:6px}
 .cell{background:var(--surface);border:var(--border);border-radius:var(--radius-s);padding:var(--space-2) 10px;font-size:var(--text-s);line-height:1.55;min-width:0}
-.cell b{display:block;font-size:var(--text-s)}
+.cell b{display:block}
 .cell.human{background:var(--accent-soft);border-color:var(--accent)}
 .cell.human b{color:var(--accent)}
 .pair{display:grid;grid-template-columns:1fr 1fr;gap:var(--space-2)}
@@ -50,41 +53,17 @@ section{padding-top:var(--space-7);scroll-margin-top:52px}
 .term{background:var(--bg);padding:var(--space-3) var(--space-4);display:grid;gap:var(--space-1);align-content:start}
 .term dt{font-weight:700}
 .term dd{margin:0;font-size:15px;color:var(--muted)}
-.term .eg{font-size:var(--text-s);color:var(--fg)}
 
-/* layer detail */
-.detail{background:var(--bg);border:var(--border);border-radius:var(--radius-l);padding:var(--space-5);display:grid;gap:var(--space-3);min-width:0}
-.detail .why{font-size:15px;max-width:80ch}
-.detail .why b{display:inline-block;font-size:var(--text-xs);background:var(--sunk);color:var(--muted);border-radius:4px;padding:0 6px;margin-right:6px}
-.kv{display:grid;grid-template-columns:120px 1fr;gap:var(--space-2) var(--space-4);font-size:15px;margin:0}
-.kv dt{color:var(--subtle)}
-.kv dd{margin:0;min-width:0}
-@media (max-width:600px){.detail{padding:var(--space-4)}.kv{grid-template-columns:1fr;gap:2px}.kv dt{margin-top:var(--space-2)}}
-.tbl{overflow-x:auto}
-table{border-collapse:collapse;width:100%;font-size:15px;min-width:620px;font-variant-numeric:tabular-nums}
-th,td{text-align:left;padding:10px var(--space-4) 10px 0;border-bottom:var(--border);vertical-align:top;line-height:1.6}
-thead th{font-size:13px;font-weight:500;color:var(--subtle);border-bottom-color:var(--line-strong)}
-tbody th{font-weight:700}
-tbody tr:last-child > *{border-bottom:0}
-tbody td:first-child,tbody th{min-width:7.5em}
-
-/* step badges (inside .ds-steps) */
-.ds-steps .meta{display:flex;flex-wrap:wrap;gap:6px;margin-top:var(--space-2)}
+/* steps meta */
 .ds-steps .step-body{min-width:0}
-.badge{display:inline-flex;align-items:center;min-height:22px;padding:0 var(--space-2);border-radius:4px;font-size:var(--text-xs);font-weight:700;background:var(--sunk);color:var(--muted);white-space:nowrap}
-.badge.h{background:var(--accent-soft);color:var(--accent)}
-.badge.c{background:var(--ok-soft);color:var(--ok)}
+.meta{display:flex;flex-wrap:wrap;gap:6px;margin-top:var(--space-2)}
 
-/* misc */
-.callout{background:var(--surface);border:var(--border);border-radius:var(--radius-l);padding:var(--space-4);display:grid;gap:6px;margin-top:var(--space-4)}
+/* start */
 .roles{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,420px),1fr));gap:var(--space-3)}
-.role{border:var(--border);border-radius:var(--radius-l);padding:var(--space-5);display:grid;gap:var(--space-3);align-content:start;min-width:0}
-.role ol,.howto{margin:0;padding-left:22px;font-size:15px;display:grid;gap:6px}
-.howto{max-width:80ch}
-.ds-cmd{margin-top:var(--space-3)}
-.role .ds-cmd{margin-top:0}
-.mermaid-box{border:var(--border);border-radius:var(--radius-l);padding:var(--space-4);overflow-x:auto;margin-top:var(--space-4)}
-pre.mermaid{margin:0;background:transparent;font-family:var(--font-sans)}
+.roles .ds-panel{display:grid;gap:var(--space-3);align-content:start}
+.roles ol{margin:0;padding-left:22px;font-size:15px;display:grid;gap:6px}
+
+/* reference */
 .tree{font-family:var(--font-mono);font-size:13.5px;line-height:1.75;background:var(--surface);border:var(--border);border-radius:var(--radius-l);padding:var(--space-4);overflow-x:auto;white-space:pre;word-break:normal}
 .tree .c{color:var(--subtle)}
 .faq{border-top:var(--border)}
@@ -93,96 +72,89 @@ pre.mermaid{margin:0;background:transparent;font-family:var(--font-sans)}
 .faq details p{padding-bottom:var(--space-4);font-size:15px;max-width:80ch;color:var(--muted)}
 footer{margin-top:var(--space-8);padding-top:var(--space-4);border-top:var(--border);font-size:var(--text-s);color:var(--subtle)}
 </style>
-
 <div class="wrap" lang="ko">
 <header class="top">
   <h1>AI 에이전트와 함께 일하는 팀의 GitHub 구조</h1>
-  <p class="lede">이 레포를 복제하면 Claude Code, Copilot, Cursor 같은 AI 도구를 쓰는 여러 팀원이 여러 레포에서 같은 규칙과 같은 검사로 작업합니다. 이 페이지는 처음 접하는 사람을 위해 구성 요소의 위치, 단계별 담당자와 시점, 구조를 이렇게 나눈 이유를 설명합니다.</p>
+  <p class="ds-lede">이 레포는 팀원마다 다른 AI 도구(Claude Code, Copilot, Cursor 등)를 쓰고 레포가 여러 개인 팀을 위한 템플릿입니다. 어떤 도구로 작업하든 같은 규칙을 읽고 같은 검사를 통과해야 main에 반영됩니다. 이 페이지는 전체 구조, 작업 하나가 진행되는 순서, 각 장치를 둔 이유를 처음 보는 사람 기준으로 설명합니다.</p>
   <ul class="facts">
     <li>API 키 없이 동작</li>
-    <li>규칙 파일 1개(AGENTS.md)</li>
+    <li>규칙 원본 1개(AGENTS.md, 약 60줄)</li>
     <li>사람 승인 없이는 머지 불가</li>
-    <li>워크플로 <b>22</b>개 · 스킬 <b>14</b>개(플러그인 12, 레포 2) · 서브에이전트 <b>5</b>개</li>
+    <li>워크플로 <b>22</b> · 스킬 <b>15</b>(플러그인 12, 레포 3) · 서브에이전트 <b>5</b></li>
   </ul>
 </header>
 
 <nav class="toc" aria-label="목차">
-  <a href="#overview">전체 구조</a><a href="#terms">용어</a><a href="#layers">6개 층</a><a href="#flow">이슈에서 머지까지</a><a href="#design">설계 우선·겹침 확인</a><a href="#labels">라벨 상태</a><a href="#backend">AI 실행 주체</a><a href="#guards">차단 항목</a><a href="#lean">경량 하네스</a><a href="#multi">다중 레포</a><a href="#scale">팀 규모 운영</a><a href="#style">글·화면 기준</a><a href="#start">역할별 시작</a><a href="#files">파일 구조</a><a href="#faq">FAQ</a>
+  <a href="#overview">전체 구조</a><a href="#terms">용어</a><a href="#flow">작업 흐름</a><a href="#design">큰 작업과 겹침</a><a href="#guards">규칙과 강제 장치</a><a href="#automation">자동화</a><a href="#backend">AI 실행 주체</a><a href="#multi">여러 레포</a><a href="#scale">팀 규모</a><a href="#style">글과 화면</a><a href="#start">시작하기</a><a href="#files">파일 구조</a><a href="#faq">FAQ</a>
 </nav>
 
-<!-- ============ 1. overview ============ -->
+<!-- 1. overview -->
 <section id="overview">
   <div class="sec-head">
     <h2>전체 구조</h2>
-    <p>구조도는 위에서 아래 순서로 읽습니다. 사람과 AI는 ①층의 규칙을 읽고 ②·③층이 그 규칙을 강제합니다. ④층은 이슈 등록부터 머지까지의 작업 단계입니다. ⑤층은 AI 실행 위치, ⑥층은 이 구조를 다른 레포에 배포하는 방법입니다.</p>
+    <p>구조는 여섯 층입니다. 사람과 AI는 ①의 규칙을 읽고, ②와 ③이 그 규칙을 기계적으로 강제합니다. ④는 이슈에서 머지까지의 작업 단계, ⑤는 AI가 실행되는 위치, ⑥은 이 구조를 다른 레포에 배포하는 방법입니다. 파란 칸은 사람이 판단하는 지점입니다.</p>
   </div>
-
   <div class="map" role="img" aria-label="6개 층으로 된 전체 구조도">
     <div class="who">
       <strong>사람 + AI 도구</strong>
       <span class="tool">개발자</span><span class="tool">리뷰어(CODEOWNER)</span><span class="tool">Claude Code</span><span class="tool">GitHub Copilot</span><span class="tool">Cursor</span><span class="tool">OpenAI Codex</span><span class="tool">Gemini CLI</span><span class="tool">Aider · Zed · Jules</span>
     </div>
-    <div class="conn">모든 도구가 같은 규칙 파일 참조</div>
-
+    <div class="conn">모든 도구가 같은 규칙 파일을 읽음</div>
     <div class="layer">
-      <div class="layer-h"><span class="n">①</span><h3>규칙: 작업 지시</h3><span class="q">AI에 대한 지시. 미준수 가능</span></div>
+      <div class="layer-h"><h3>① 규칙</h3><span>AI에 대한 지시. 강제력 없음</span></div>
       <div class="cells">
-        <div class="cell"><b>AGENTS.md</b>팀 규칙의 단일 원본. 명령, 작업 순서, 금지 사항</div>
-        <div class="cell"><b>도구별 연결 파일</b>CLAUDE.md, copilot-instructions.md 등. AGENTS.md를 가리키기만 함</div>
-        <div class="cell"><b>경로별 규칙</b>워크플로·테스트·글·화면 파일 수정 시에만 추가로 적용되는 규칙</div>
-        <div class="cell"><b>REVIEW.md · ADR</b>리뷰 기준과 설계 결정 기록</div>
+        <div class="cell"><b>AGENTS.md</b>팀 규칙의 단일 원본</div>
+        <div class="cell"><b>도구별 연결 파일</b>AGENTS.md를 가리키기만 함</div>
+        <div class="cell"><b>경로별 규칙</b>특정 파일을 수정할 때만 추가</div>
+        <div class="cell"><b>REVIEW.md · ADR · 설계</b>리뷰 기준과 결정 기록</div>
       </div>
     </div>
-    <div class="conn">규칙은 강제력이 없으므로 필수 항목은 아래 두 층에서 기계적으로 차단</div>
-
+    <div class="conn">필수 항목은 아래 두 층에서 기계적으로 차단</div>
     <div class="pair">
       <div class="layer">
-        <div class="layer-h"><span class="n">②</span><h3>로컬 가드레일</h3><span class="q">개발자 PC에서 차단</span></div>
+        <div class="layer-h"><h3>② 로컬 가드레일</h3><span>개발자 PC</span></div>
         <div class="cells">
-          <div class="cell"><b>훅(플러그인)</b>비밀 파일 수정, main 커밋, 강제 푸시 차단. 수정 직후 글·화면 스타일 검사</div>
-          <div class="cell"><b>권한 설정</b>확인 없이 허용하는 명령과 항상 거부하는 명령</div>
-          <div class="cell"><b>pre-commit</b>커밋 직전 비밀키·워크플로·쉘·YAML·글·화면 스타일 검사</div>
+          <div class="cell"><b>훅</b>위험한 수정과 git 명령 차단, 수정 직후 검사</div>
+          <div class="cell"><b>권한 설정</b>허용·거부 명령 목록</div>
+          <div class="cell"><b>pre-commit</b>커밋 직전 검사</div>
         </div>
       </div>
       <div class="layer">
-        <div class="layer-h"><span class="n">③</span><h3>GitHub 거버넌스</h3><span class="q">서버에서 차단</span></div>
+        <div class="layer-h"><h3>③ GitHub 거버넌스</h3><span>서버</span></div>
         <div class="cells">
-          <div class="cell"><b>이슈·PR 양식</b>AI가 일할 수 있는 이슈, AI 사용 공개가 필수인 PR</div>
-          <div class="cell"><b>브랜치 보호(룰셋)</b>PR 필수, 사람 승인 1명, CI 통과, squash만</div>
+          <div class="cell"><b>이슈·PR 양식</b>필수 항목과 AI 사용 공개</div>
+          <div class="cell"><b>룰셋 · CODEOWNERS</b>PR, 사람 승인, CI 통과</div>
           <div class="cell"><b>보안 스캔</b>CodeQL, 비밀 스캔, Dependabot</div>
         </div>
       </div>
     </div>
     <div class="conn">이 틀 안에서 작업 진행</div>
-
     <div class="layer">
-      <div class="layer-h"><span class="n">④</span><h3>자동화: 이슈에서 머지까지</h3><span class="q">파란 칸은 사람의 확인 필수</span></div>
+      <div class="layer-h"><h3>④ 이슈에서 머지까지</h3><span>워크플로와 AI 에이전트가 진행</span></div>
       <div class="cells">
-        <div class="cell"><b>1. 이슈 등록</b>양식대로 작성</div>
-        <div class="cell"><b>2. AI 분류</b>라벨 제안, 빠진 정보 지적</div>
-        <div class="cell human"><b>3. 사람이 승인</b><code>ai:ready</code> 라벨</div>
-        <div class="cell"><b>4. AI 구현</b>테스트 먼저, 검사 통과 후 커밋</div>
-        <div class="cell"><b>5. 초안 PR</b>자동으로 열림</div>
-        <div class="cell"><b>6. CI + AI 리뷰</b>리뷰는 참고용</div>
-        <div class="cell human"><b>7. 사람이 리뷰·승인</b>CODEOWNER</div>
-        <div class="cell"><b>8. 머지·릴리스</b>squash, 자동 릴리스 노트</div>
+        <div class="cell"><b>이슈 등록</b>양식대로 작성</div>
+        <div class="cell"><b>AI 분류</b>라벨 제안, 빠진 정보 질문</div>
+        <div class="cell human"><b>ai:ready 부여</b>AI에 맡길지 결정</div>
+        <div class="cell"><b>AI 구현 · 초안 PR</b>테스트 먼저</div>
+        <div class="cell"><b>CI · AI 리뷰</b>리뷰는 참고용</div>
+        <div class="cell human"><b>CODEOWNER 승인</b>받아들일지 결정</div>
+        <div class="cell"><b>squash 머지</b>릴리스 노트 자동</div>
       </div>
     </div>
-
     <div class="pair">
       <div class="layer">
-        <div class="layer-h"><span class="n">⑤</span><h3>AI 실행 위치</h3><span class="q">선택 사항</span></div>
+        <div class="layer-h"><h3>⑤ AI 실행 주체</h3><span>선택 사항</span></div>
         <div class="cells">
-          <div class="cell"><b>내 자리(기본)</b>내 claude 로그인으로 <code>make ai-*</code></div>
-          <div class="cell"><b>사내 서버</b>llama.cpp·Ollama 로컬 모델</div>
-          <div class="cell"><b>Anthropic</b>구독 토큰·API 키로 GitHub에서 자동</div>
+          <div class="cell"><b>내 자리(기본)</b>내 claude 로그인</div>
+          <div class="cell"><b>사내 서버</b>로컬 모델</div>
+          <div class="cell"><b>Anthropic</b>토큰 또는 API 키</div>
         </div>
       </div>
       <div class="layer">
-        <div class="layer-h"><span class="n">⑥</span><h3>다중 레포 배포</h3><span class="q">허브 1개, 서비스 레포 N개</span></div>
+        <div class="layer-h"><h3>⑥ 여러 레포 배포</h3><span>허브 1개, 서비스 레포 N개</span></div>
         <div class="cells">
-          <div class="cell"><b>템플릿 복사</b><code>make new-repo</code></div>
-          <div class="cell"><b>플러그인 마켓플레이스</b>훅·스킬을 모든 레포에 한 번에 갱신</div>
+          <div class="cell"><b>템플릿 복사</b>새 레포 생성 시 1회</div>
+          <div class="cell"><b>플러그인</b>훅·스킬 일괄 갱신</div>
           <div class="cell"><b>조직 설정</b>재사용 워크플로, 조직 룰셋</div>
         </div>
       </div>
@@ -190,159 +162,36 @@ footer{margin-top:var(--space-8);padding-top:var(--space-4);border-top:var(--bor
   </div>
 </section>
 
-<!-- ============ 2. terms ============ -->
+<!-- 2. terms -->
 <section id="terms">
   <div class="sec-head">
     <h2>용어</h2>
-    <p>이 페이지와 레포 문서에 자주 나오는 용어와 해당 파일입니다.</p>
+    <p>이 페이지에서 반복해서 쓰는 용어입니다.</p>
   </div>
   <dl class="gloss">
-    <div class="term"><dt>AGENTS.md</dt><dd>AI 코딩 도구들이 공통으로 읽는 "에이전트용 README". Linux Foundation 산하 재단이 관리하는 공개 형식입니다.</dd><dd class="eg">이 레포의 모든 규칙이 이 파일에 있습니다.</dd></div>
-    <div class="term"><dt>에이전트</dt><dd>지시를 받아 스스로 파일을 읽고 고치고 명령을 실행하는 AI. Claude Code, Copilot 클라우드 에이전트 등.</dd><dd class="eg">이 템플릿에서는 이슈를 받아 코드를 작성하고 PR을 엽니다.</dd></div>
-    <div class="term"><dt>훅(hook)</dt><dd>AI가 어떤 행동을 하기 직전이나 직후에 자동으로 실행되는 스크립트. AI가 무시할 수 없습니다.</dd><dd class="eg">예: <code>.env</code> 수정 시도를 차단하고 이유를 AI에 반환합니다.</dd></div>
-    <div class="term"><dt>스킬(skill)</dt><dd>반복 작업의 절차서. AI가 <code>/이름</code>으로 호출해 절차대로 실행합니다.</dd><dd class="eg">예: <code>/implement-issue 12</code>, <code>/review-pr 34</code></dd></div>
-    <div class="term"><dt>서브에이전트</dt><dd>한 가지 역할만 담당하는 별도 AI. 작업한 AI와 독립된 관점의 검토에 사용합니다.</dd><dd class="eg">예: code-reviewer, security-reviewer</dd></div>
-    <div class="term"><dt>플러그인 · 마켓플레이스</dt><dd>훅·스킬·서브에이전트를 묶은 패키지가 플러그인이고 플러그인 목록을 게시하는 저장소가 마켓플레이스입니다.</dd><dd class="eg">이 레포 자체가 마켓플레이스 "ai-collab"입니다.</dd></div>
-    <div class="term"><dt>워크플로(GitHub Actions)</dt><dd>GitHub에서 이벤트(이슈 생성, PR, 푸시)가 발생하면 자동으로 실행되는 작업.</dd><dd class="eg"><code>.github/workflows/*.yml</code> 22개</dd></div>
-    <div class="term"><dt>룰셋 · CODEOWNERS</dt><dd>룰셋은 브랜치 보호 규칙(승인·CI 필수 등), CODEOWNERS는 경로별 책임 리뷰어 목록입니다.</dd><dd class="eg"><code>scripts/rulesets/main.json</code>, <code>.github/CODEOWNERS</code></dd></div>
-    <div class="term"><dt>라벨 상태</dt><dd>이슈의 진행 단계를 라벨로 표시합니다. 워크플로는 라벨을 기준으로 실행됩니다.</dd><dd class="eg"><code>ai:ready → ai:in-progress → ai:review → ai:done</code></dd></div>
-    <div class="term"><dt>claude -p (헤드리스)</dt><dd>대화창 없이 명령 한 줄로 Claude Code를 실행하는 방식. 스크립트와 자동화에 사용합니다.</dd><dd class="eg"><code>make ai-review PR=34</code>가 내부에서 이 방식을 사용합니다.</dd></div>
-    <div class="term"><dt>CI · ci-ok</dt><dd>PR마다 린트·타입·테스트를 자동으로 실행하는 검사. 결과를 <code>ci-ok</code> 하나로 모아 머지 조건으로 지정합니다.</dd><dd class="eg"><code>.github/workflows/ci.yml</code></dd></div>
-    <div class="term"><dt>squash 머지</dt><dd>PR의 여러 커밋을 하나로 합쳐 main에 반영하는 방식. PR 제목이 커밋 제목이 됩니다.</dd><dd class="eg">따라서 PR 제목 형식을 검사합니다.</dd></div>
+    <div class="term"><dt>AGENTS.md</dt><dd>AI 코딩 도구들이 공통으로 읽는 에이전트용 README. 공개 형식이며 이 레포의 팀 규칙이 모두 이 파일에 있습니다.</dd></div>
+    <div class="term"><dt>에이전트</dt><dd>지시를 받아 파일을 읽고 수정하고 명령을 실행하는 AI. 이 템플릿에서는 이슈를 받아 코드를 작성하고 PR을 엽니다.</dd></div>
+    <div class="term"><dt>훅(hook)</dt><dd>AI가 행동하기 직전이나 직후에 자동으로 실행되는 스크립트. AI가 무시할 수 없습니다. 예: <code>.env</code> 수정 차단</dd></div>
+    <div class="term"><dt>스킬(skill)</dt><dd>반복 작업의 절차서. <code>/implement-issue 12</code>처럼 호출하거나 상황에 맞으면 AI가 스스로 불러옵니다.</dd></div>
+    <div class="term"><dt>서브에이전트</dt><dd>한 가지 역할만 맡는 별도 AI. 작업한 AI와 독립된 관점으로 검토할 때 씁니다. 예: security-reviewer</dd></div>
+    <div class="term"><dt>플러그인 · 마켓플레이스</dt><dd>훅·스킬·서브에이전트를 묶은 패키지와 그 목록. 이 레포 자체가 마켓플레이스 "ai-collab"입니다.</dd></div>
+    <div class="term"><dt>워크플로</dt><dd>이슈 생성, PR, 푸시 같은 이벤트에 GitHub Actions가 자동으로 실행하는 작업. <code>.github/workflows/</code></dd></div>
+    <div class="term"><dt>룰셋 · CODEOWNERS</dt><dd>룰셋은 브랜치 보호 규칙, CODEOWNERS는 경로별 책임 리뷰어 목록입니다.</dd></div>
+    <div class="term"><dt>라벨 상태</dt><dd>이슈의 진행 단계를 라벨로 표시하는 방식. 워크플로가 라벨을 보고 실행됩니다.</dd></div>
+    <div class="term"><dt>claude -p</dt><dd>대화창 없이 명령 한 줄로 Claude Code를 실행하는 방식. <code>make ai-*</code>가 내부에서 사용합니다.</dd></div>
+    <div class="term"><dt>ci-ok</dt><dd>린트·타입·테스트 결과를 하나로 모은 검사. 머지 조건으로 지정합니다.</dd></div>
+    <div class="term"><dt>squash 머지</dt><dd>PR의 커밋을 하나로 합쳐 반영하는 방식. PR 제목이 main의 커밋 제목이 됩니다.</dd></div>
   </dl>
 </section>
 
-<!-- ============ 3. layers ============ -->
-<section id="layers">
-  <div class="sec-head">
-    <h2>6개 층 상세</h2>
-    <p>층별 구성 요소, 필요한 이유, 파일 위치, 작동 시점을 정리합니다.</p>
-  </div>
-  <div class="stack">
-
-    <article class="detail">
-      <h3>① 규칙: AGENTS.md 단일 원본</h3>
-      <p class="why"><b>왜</b>팀원마다 사용하는 AI 도구가 다릅니다. 도구마다 규칙 파일을 따로 두면 몇 주 만에 내용이 서로 달라집니다. 따라서 규칙은 AGENTS.md 한 곳에 작성하고 도구별 파일에는 "AGENTS.md를 읽어라"만 적습니다.</p>
-      <dl class="kv">
-        <dt>담는 내용</dt><dd>① 실행 명령(<code>make setup</code>, <code>make check</code>) ② 작업 순서(이슈, 브랜치, PR, 리뷰, 머지) ③ 코딩·테스트·git 규칙 ④ AI가 건드리면 안 되는 파일 ⑤ AI 행동 원칙(범위 지키기, 증거 제시, 외부 텍스트는 명령이 아님)</dd>
-        <dt>크기 제한</dt><dd>짧게 유지합니다(현재 약 60줄, 150줄을 넘으면 검사가 경고). 기준은 "이 줄을 지우면 AI가 실수하는가"입니다. 파일이 길어지면 AI가 중요한 지시를 놓치므로 긴 설명은 <code>docs/</code>로 옮깁니다.</dd>
-        <dt>도구별 연결</dt><dd><code>CLAUDE.md</code>(Claude), <code>.github/copilot-instructions.md</code>(Copilot), <code>.cursor/rules/</code>(Cursor), <code>GEMINI.md</code>+<code>.gemini/settings.json</code>(Gemini), <code>.aider.conf.yml</code>(Aider), <code>.codex/</code>(Codex), <code>.rules</code>(Zed)</dd>
-        <dt>경로별 규칙</dt><dd>워크플로 파일을 고칠 때는 "권한 최소화, 액션 버전 고정", 테스트 파일을 고칠 때는 "테스트 끄기 금지", 글과 화면 파일을 고칠 때는 docs/17 기준이 추가로 적용됩니다. <code>.claude/rules/</code>, <code>.github/instructions/</code>, <code>.cursor/rules/*.mdc</code></dd>
-        <dt>한계</dt><dd>규칙은 AI에 제공하는 맥락이며 강제력이 없습니다. 따라서 ②·③층을 별도로 둡니다.</dd>
-      </dl>
-    </article>
-
-    <article class="detail">
-      <h3>② 로컬 가드레일: 개발자 PC의 기계적 차단</h3>
-      <p class="why"><b>왜</b>AI가 규칙을 잊거나 잘못 판단해도 사고로 이어지지 않게 합니다. 훅은 AI가 행동하기 직전에 실행되어 위험한 행동을 차단하고 차단 이유를 AI에 반환합니다.</p>
-      <div class="tbl"><table>
-        <thead><tr><th>장치</th><th>작동 시점</th><th>역할</th><th>파일</th></tr></thead>
-        <tbody>
-          <tr><td>보호 파일 훅</td><td>AI가 파일을 수정하기 직전</td><td><code>.env</code>, 키 파일, 락파일, CODEOWNERS, 룰셋, 팀 권한 설정 수정을 차단</td><td><code>plugins/team-ai-workflow/scripts/protect-files.sh</code></td></tr>
-          <tr><td>git 규칙 훅</td><td>AI가 git 명령을 실행하기 직전</td><td>main에 커밋, 공유 브랜치 강제 푸시를 차단</td><td><code>…/scripts/git-guard.sh</code></td></tr>
-          <tr><td>자동 포맷 훅</td><td>파일 수정 직후</td><td>prettier·ruff·gofmt 등으로 정리. 실패해도 작업 계속</td><td><code>…/scripts/format-after-edit.sh</code></td></tr>
-          <tr><td>스타일 검사 훅</td><td>AI가 <code>.md</code>, <code>.html</code>, <code>.css</code>, <code>.tsx</code> 등을 수정한 직후</td><td>과장 수식어, 번역투, 말투 섞임, 보라 그라데이션, 이모지 아이콘 같은 AI 티를 검사해 결과를 AI에 반환. 수정은 차단하지 않음</td><td><code>…/style/style_check.py</code></td></tr>
-          <tr><td>세션 시작 훅</td><td>Claude Code를 켤 때</td><td>의존성 설치, pre-commit 설치, 팀의 활성 설계와 영역별 담당자 요약을 AI에 전달</td><td><code>.claude/hooks/session-start.sh</code></td></tr>
-          <tr><td>권한 설정</td><td>AI가 명령을 실행할 때마다</td><td>읽기·빌드·테스트는 묻지 않고 허용, 비밀 읽기·<code>reset --hard</code>·<code>sudo</code> 등은 항상 거부</td><td><code>.claude/settings.json</code></td></tr>
-          <tr><td>pre-commit</td><td>사람과 AI의 모든 커밋 시</td><td>비밀키 검출(gitleaks), 워크플로·쉘·YAML·마크다운 검사, 글·화면 스타일 검사, 커밋 메시지 형식</td><td><code>.pre-commit-config.yaml</code></td></tr>
-        </tbody>
-      </table></div>
-    </article>
-
-    <article class="detail">
-      <h3>③ GitHub 거버넌스: 서버 측 차단</h3>
-      <p class="why"><b>왜</b>로컬 장치는 끌 수 있습니다. Copilot과 Cursor는 Claude 훅을 사용하지 않습니다. 따라서 마지막 관문을 GitHub 서버에 둡니다. 어떤 도구로 만든 코드든 이 단계를 통과해야 main에 반영됩니다.</p>
-      <div class="tbl"><table>
-        <thead><tr><th>장치</th><th>규칙</th><th>파일</th></tr></thead>
-        <tbody>
-          <tr><td>이슈 양식 3종</td><td>작업(AI 가능)·버그·기능. 배경, 수용 기준, 수정 범위, 제외 사항, 테스트 방법 기재</td><td><code>.github/ISSUE_TEMPLATE/</code></td></tr>
-          <tr><td>PR 양식</td><td>요약·변경·테스트 증거·AI 사용 공개·체크리스트. 공개 항목은 정확히 하나만 체크해야 통과</td><td><code>.github/pull_request_template.md</code></td></tr>
-          <tr><td>브랜치 보호</td><td>PR 필수, 사람 승인 1명(CODEOWNER), 마지막 푸시 이후 재승인, 리뷰 스레드 해결, <code>ci-ok</code> 통과, squash만, 강제 푸시·삭제 금지</td><td><code>scripts/rulesets/main.json</code></td></tr>
-          <tr><td>CODEOWNERS</td><td>경로별 책임 리뷰어. 정책 파일은 관리자만</td><td><code>.github/CODEOWNERS</code></td></tr>
-          <tr><td>라벨</td><td>상태·크기·유형·영역·우선순위 라벨을 코드로 관리, 자동 동기화</td><td><code>.github/labels.yml</code></td></tr>
-          <tr><td>보안</td><td>CodeQL 코드 스캔, 비밀 스캔, Dependabot 의존성 갱신(액션은 커밋 해시로 고정)</td><td><code>codeql.yml</code>, <code>dependabot.yml</code></td></tr>
-        </tbody>
-      </table></div>
-    </article>
-
-    <article class="detail">
-      <h3>④ 자동화: 워크플로별 역할</h3>
-      <p class="why"><b>왜</b>분류, 라벨, 1차 리뷰, 릴리스 노트 같은 반복 작업은 워크플로가 처리합니다. 사람은 "이 작업을 AI에 맡길지"와 "이 코드를 받아들일지" 두 번만 판단합니다.</p>
-      <div class="tbl"><table>
-        <thead><tr><th>워크플로</th><th>실행 시점</th><th>역할</th><th>AI 필요</th></tr></thead>
-        <tbody>
-          <tr><td><code>ci.yml</code></td><td>PR, main 푸시</td><td>스택을 자동 감지해 린트·글·화면 스타일(<code>make style</code>)·타입·테스트·빌드. 결과를 <code>ci-ok</code>로 모음</td><td>아니오</td></tr>
-          <tr><td><code>pr-checks.yml</code></td><td>PR</td><td>제목 형식, 크기 라벨(XS~XL), 영역 라벨, AI 공개 체크에 따라 <code>ai:assisted</code>/<code>ai:generated</code></td><td>아니오</td></tr>
-          <tr><td><code>agent-approval-check.yml</code></td><td>PR·리뷰</td><td>AI가 만든 커밋이 있으면 사람 승인을 따로 요구</td><td>아니오</td></tr>
-          <tr><td><code>issue-state-sync.yml</code></td><td>PR 열림·머지</td><td>AI PR 라벨, 머지 시 연결된 이슈를 <code>ai:done</code>으로 변경</td><td>아니오</td></tr>
-          <tr><td><code>release-please.yml</code></td><td>main 푸시</td><td>커밋 제목으로 릴리스 PR과 변경 기록 자동 작성</td><td>아니오</td></tr>
-          <tr><td><code>labels-sync</code> · <code>stale</code> · <code>codeql</code> · <code>dependabot-auto-merge</code> · <code>validate-ai-config</code></td><td>각각</td><td>라벨 동기화, 오래된 이슈 정리, 보안 스캔, 의존성 소규모 갱신 자동 머지, 설정 파일 검증</td><td>아니오</td></tr>
-          <tr><td><code>work-board.yml</code></td><td>30분마다, main 변경</td><td>등록된 레포들의 활성 설계와 열린 PR 변경 파일을 모아 <code>board.json</code>으로 만들고 이 해설 페이지와 함께 Pages에 배포</td><td>아니오</td></tr>
-          <tr><td><code>design-check.yml</code></td><td>PR</td><td>PR이 건드리는 영역을 팀 보드와 비교해 겹치면 댓글. 큰 PR에 설계 링크가 없으면 알림(막지 않음)</td><td>아니오</td></tr>
-          <tr><td><code>contract-check.yml</code></td><td>PR (계약 파일 변경 시)</td><td>API·이벤트·스키마 변경을 알리고 깨지는 변경(OpenAPI·protobuf)이면 <code>breaking-change</code> 라벨 없이는 실패</td><td>아니오</td></tr>
-          <tr><td><code>copilot-setup-steps</code> · <code>bootstrap-repo</code></td><td>각각</td><td>Copilot 에이전트 환경 준비 · 레포 설정·라벨·룰셋 적용(수동)</td><td>아니오</td></tr>
-          <tr><td><code>claude-issue-triage.yml</code></td><td>이슈 생성</td><td>라벨 제안, 빠진 정보·중복 댓글. 이슈를 닫지 않음</td><td>예</td></tr>
-          <tr><td><code>claude-implement-issue.yml</code></td><td><code>ai:ready</code> 라벨</td><td>브랜치 생성, 테스트·구현, 검사 통과 후 커밋, 초안 PR</td><td>예</td></tr>
-          <tr><td><code>claude-code-review.yml</code></td><td>PR</td><td>줄 단위 코멘트와 요약. 승인·거절은 하지 않음</td><td>예</td></tr>
-          <tr><td><code>claude-ci-fix.yml</code></td><td>CI 실패</td><td>실패 로그를 읽고 원인 수정 PR 또는 진단 댓글</td><td>예</td></tr>
-          <tr><td><code>claude.yml</code></td><td>댓글에 <code>@claude</code></td><td>질문 답변, 요청한 수정</td><td>예</td></tr>
-          <tr><td><code>claude-maintenance.yml</code></td><td>매주 월요일</td><td>유지보수 리포트 이슈 1개</td><td>예</td></tr>
-          <tr><td><code>ai-local-runner.yml</code></td><td>위 이벤트 전부</td><td>사내 서버의 로컬 모델로 같은 작업 수행</td><td>예(로컬)</td></tr>
-        </tbody>
-      </table></div>
-      <p class="muted small">"AI 필요"가 "예"인 워크플로는 ⑤층에서 실행 주체를 지정한 경우에만 실행됩니다. 지정하지 않으면 건너뛰고(skipped), 나머지 워크플로는 그대로 실행됩니다.</p>
-    </article>
-
-    <article class="detail">
-      <h3>⑤ AI 실행 주체: API 키 선택 사항</h3>
-      <p class="why"><b>왜</b>GitHub의 실행 서버는 매번 새로 생성되는 빈 환경이라 로그인 정보가 없습니다. 따라서 그 환경에서 AI를 실행하려면 키가 필요합니다. 팀원 PC에는 이미 Claude 로그인이 있으므로 같은 작업을 개발자 PC에서 실행하면 키가 필요하지 않습니다.</p>
-      <div class="tbl"><table>
-        <thead><tr><th>구분</th><th>내 자리 (기본)</th><th>사내 로컬 LLM</th><th>Anthropic (선택)</th></tr></thead>
-        <tbody>
-          <tr><th scope="row">자격증명</th><td>내 claude.ai 구독 로그인</td><td>없음</td><td>구독 토큰 또는 API 키</td></tr>
-          <tr><th scope="row">실행 위치</th><td>개발자 PC</td><td>사내 GPU 서버 + 자체 러너</td><td>GitHub 서버</td></tr>
-          <tr><th scope="row">켜는 법</th><td>설정 없음. <code>make ai-review PR=34</code></td><td>변수 <code>AI_BACKEND=local</code></td><td>변수 <code>AI_BACKEND=anthropic</code> + 시크릿</td></tr>
-          <tr><th scope="row">자동 반응</th><td>아니오(사람이 명령)</td><td>예</td><td>예</td></tr>
-          <tr><th scope="row">품질</th><td>최고</td><td>모델에 따라 다름</td><td>최고</td></tr>
-          <tr><th scope="row">안내</th><td colspan="3"><code>docs/13-ai-backends.md</code>, <code>infra/local-llm/README.md</code></td></tr>
-        </tbody>
-      </table></div>
-    </article>
-
-    <article class="detail">
-      <h3>⑥ 다중 레포 배포</h3>
-      <p class="why"><b>왜</b>서비스 레포가 늘어날수록 레포별 규칙이 달라집니다. 이 레포를 허브로 두고 처음에는 복사로, 이후에는 플러그인 갱신으로 같은 상태를 유지합니다.</p>
-      <div class="tbl"><table>
-        <thead><tr><th>배포 대상</th><th>방법</th><th>갱신</th></tr></thead>
-        <tbody>
-          <tr><td>규칙·양식·워크플로·Makefile</td><td>템플릿 복사: <code>make new-repo REPO=org/svc</code></td><td>복사 시점에 고정. 이후에는 동기화 PR(repo-file-sync, Copier)</td></tr>
-          <tr><td>훅·스킬·서브에이전트</td><td>플러그인 마켓플레이스: 각 레포 <code>.claude/settings.json</code>에 등록</td><td>허브에서 버전을 올리면 <code>claude plugin update</code>로 일괄 반영</td></tr>
-          <tr><td>CI 잡</td><td>재사용 워크플로 + 조직 룰셋 "워크플로 통과 필수"</td><td>버전 태그 고정</td></tr>
-          <tr><td>CONTRIBUTING·SECURITY 등</td><td>조직의 <code>.github</code> 레포 기본값</td><td>자동(레포에 같은 파일이 없을 때)</td></tr>
-        </tbody>
-      </table></div>
-    </article>
-  </div>
-</section>
-
-<!-- ============ 4. flow ============ -->
+<!-- 3. flow -->
 <section id="flow">
   <div class="sec-head">
-    <h2>이슈에서 머지까지의 흐름</h2>
-    <p>로그인 기능에 요청 제한을 추가하는 이슈 #42를 예로 듭니다. 번호가 파란 단계는 사람이 판단합니다.</p>
+    <h2>이슈 하나가 머지되기까지</h2>
+    <p>로그인에 요청 제한을 추가하는 이슈 #42를 예로 듭니다. 사람이 판단하는 지점은 두 곳입니다. 이 작업을 AI에 맡길지, 그리고 결과 코드를 받아들일지입니다. 나머지는 워크플로와 AI 에이전트가 진행합니다.</p>
   </div>
-  <ol class="ds-steps">
-    <li><div class="step-body"><h3>이슈 등록</h3><p>팀원이 "작업(AI 가능)" 양식으로 #42를 작성합니다. 수용 기준은 "같은 IP에서 1분에 5회 넘게 로그인하면 429 응답", 범위는 <code>src/auth/</code>입니다.</p><div class="meta"><span class="badge">사람</span><span class="badge">이슈 양식</span></div></div></li>
-    <li><div class="step-body"><h3>AI 분류(트리아지)</h3><p>AI가 이슈를 읽고 <code>type/feature</code>, <code>area/auth</code>, <code>priority/p2</code>, <code>size/S</code> 라벨을 추가하고 "실패 시 응답 본문 형식이 없다"는 댓글을 남깁니다. 이슈를 닫거나 담당자를 바꾸지 않습니다.</p><div class="meta"><span class="badge a">AI</span><span class="badge">triage.sh · claude-issue-triage.yml</span></div></div></li>
-    <li class="is-human"><div class="step-body"><h3>AI 위임 결정</h3><p>메인테이너가 빠진 내용을 보강하고 <code>ai:ready</code> 라벨을 추가합니다. 이 라벨은 쓰기 권한이 있는 사람만 추가할 수 있습니다. 보안, 개인정보, 운영 장애 관련 이슈에는 추가하지 않습니다.</p><div class="meta"><span class="badge h">사람 체크포인트 1</span></div></div></li>
-    <li><div class="step-body"><h3>AI 구현</h3><p>라벨이 <code>ai:in-progress</code>로 변경됩니다. AI가 별도 작업 폴더(worktree)에서 <code>ai/issue-42-…</code> 브랜치를 만들고 수용 기준을 테스트로 먼저 작성한 뒤 구현합니다. <code>make check</code>가 통과해야 커밋합니다. 이 과정에서 훅이 비밀 파일 수정과 main 직접 커밋을 차단합니다.</p><div class="meta"><span class="badge a">AI</span><span class="badge">implement.sh · /implement-issue</span><span class="badge c">훅 작동</span></div></div></li>
-    <li><div class="step-body"><h3>초안 PR 생성</h3><p>"Closes #42"가 포함된 초안 PR이 <code>ai:generated</code> 라벨과 함께 열리고 이슈 라벨은 <code>ai:review</code>로 변경됩니다. 실패하면 이슈 라벨이 <code>ai:needs-human</code>으로 변경되고 실패 이유가 댓글로 기록됩니다.</p><div class="meta"><span class="badge a">자동</span></div></div></li>
-    <li><div class="step-body"><h3>자동 검사와 AI 리뷰</h3><p>CI(<code>ci-ok</code>), PR 제목·크기·AI 공개 검사, 보안 스캔이 실행됩니다. AI 리뷰어는 "1분 경계에서 카운터가 초기화되지 않음" 같은 지적을 줄 단위로 남깁니다. AI 리뷰는 승인으로 집계하지 않습니다. CI가 실패하면 AI가 원인을 수정하는 PR을 별도로 엽니다.</p><div class="meta"><span class="badge c">CI</span><span class="badge a">AI(참고용)</span></div></div></li>
-    <li class="is-human"><div class="step-body"><h3>사람 리뷰와 승인</h3><p>CODEOWNER가 코드를 읽고 AI 지적 중 타당한 항목의 반영을 요청합니다. 승인 후 새 커밋이 추가되면 다시 승인해야 합니다. AI 커밋이 있는 PR은 별도의 사람 승인 검사도 통과해야 합니다.</p><div class="meta"><span class="badge h">사람 체크포인트 2</span></div></div></li>
-    <li><div class="step-body"><h3>머지와 릴리스</h3><p>squash 머지로 PR 제목 "feat(auth): add login rate limit (#42)"가 main 커밋 제목이 됩니다. 브랜치는 삭제되고 #42의 라벨은 <code>ai:done</code>으로 변경됩니다. release-please가 다음 버전의 변경 기록에 이 항목을 추가합니다.</p><div class="meta"><span class="badge a">자동</span></div></div></li>
-  </ol>
-
-  <div class="mermaid-box">
+  <div class="sec">
+    <figure class="ds-figure">
 <pre class="mermaid">
 sequenceDiagram
   autonumber
@@ -363,24 +212,43 @@ sequenceDiagram
   Rev->>GH: 코드 리뷰 → 승인
   GH-->>GH: squash 머지 · 이슈 ai:done · 릴리스 노트
 </pre>
+      <figcaption>참여자 다섯이 주고받는 순서. 아래 단계 설명과 번호가 다릅니다.</figcaption>
+    </figure>
+    <ol class="ds-steps">
+      <li><div class="step-body"><h3>이슈 등록</h3><p>팀원이 "작업(AI 가능)" 양식으로 #42를 작성합니다. 수용 기준은 "같은 IP에서 1분에 5회 넘게 로그인하면 429 응답", 범위는 <code>src/auth/</code>입니다.</p></div></li>
+      <li><div class="step-body"><h3>AI 분류</h3><p>AI가 <code>type/feature</code>, <code>area/auth</code>, <code>priority/p2</code>, <code>size/S</code> 라벨을 추가하고 "실패 시 응답 본문 형식이 없다"는 댓글을 남깁니다. 이슈를 닫거나 담당자를 바꾸지 않습니다.</p></div></li>
+      <li class="is-human"><div class="step-body"><h3>AI 위임 결정</h3><p>메인테이너가 빠진 내용을 보강하고 <code>ai:ready</code> 라벨을 붙입니다. 쓰기 권한이 있는 사람만 붙일 수 있습니다. 보안·개인정보·운영 장애 이슈에는 붙이지 않습니다.</p></div><span class="ds-who">사람</span></li>
+      <li><div class="step-body"><h3>AI 구현</h3><p>라벨이 <code>ai:in-progress</code>로 바뀝니다. AI가 별도 작업 폴더(worktree)의 <code>ai/issue-42-…</code> 브랜치에서 수용 기준을 테스트로 먼저 작성하고 구현합니다. <code>make check</code>가 통과해야 커밋합니다.</p></div></li>
+      <li><div class="step-body"><h3>초안 PR</h3><p>"Closes #42"가 들어간 초안 PR이 <code>ai:generated</code> 라벨로 열리고 이슈는 <code>ai:review</code>가 됩니다. 실패하면 이슈가 <code>ai:needs-human</code>이 되고 이유가 댓글로 남습니다.</p></div></li>
+      <li><div class="step-body"><h3>자동 검사와 AI 리뷰</h3><p>CI(<code>ci-ok</code>), PR 제목·크기·AI 공개 검사, 보안 스캔이 실행됩니다. AI 리뷰어는 "1분 경계에서 카운터가 초기화되지 않음" 같은 지적을 줄 단위로 남깁니다. AI 리뷰는 승인으로 집계하지 않습니다.</p></div></li>
+      <li class="is-human"><div class="step-body"><h3>사람 리뷰와 승인</h3><p>CODEOWNER가 코드를 읽고 타당한 AI 지적의 반영을 요청한 뒤 승인합니다. 승인 후 새 커밋이 생기면 다시 승인해야 합니다. AI 커밋이 있는 PR은 별도의 사람 승인 검사도 통과해야 합니다.</p></div><span class="ds-who">사람</span></li>
+      <li><div class="step-body"><h3>머지와 릴리스</h3><p>squash 머지로 PR 제목 "feat(auth): add login rate limit (#42)"가 main의 커밋 제목이 됩니다. 이슈는 <code>ai:done</code>이 되고 release-please가 다음 버전의 변경 기록에 추가합니다.</p></div></li>
+    </ol>
+    <h3>라벨로 보는 이슈 상태</h3>
+    <p>위 단계에서 이슈 라벨이 바뀝니다. 이슈 목록의 라벨만 보면 누가 무엇을 기다리는지 알 수 있습니다.</p>
+    <div class="ds-table-wrap"><table class="ds-table">
+      <thead><tr><th>라벨</th><th>의미</th><th>붙이는 주체</th></tr></thead>
+      <tbody>
+        <tr><td><code>ai:ready</code></td><td>범위와 수용 기준이 명확해 AI에 맡길 수 있음</td><td>메인테이너</td></tr>
+        <tr><td><code>ai:in-progress</code></td><td>에이전트가 작업 중. 다른 사람은 손대지 않음</td><td>자동</td></tr>
+        <tr><td><code>ai:review</code></td><td>초안 PR이 사람 리뷰를 기다림</td><td>자동</td></tr>
+        <tr><td><code>ai:needs-human</code></td><td>에이전트가 막힘. 이슈를 보강하면 <code>ai:ready</code>로 다시 시작</td><td>자동</td></tr>
+        <tr><td><code>ai:done</code></td><td>에이전트 작업이 머지됨</td><td>자동</td></tr>
+        <tr><td><code>ai:assisted</code> · <code>ai:generated</code></td><td>PR 출처. 사람이 AI 도움을 받음 / 에이전트가 작성</td><td>PR 양식의 체크로 자동</td></tr>
+        <tr><td><code>size/XS</code>~<code>size/XL</code></td><td>변경 줄 수. 목표는 400줄 이하, XL(800줄 초과)은 분할 요청</td><td>자동</td></tr>
+      </tbody>
+    </table></div>
   </div>
 </section>
 
-<!-- ============ 4b. design-first ============ -->
+<!-- 4. design-first -->
 <section id="design">
   <div class="sec-head">
-    <h2>설계 우선과 겹침 확인</h2>
-    <p>이 절차는 두 가지 문제를 줄입니다. ① 영역이 모호한 작업을 두 사람의 AI가 각각 구현하는 중복, ② 설계 없이 구현한 뒤 리뷰 단계에서 방향을 수정하는 낭비. 설계는 모든 작업에 요구하지 않고 작업 크기에 따라 요구합니다.</p>
+    <h2>큰 작업은 설계부터, 시작 전에는 겹침 확인</h2>
+    <p>AI가 코드를 빨리 만들수록 두 가지 낭비가 커집니다. 같은 영역을 두 사람의 AI가 따로 구현하는 중복, 그리고 설계 없이 구현한 뒤 리뷰에서 방향을 바꾸는 재작업입니다. 그래서 작업 크기에 따라 선행 작업을 정합니다. 또 시작 전에 다른 사람의 작업과 겹치는지 확인합니다.</p>
   </div>
-  <div class="tbl"><table>
-    <thead><tr><th>단계</th><th>기준</th><th>선행 작업</th><th>승인</th></tr></thead>
-    <tbody>
-      <tr><th scope="row">T0</th><td>한 문장으로 설명되는 변경</td><td>이슈 + 브랜치. 초안 PR이 작업 선점 표시</td><td>일반 PR 리뷰</td></tr>
-      <tr><th scope="row">T1</th><td>여러 파일, 방법이 여러 개</td><td>AI의 계획(plan)을 PR 본문 맨 위에 두고 코드 전에 초안 PR</td><td>계획에 리뷰어 OK</td></tr>
-      <tr><th scope="row">T2</th><td>여러 모듈·레포, 공개 인터페이스, 하루 이상, 영역이 모호</td><td><code>/design</code>으로 1쪽 설계 + Mermaid 구조도를 <code>docs/designs/</code>에. 설계만 담은 작은 PR</td><td>설계 PR 머지 = 승인</td></tr>
-    </tbody>
-  </table></div>
-  <div class="mermaid-box">
+  <div class="sec">
+    <figure class="ds-figure">
 <pre class="mermaid">
 flowchart LR
   R["요청 / 아이디어"] --> S{"한 문장으로<br/>설명 가능?"}
@@ -388,131 +256,155 @@ flowchart LR
   S -- 아니오 --> M{"여러 모듈·레포 또는<br/>영역이 모호?"}
   M -- 아니오 --> T1["T1: 계획을 PR 본문에"]
   M -- 예 --> T2["T2: /design → 설계 PR"]
-  T0 & T1 & T2 --> O["겹침 확인<br/>board.py overlap"]
-  O -- 겹침 --> TALK["담당자와 대화<br/>합치기 · 영역 나누기"]
+  T0 & T1 & T2 --> O["겹침 확인"]
+  O -- 겹침 --> TALK["담당자와 협의<br/>합치기 · 영역 나누기"]
   O -- 없음 --> W["구현 PR (설계 링크)"]
 </pre>
-  </div>
-  <h3 style="margin:24px 0 10px">팀 작업 보드: 토큰 소모가 적은 겹침 확인</h3>
-  <ol class="ds-steps">
-    <li><div class="step-body"><h4>설계에 영역 기재</h4><p>설계 머리말의 <code>areas</code>에 변경할 경로(<code>src/auth/**</code>)나 이름 붙은 영역(<code>api:/login</code>, <code>db:users</code>)을 기재합니다.</p><div class="meta"><span class="badge">사람 + AI</span></div></div></li>
-    <li><div class="step-body"><h4>허브의 수집</h4><p><code>work-board.yml</code>이 30분마다 등록된 모든 레포의 활성 설계와 열린 PR의 변경 파일을 모아 <code>board.json</code>으로 게시합니다. 스크립트로 처리하므로 AI를 사용하지 않습니다.</p><div class="meta"><span class="badge c">자동 · 토큰 0</span></div></div></li>
-    <li><div class="step-body"><h4>AI의 요약 참조</h4><p>세션 시작 시 영역별 현재 담당자 요약이 AI에 전달됩니다(약 2천 토큰). 작업 전에 <code>/check-overlap</code>이 작업 영역을 보드와 비교합니다.</p><div class="meta"><span class="badge a">AI</span></div></div></li>
-    <li class="is-human"><div class="step-body"><h4>겹침 발생 시 담당자 간 협의</h4><p>PR마다 <code>design-check.yml</code>이 겹침을 댓글로 알립니다. 머지를 차단하지는 않습니다. 보드는 담당자 간 협의를 대체하지 않으며 협의가 필요한 시점을 알립니다.</p><div class="meta"><span class="badge h">사람</span></div></div></li>
-  </ol>
-  <div class="callout">
-    <b>이슈보다 큰 작업의 처리</b>
-    <p class="muted">이니셔티브·에픽은 T2 설계 하나 아래 여러 이슈로 나눕니다. 조사(spike)의 결과물은 코드가 아닌 설계 문서입니다. 여러 레포에 걸친 작업은 설계의 <code>repos</code>에 모든 레포를 기재합니다. 핫픽스는 <code>no-design</code> 라벨로 설계를 생략하고 필요하면 이후에 ADR을 작성합니다. 21일 동안 갱신이 없는 설계는 stale로 표시되어 정리 대상이 됩니다.</p>
+    </figure>
+    <div class="ds-table-wrap"><table class="ds-table">
+      <thead><tr><th>단계</th><th>기준</th><th>선행 작업</th><th>승인</th></tr></thead>
+      <tbody>
+        <tr><th scope="row">T0</th><td>한 문장으로 설명되는 변경</td><td>이슈와 브랜치. 초안 PR이 작업 선점 표시</td><td>일반 PR 리뷰</td></tr>
+        <tr><th scope="row">T1</th><td>여러 파일, 방법이 여러 개</td><td>AI의 계획을 PR 본문 맨 위에 두고 코드 전에 초안 PR</td><td>계획에 리뷰어 OK</td></tr>
+        <tr><th scope="row">T2</th><td>여러 모듈·레포, 공개 인터페이스, 하루 이상, 영역이 모호</td><td><code>/design</code>으로 1쪽 설계와 Mermaid 구조도를 <code>docs/designs/</code>에 작성. 설계만 담은 작은 PR</td><td>설계 PR 머지 = 승인</td></tr>
+      </tbody>
+    </table></div>
+    <h3>겹침 확인</h3>
+    <p>설계 머리말의 <code>areas</code>에 변경할 경로(<code>src/auth/**</code>)나 이름 붙은 영역(<code>api:/login</code>, <code>db:users</code>)을 적습니다. 허브의 <code>work-board.yml</code>이 30분마다 등록된 모든 레포의 활성 설계와 열린 PR의 변경 파일을 <code>board.json</code>으로 모읍니다. 스크립트로 처리하므로 토큰을 쓰지 않습니다. AI는 세션을 시작할 때 영역별 담당자 요약(약 2천 토큰)을 받습니다. 작업 전에는 <code>/check-overlap</code>으로 보드와 비교합니다. 사람은 같은 확인을 명령으로 실행합니다.</p>
+    <div class="ds-cmd"><code>make overlap AREAS="src/auth/** api:/login"</code><button type="button">복사</button></div>
+    <p>PR마다 <code>design-check.yml</code>이 겹침을 댓글로 알리지만 머지를 막지는 않습니다. 보드는 담당자끼리 협의할 시점을 알릴 뿐이며 협의를 대신하지 않습니다.</p>
+    <div class="ds-note"><b>이슈보다 큰 작업</b><span>이니셔티브와 에픽은 T2 설계 하나 아래 여러 이슈로 나눕니다. 조사(spike)의 결과물은 코드가 아닌 설계 문서입니다. 핫픽스는 <code>no-design</code> 라벨로 설계를 생략하고 필요하면 나중에 ADR을 씁니다. 21일 동안 갱신이 없는 설계는 stale로 표시됩니다.</span></div>
   </div>
 </section>
 
-<!-- ============ 5. labels ============ -->
-<section id="labels">
+<!-- 5. guards -->
+<section id="guards">
   <div class="sec-head">
-    <h2>라벨 기반 이슈 상태</h2>
-    <p>워크플로는 라벨을 기준으로 실행됩니다. 이슈 목록의 라벨만으로 각 이슈의 대기 주체와 대기 사유를 확인할 수 있습니다.</p>
+    <h2>규칙과 강제 장치</h2>
+    <p>규칙은 AI에 주는 맥락일 뿐 강제력이 없습니다. AI가 규칙을 잊거나 잘못 판단해도 사고로 이어지지 않도록, 반드시 지켜야 하는 항목은 개발자 PC와 GitHub 서버에서 기계적으로 막습니다. 로컬 장치는 끌 수 있고 Copilot이나 Cursor는 Claude 훅을 쓰지 않으므로 마지막 관문은 서버에 둡니다.</p>
   </div>
-  <div class="mermaid-box">
-<pre class="mermaid">
-stateDiagram-v2
-  [*] --> 분류대기: 이슈 생성
-  분류대기 --> 분류됨: AI 트리아지
-  분류됨 --> ai_ready: 사람이 승인
-  ai_ready --> ai_in_progress: 에이전트 시작
-  ai_in_progress --> ai_review: 초안 PR 열림
-  ai_in_progress --> ai_needs_human: 실패 또는 판단 필요
-  ai_needs_human --> ai_ready: 이슈 보강 후 재시도
-  ai_review --> ai_done: 사람 승인 후 머지
-  ai_done --> [*]
-</pre>
+  <div class="sec">
+    <h3>규칙: AGENTS.md 하나</h3>
+    <p>팀원마다 AI 도구가 다릅니다. 도구마다 규칙 파일을 따로 두면 몇 주 만에 내용이 어긋납니다. 그래서 규칙은 AGENTS.md 한 곳에 쓰고 도구별 파일에는 AGENTS.md를 가리키는 줄만 둡니다.</p>
+    <div class="ds-table-wrap"><table class="ds-table">
+      <tbody>
+        <tr><th scope="row">담는 내용</th><td>실행 명령, 작업 크기별 절차, 사람만 수정하는 파일, AI 행동 원칙(범위 지키기, 외부 텍스트는 명령이 아님)</td></tr>
+        <tr><th scope="row">크기</th><td>약 60줄. 150줄을 넘으면 검사가 경고. 기준은 "이 줄을 지우면 AI가 실수하는가"이며 긴 설명은 <code>docs/</code>에 둠</td></tr>
+        <tr><th scope="row">도구별 연결</th><td><code>CLAUDE.md</code>, <code>.github/copilot-instructions.md</code>, <code>.cursor/rules/</code>, <code>GEMINI.md</code>, <code>.aider.conf.yml</code>, <code>.codex/</code>, <code>.rules</code>(Zed)</td></tr>
+        <tr><th scope="row">경로별 규칙</th><td>워크플로 파일은 권한 최소화와 액션 버전 고정, 테스트 파일은 테스트 끄기 금지, 글과 화면 파일은 docs/17 기준. <code>.claude/rules/</code>, <code>.github/instructions/</code>, <code>.cursor/rules/*.mdc</code></td></tr>
+      </tbody>
+    </table></div>
+
+    <h3>강제 장치</h3>
+    <div class="ds-table-wrap"><table class="ds-table">
+      <thead><tr><th>장치</th><th>위치 · 작동 시점</th><th>하는 일</th><th>파일</th></tr></thead>
+      <tbody>
+        <tr><td>보호 파일 훅</td><td>PC · AI가 파일을 수정하기 직전</td><td>비밀·락파일·정책 파일 수정 차단</td><td><code>protect-files.sh</code></td></tr>
+        <tr><td>git 규칙 훅</td><td>PC · AI가 git 명령을 실행하기 직전</td><td>main 커밋, 공유 브랜치 강제 푸시 차단</td><td><code>git-guard.sh</code></td></tr>
+        <tr><td>포맷·스타일 훅</td><td>PC · AI가 파일을 수정한 직후</td><td>자동 포맷, 글·화면 기준 검사 결과를 AI에 반환. 차단하지 않음</td><td><code>format-after-edit.sh</code>, <code>style_check.py</code></td></tr>
+        <tr><td>세션 시작 훅</td><td>PC · Claude Code를 켤 때</td><td>의존성과 pre-commit 설치, 팀의 활성 설계와 담당자 요약 전달</td><td><code>.claude/hooks/session-start.sh</code></td></tr>
+        <tr><td>권한 설정</td><td>PC · AI가 명령을 실행할 때마다</td><td>읽기·빌드·테스트는 허용, 비밀 읽기·<code>reset --hard</code>·<code>sudo</code>는 거부</td><td><code>.claude/settings.json</code></td></tr>
+        <tr><td>pre-commit</td><td>PC · 사람과 AI의 모든 커밋</td><td>비밀키(gitleaks), 워크플로·쉘·YAML·마크다운, 글·화면 기준, 커밋 메시지 형식</td><td><code>.pre-commit-config.yaml</code></td></tr>
+        <tr><td>이슈·PR 양식</td><td>서버 · 작성할 때</td><td>수용 기준과 범위 필수, PR의 AI 사용 공개는 정확히 하나만 체크</td><td><code>.github/ISSUE_TEMPLATE/</code>, <code>pull_request_template.md</code></td></tr>
+        <tr><td>룰셋</td><td>서버 · 머지할 때</td><td>PR 필수, CODEOWNER 승인 1명, 마지막 푸시 후 재승인, 리뷰 스레드 해결, <code>ci-ok</code>, squash만</td><td><code>scripts/rulesets/main.json</code></td></tr>
+        <tr><td>CODEOWNERS · 라벨</td><td>서버 · PR과 이슈마다</td><td>경로별 책임 리뷰어 지정, 라벨을 코드로 관리</td><td><code>.github/CODEOWNERS</code>, <code>labels.yml</code></td></tr>
+        <tr><td>보안 스캔</td><td>서버 · 푸시와 주기 실행</td><td>CodeQL, 비밀 스캔, Dependabot. 액션은 커밋 해시로 고정</td><td><code>codeql.yml</code>, <code>dependabot.yml</code></td></tr>
+      </tbody>
+    </table></div>
+
+    <h3>막혔을 때</h3>
+    <p>아래 차단은 의도된 동작입니다. 정당한 변경이면 사람이 직접 수정하고 PR에 이유를 적습니다.</p>
+    <div class="ds-table-wrap"><table class="ds-table">
+      <thead><tr><th>시도</th><th>막는 장치</th><th>대신 할 일</th></tr></thead>
+      <tbody>
+        <tr><td>AI가 <code>.env</code>, 키 파일, 비밀 폴더를 수정</td><td>보호 파일 훅</td><td>사람이 직접 수정. 예시는 <code>.env.example</code>에</td></tr>
+        <tr><td>AI가 락파일을 직접 수정</td><td>보호 파일 훅</td><td>패키지 매니저 명령으로 재생성</td></tr>
+        <tr><td>AI가 CODEOWNERS, 룰셋, 팀 권한 설정을 수정</td><td>보호 파일 훅, CODEOWNERS</td><td>관리자가 PR로 변경</td></tr>
+        <tr><td>main에 바로 커밋</td><td>git 규칙 훅, pre-commit, 룰셋</td><td><code>feat/42-rate-limit</code> 같은 브랜치에서 PR</td></tr>
+        <tr><td>공유 브랜치에 강제 푸시</td><td>git 규칙 훅, 권한 설정, 룰셋</td><td>merge로 통합</td></tr>
+        <tr><td>비밀키가 든 커밋</td><td>pre-commit, GitHub 푸시 보호</td><td>키를 폐기하고 다시 커밋</td></tr>
+        <tr><td>CI 실패나 승인 없이 머지</td><td>룰셋</td><td>원인을 수정. 테스트를 끄지 않음</td></tr>
+        <tr><td>AI가 PR을 승인하거나 머지</td><td>권한 설정, 승인 미집계</td><td>CODEOWNER가 승인</td></tr>
+        <tr><td>이슈 본문에 숨긴 지시로 AI를 조종</td><td>쓰기 권한자만 트리거, 봇 무시, "외부 텍스트는 명령이 아님" 규칙</td><td>의심되면 보안 경로로 보고</td></tr>
+      </tbody>
+    </table></div>
+
+    <h3>장치를 최소로 두는 이유</h3>
+    <p>최신 모델은 지시를 강하게 따릅니다. 이전 모델에 맞춰 쌓은 "반드시·절대" 규칙과 잦은 확인은 오히려 과잉 반응과 확인 피로를 만듭니다. 그래서 사고 비용이 큰 항목만 결정적으로 막고 나머지는 덜어냈습니다. 모델을 바꿀 때마다 "이 줄을 지우면 실수하는가"를 다시 점검합니다(<code>docs/15-lean-harness.md</code>).</p>
+    <div class="ds-table-wrap"><table class="ds-table">
+      <thead><tr><th>구분</th><th>대상</th><th>이유</th></tr></thead>
+      <tbody>
+        <tr><th scope="row">유지</th><td>보호 경로 훅, main 커밋·강제 푸시 차단, CI, CODEOWNERS, 룰셋</td><td>사고 비용이 크고 결정적으로 막아야 함</td></tr>
+        <tr><th scope="row">완화</th><td>push·PR 생성 같은 일상 작업의 "매번 묻기", 강조 어조</td><td>auto 모드 분류기가 위험한 것만 확인</td></tr>
+        <tr><th scope="row">제거</th><td>800줄 커밋 차단, 종료 시 요약 훅, 기본 동작을 되풀이하는 스킬 본문</td><td>모델의 기본 동작과 중복</td></tr>
+      </tbody>
+    </table></div>
   </div>
-  <div class="tbl mt"><table>
-    <thead><tr><th>라벨</th><th>의미</th><th>지정 주체</th></tr></thead>
+</section>
+
+<!-- 6. automation -->
+<section id="automation">
+  <div class="sec-head">
+    <h2>자동화 워크플로</h2>
+    <p>분류, 라벨, 1차 리뷰, 릴리스 노트 같은 반복 작업은 워크플로가 처리합니다. AI가 필요 없는 워크플로는 항상 실행됩니다. AI가 필요한 워크플로는 실행 주체를 지정한 경우에만 실행됩니다. 지정하지 않으면 건너뛰며(skipped) 레포는 정상적으로 동작합니다.</p>
+  </div>
+  <div class="ds-table-wrap"><table class="ds-table">
+    <thead><tr><th>워크플로</th><th>실행 시점</th><th>하는 일</th><th>AI</th></tr></thead>
     <tbody>
-      <tr><td><code>ai:ready</code></td><td>AI에게 맡겨도 될 만큼 범위와 수용 기준이 명확함</td><td>메인테이너</td></tr>
-      <tr><td><code>ai:in-progress</code></td><td>에이전트가 작업 중. 중복 작업 금지</td><td>자동</td></tr>
-      <tr><td><code>ai:review</code></td><td>초안 PR이 열려 사람 리뷰 대기</td><td>자동</td></tr>
-      <tr><td><code>ai:needs-human</code></td><td>에이전트가 막힘. 사람이 판단하거나 이슈를 보강해야 함</td><td>자동</td></tr>
-      <tr><td><code>ai:done</code></td><td>에이전트 작업이 머지됨</td><td>자동</td></tr>
-      <tr><td><code>ai:assisted</code> / <code>ai:generated</code></td><td>PR 출처: 사람이 AI 도움을 받음 / 에이전트가 작성</td><td>PR 양식의 체크를 보고 자동</td></tr>
-      <tr><td><code>size/XS</code> ~ <code>size/XL</code></td><td>변경 줄 수. 팀 목표는 400줄 이하, XL(800줄 초과)은 분할</td><td>자동</td></tr>
+      <tr><td><code>ci.yml</code></td><td>PR, main 푸시</td><td>스택을 감지해 린트·글과 화면 기준·타입·테스트·빌드. 결과를 <code>ci-ok</code>로 모음</td><td>아니오</td></tr>
+      <tr><td><code>pr-checks.yml</code></td><td>PR</td><td>제목 형식, 크기·영역 라벨, AI 공개에 따른 출처 라벨</td><td>아니오</td></tr>
+      <tr><td><code>agent-approval-check.yml</code></td><td>PR, 리뷰</td><td>AI 커밋이 있으면 사람 승인을 따로 요구</td><td>아니오</td></tr>
+      <tr><td><code>issue-state-sync.yml</code></td><td>PR 열림·머지</td><td>에이전트 PR에 <code>ai:generated</code>, 머지 시 연결된 이슈를 <code>ai:done</code>으로 변경</td><td>아니오</td></tr>
+      <tr><td><code>release-please.yml</code></td><td>main 푸시</td><td>커밋 제목으로 릴리스 PR과 변경 기록 작성</td><td>아니오</td></tr>
+      <tr><td><code>work-board.yml</code></td><td>30분마다, main 변경</td><td>팀 작업 보드 수집, 이 페이지와 함께 Pages에 배포</td><td>아니오</td></tr>
+      <tr><td><code>design-check.yml</code></td><td>PR</td><td>영역 겹침 댓글, 큰 PR에 설계 링크가 없으면 알림</td><td>아니오</td></tr>
+      <tr><td><code>contract-check.yml</code></td><td>계약 파일이 바뀐 PR</td><td>OpenAPI·protobuf의 깨지는 변경은 <code>breaking-change</code> 라벨 없이 실패</td><td>아니오</td></tr>
+      <tr><td><code>labels-sync</code> · <code>stale</code> · <code>codeql</code> · <code>dependabot-auto-merge</code> · <code>validate-ai-config</code> · <code>copilot-setup-steps</code> · <code>bootstrap-repo</code></td><td>각각</td><td>라벨 동기화, 오래된 이슈 정리, 보안 스캔, 의존성 소규모 갱신 자동 머지, 설정 검증, Copilot 환경 준비, 레포 초기 설정</td><td>아니오</td></tr>
+      <tr><td><code>claude-issue-triage.yml</code></td><td>이슈 생성</td><td>라벨 제안, 빠진 정보·중복 댓글. 이슈를 닫지 않음</td><td>예</td></tr>
+      <tr><td><code>claude-implement-issue.yml</code></td><td><code>ai:ready</code> 라벨</td><td>브랜치, 테스트와 구현, 검사 통과 후 초안 PR</td><td>예</td></tr>
+      <tr><td><code>claude-code-review.yml</code></td><td>PR</td><td>줄 단위 코멘트와 요약. 승인·거절은 하지 않음</td><td>예</td></tr>
+      <tr><td><code>claude-ci-fix.yml</code></td><td>CI 실패</td><td>실패 로그를 읽고 수정 PR 또는 진단 댓글</td><td>예</td></tr>
+      <tr><td><code>claude.yml</code></td><td>댓글의 <code>@claude</code></td><td>질문 답변, 요청한 수정</td><td>예</td></tr>
+      <tr><td><code>claude-maintenance.yml</code></td><td>매주 월요일</td><td>유지보수 리포트, 반복된 리뷰 지적을 규칙으로 바꾸자는 제안</td><td>예</td></tr>
+      <tr><td><code>ai-local-runner.yml</code></td><td>위 이벤트 전부</td><td>사내 서버의 로컬 모델로 같은 작업 수행</td><td>예(로컬)</td></tr>
     </tbody>
   </table></div>
 </section>
 
-<!-- ============ 6. backend ============ -->
+<!-- 7. backend -->
 <section id="backend">
   <div class="sec-head">
-    <h2>AI 실행 주체 선택</h2>
-    <p>레포 변수 <code>AI_BACKEND</code> 하나로 지정합니다. 아무것도 설정하지 않아도 레포는 정상적으로 동작합니다.</p>
+    <h2>AI 실행 주체</h2>
+    <p>GitHub의 실행 서버는 매번 새로 만들어지는 빈 환경이라 로그인 정보가 없습니다. 그래서 서버에서 AI를 돌리려면 키가 필요합니다. 팀원 PC에는 이미 Claude 로그인이 있으므로 같은 작업을 내 자리에서 실행하면 키가 필요 없습니다. 어느 쪽을 쓸지는 레포 변수 <code>AI_BACKEND</code> 하나로 정합니다.</p>
   </div>
-  <div class="mermaid-box">
+  <div class="sec">
+    <figure class="ds-figure">
 <pre class="mermaid">
 flowchart TD
   Q1{"이벤트 발생 시<br/>AI 자동 반응 필요?"}
-  Q1 -- 아니오 --> A["내 자리에서 실행<br/>make ai-triage / ai-review / ai-implement<br/>설정 없음 · 키 없음"]
+  Q1 -- 아니오 --> A["내 자리에서 실행<br/>내 claude 로그인 · 설정 없음<br/>사람이 명령할 때만"]
   Q1 -- 예 --> Q2{"코드의 외부 전송<br/>금지?"}
-  Q2 -- 예 --> B["사내 로컬 LLM<br/>llama.cpp 또는 Ollama + 자체 러너<br/>AI_BACKEND=local"]
+  Q2 -- 예 --> B["사내 로컬 LLM<br/>llama.cpp 또는 Ollama + 자체 러너<br/>AI_BACKEND=local · 품질은 모델에 따라 다름"]
   Q2 -- 아니오 --> C["Anthropic<br/>구독 토큰 또는 API 키<br/>AI_BACKEND=anthropic"]
-  A -.-> N["어느 경우든 CI · 검사 · 라벨 · 릴리스는 그대로 동작"]
-  B -.-> N
-  C -.-> N
 </pre>
-  </div>
-  <div class="ds-cmd"><pre><span class="ds-c"># 내 자리에서 실행 (본인 claude 로그인, 키 불필요). POST=1을 붙일 때만 GitHub에 기록합니다.</span>
-make ai-triage ISSUE=42            <span class="ds-c"># 분류 결과만 화면에 출력</span>
-make ai-triage ISSUE=42 POST=1     <span class="ds-c"># 라벨 적용 + 댓글</span>
-make ai-review PR=57 POST=1        <span class="ds-c"># 리뷰 댓글 (승인 안 함)</span>
-make ai-implement ISSUE=42 POST=1  <span class="ds-c"># 별도 폴더에서 구현 → 초안 PR</span>
+    </figure>
+    <p>내 자리에서 실행할 때는 아래 명령을 씁니다. <code>POST=1</code>을 붙일 때만 결과를 GitHub에 기록합니다. 서버 설정은 <code>docs/13-ai-backends.md</code>와 <code>infra/local-llm/README.md</code>에 있습니다.</p>
+    <div class="ds-cmd"><pre>make ai-triage ISSUE=42            <span class="ds-c"># 분류 결과만 화면에 출력</span>
+make ai-triage ISSUE=42 POST=1     <span class="ds-c"># 라벨 적용과 댓글</span>
+make ai-review PR=57 POST=1        <span class="ds-c"># 리뷰 댓글 (승인하지 않음)</span>
+make ai-implement ISSUE=42 POST=1  <span class="ds-c"># 별도 폴더에서 구현 후 초안 PR</span>
 make ai-queue POST=1               <span class="ds-c"># ai:ready 이슈를 차례로 처리</span></pre><button type="button">복사</button></div>
-</section>
-
-<!-- ============ 7. guards ============ -->
-<section id="guards">
-  <div class="sec-head">
-    <h2>차단 항목과 대안</h2>
-    <p>아래 차단은 의도된 동작입니다. 정당한 변경이면 사람이 직접 수정하고 PR에 이유를 기재합니다.</p>
   </div>
-  <div class="tbl"><table>
-    <thead><tr><th>시도</th><th>차단 장치</th><th>대안</th></tr></thead>
-    <tbody>
-      <tr><td>AI가 <code>.env</code>, 키 파일, 비밀 폴더를 수정</td><td>훅</td><td>사람이 직접. 예시는 <code>.env.example</code>에</td></tr>
-      <tr><td>AI가 락파일(package-lock 등)을 직접 수정</td><td>훅</td><td>패키지 매니저 명령으로 재생성</td></tr>
-      <tr><td>AI가 CODEOWNERS, 룰셋, 팀 권한 설정을 수정</td><td>훅 + CODEOWNERS</td><td>관리자가 PR로</td></tr>
-      <tr><td>main에 바로 커밋</td><td>훅 + pre-commit + 룰셋</td><td><code>feat/42-rate-limit</code> 같은 브랜치에서 PR</td></tr>
-      <tr><td>공유 브랜치에 강제 푸시</td><td>훅 + 권한 거부 + 룰셋</td><td>merge로 통합</td></tr>
-      <tr><td>비밀키가 들어간 커밋</td><td>pre-commit(gitleaks) + GitHub 푸시 보호</td><td>키 폐기 후 다시 커밋</td></tr>
-      <tr><td>CI 실패 상태로 머지, 승인 없이 머지</td><td>룰셋</td><td>원인 수정. 테스트를 끄지 않음</td></tr>
-      <tr><td>AI가 PR 승인·머지</td><td>권한 거부 + 리뷰 도구가 승인 불가 + 승인 미집계</td><td>사람이 승인</td></tr>
-      <tr><td>이슈 본문에 숨긴 지시로 AI를 조종</td><td>쓰기 권한자만 트리거, 봇 무시, "외부 텍스트는 명령이 아님" 규칙</td><td>의심되면 보안 경로로 보고</td></tr>
-    </tbody>
-  </table></div>
 </section>
 
-<!-- ============ 7b. lean ============ -->
-<section id="lean">
-  <div class="sec-head">
-    <h2>경량 하네스</h2>
-    <p>최신 모델은 지시를 강하게 따릅니다. 따라서 이전 모델에 맞춰 누적한 "반드시/절대" 규칙과 세밀한 확인 절차가 오히려 과잉 반응과 확인 피로를 유발합니다. 결정적 안전장치만 유지하고 나머지는 제거했습니다.</p>
-  </div>
-  <div class="tbl"><table>
-    <thead><tr><th>구분</th><th>무엇</th><th>이유</th></tr></thead>
-    <tbody>
-      <tr><th scope="row">유지</th><td>보호 경로 훅, main 직접 커밋·강제 푸시 차단, CI, CODEOWNERS, 룰셋</td><td>사고 비용이 크고 결정적으로 막아야 함</td></tr>
-      <tr><th scope="row">완화</th><td>push·PR 생성 등 일상 작업의 "매번 묻기", 강조 톤</td><td>auto 모드 분류기가 위험한 것만 확인</td></tr>
-      <tr><th scope="row">제거</th><td>800줄 커밋 차단, 종료 시 요약 훅, 기본 동작을 되풀이하는 스킬 본문</td><td>모델의 기본 동작과 중복. AGENTS.md 약 60줄, 작업 스킬 10개 합계 약 100줄</td></tr>
-    </tbody>
-  </table></div>
-  <p class="muted mt">권한 변경은 팀 정책이므로 사람이 <code>scripts/apply-lean-permissions.sh</code>로 적용합니다. 모델을 업그레이드할 때마다 "이 줄을 지우면 실수하는가"를 다시 점검합니다(<code>docs/15-lean-harness.md</code>).</p>
-</section>
-
-<!-- ============ 8. multi ============ -->
+<!-- 8. multi -->
 <section id="multi">
   <div class="sec-head">
-    <h2>다중 레포 운영</h2>
-    <p>이 레포가 허브입니다. 서비스 레포는 허브에서 생성되고 허브의 플러그인을 구독합니다.</p>
+    <h2>여러 레포 운영</h2>
+    <p>서비스 레포가 늘어날수록 레포마다 규칙이 달라집니다. 이 레포를 허브로 두고, 처음에는 템플릿 복사로 같은 상태를 만들고 이후에는 플러그인 갱신으로 유지합니다.</p>
   </div>
-  <div class="mermaid-box">
+  <div class="sec">
+    <figure class="ds-figure">
 <pre class="mermaid">
 flowchart LR
   subgraph HUB["허브 (이 레포)"]
@@ -529,109 +421,111 @@ flowchart LR
   M -- "plugin update (계속 갱신)" --> S1 & S2 & S3
   W -.-> S1 & S2 & S3
 </pre>
-  </div>
-  <div class="callout">
-    <b>AI의 조회 범위: 현재 레포</b>
-    <p class="muted">AI는 현재 레포 밖의 파일을 볼 수 없습니다. 따라서 허브가 30분마다 모든 레포의 활성 설계와 열린 PR 파일을 <code>board.json</code>으로 수집합니다(<a href="#design">설계 우선·겹침 확인</a>). 여러 레포에 걸친 변경은 T2 설계 하나의 <code>repos</code>에 모든 레포를 기재하고 구현은 레포별 이슈로 나눕니다. 다른 레포를 함께 참조해야 하면 Claude Code에 <code>--add-dir ../다른레포</code>로 해당 폴더를 추가합니다. 여러 AI를 동시에 실행할 때는 AI마다 다른 파일을 할당하고 worktree로 작업 폴더를 분리합니다.</p>
+    </figure>
+    <div class="ds-table-wrap"><table class="ds-table">
+      <thead><tr><th>배포 대상</th><th>방법</th><th>갱신</th></tr></thead>
+      <tbody>
+        <tr><td>규칙 · 양식 · 워크플로 · Makefile</td><td>템플릿 복사: <code>make new-repo REPO=org/svc</code></td><td>복사 시점에 고정. 이후 동기화 PR(repo-file-sync, Copier)</td></tr>
+        <tr><td>훅 · 팀 스킬 · 서브에이전트</td><td>플러그인 <code>team-ai-workflow</code>. 각 레포 <code>.claude/settings.json</code>에 등록</td><td>허브에서 버전을 올리면 <code>claude plugin update</code>로 반영</td></tr>
+        <tr><td>선택 스킬</td><td>플러그인 <code>team-ai-community</code>. 원하는 사람만 설치</td><td>같음</td></tr>
+        <tr><td>CI 잡</td><td>재사용 워크플로와 조직 룰셋 "워크플로 통과 필수"</td><td>버전 태그 고정</td></tr>
+        <tr><td>CONTRIBUTING · SECURITY 등</td><td>조직의 <code>.github</code> 레포 기본값</td><td>레포에 같은 파일이 없으면 자동 적용</td></tr>
+      </tbody>
+    </table></div>
+    <p>AI는 현재 레포 밖의 파일을 볼 수 없습니다. 여러 레포에 걸친 변경은 T2 설계 하나의 <code>repos</code>에 모든 레포를 적고 구현은 레포별 이슈로 나눕니다. 다른 레포를 함께 참고해야 하면 Claude Code에 <code>--add-dir ../다른레포</code>로 폴더를 추가합니다. 여러 AI를 동시에 돌릴 때는 AI마다 다른 파일을 맡기고 worktree로 작업 폴더를 나눕니다.</p>
   </div>
 </section>
 
-<!-- ============ 8b. scale ============ -->
+<!-- 9. scale -->
 <section id="scale">
   <div class="sec-head">
     <h2>팀 규모 운영</h2>
-    <p>AI의 코드 생성 속도가 빨라질수록 병목은 리뷰, 레포 간 계약, 반복되는 실수, 스킬 품질로 이동합니다. 사람 리뷰의 위치도 레포 성격에 따라 정합니다.</p>
+    <p>AI의 코드 생성이 빨라지면 병목은 리뷰, 레포 간 계약, 반복되는 실수, 스킬 품질로 옮겨갑니다. 사람 리뷰를 어디에 둘지도 레포의 성격에 따라 정합니다.</p>
   </div>
-  <div class="tbl"><table>
-    <thead><tr><th>병목</th><th>장치</th><th>차단 여부</th></tr></thead>
-    <tbody>
-      <tr><td>리뷰 대기</td><td>1인당 리뷰 대기 PR 상한(기본 3), PR 템플릿의 Reviewer guide("먼저 볼 곳 / 확인한 것 / 못 한 것")</td><td>알림만</td></tr>
-      <tr><td>레포 간 계약</td><td>설계의 "계약 변화" 절, <code>contract:</code> 영역, <code>contract-check.yml</code>이 OpenAPI·protobuf 깨지는 변경 탐지</td><td>깨지는 변경은 <code>breaking-change</code> 라벨 필요</td></tr>
-      <tr><td>같은 지적 반복</td><td>주간 리포트가 지난주 리뷰 댓글을 묶어, 2번 이상 나온 주제마다 린트·테스트·규칙 한 줄을 제안</td><td>제안만</td></tr>
-      <tr><td>스킬 품질</td><td>스킬별 평가(필요한 상황에서의 호출 여부 + 불필요한 상황에서의 미호출 여부), <code>make ai-eval</code></td><td>평가 없는 스킬은 경고</td></tr>
-    </tbody>
-  </table></div>
-  <div class="tbl mt"><table>
-    <thead><tr><th>구분</th><th>프로토타입 <code>PROFILE=prototype</code></th><th>운영(기본)</th></tr></thead>
-    <tbody>
-      <tr><th scope="row">PR · CI · 히스토리 보호 · 비밀 훅</th><td>유지</td><td>유지</td></tr>
-      <tr><th scope="row">사람 승인 · CODEOWNER · 에이전트 게이트</th><td>없음</td><td>1명 이상</td></tr>
-      <tr><th scope="row">운영 전환 조건</th><td colspan="2">실사용자·실데이터, 다른 레포가 API에 의존, 장애 호출, 운영 권한. 하나라도 생기면 운영으로 바꾸고 위험 구간 중심으로 한 번 전체 리뷰</td></tr>
-    </tbody>
-  </table></div>
-  <p class="muted mt">코드 리뷰는 없어지지 않고 상위 단계로 이동합니다. 의도(설계·계약), 검증(테스트·계약 diff·평가), 위험 구간 표본 리뷰가 그 대상입니다. 자세한 내용은 <code>docs/16-team-scale-ai.md</code>에 있습니다.</p>
+  <div class="sec">
+    <div class="ds-table-wrap"><table class="ds-table">
+      <thead><tr><th>병목</th><th>장치</th><th>차단 여부</th></tr></thead>
+      <tbody>
+        <tr><td>리뷰 대기</td><td>1인당 리뷰 대기 PR 상한(기본 3), PR 템플릿의 Reviewer guide(먼저 볼 곳, 확인한 것, 못 한 것)</td><td>알림만</td></tr>
+        <tr><td>레포 간 계약</td><td>설계의 "계약 변화" 절, <code>contract:</code> 영역, <code>contract-check.yml</code></td><td>깨지는 변경은 <code>breaking-change</code> 라벨 필요</td></tr>
+        <tr><td>같은 지적 반복</td><td>주간 리포트가 지난주 리뷰 댓글을 묶어 2번 이상 나온 주제마다 린트·테스트·규칙 한 줄을 제안</td><td>제안만</td></tr>
+        <tr><td>스킬 품질</td><td>스킬별 평가(필요할 때 호출하는지, 불필요할 때 호출하지 않는지), <code>make ai-eval</code></td><td>평가 없는 스킬은 경고</td></tr>
+      </tbody>
+    </table></div>
+    <div class="ds-table-wrap"><table class="ds-table">
+      <thead><tr><th>구분</th><th>프로토타입 <code>PROFILE=prototype</code></th><th>운영(기본)</th></tr></thead>
+      <tbody>
+        <tr><th scope="row">PR · CI · 히스토리 보호 · 비밀 훅</th><td>유지</td><td>유지</td></tr>
+        <tr><th scope="row">사람 승인 · CODEOWNER · 에이전트 게이트</th><td>없음</td><td>1명 이상</td></tr>
+        <tr><th scope="row">운영 전환 조건</th><td colspan="2">실사용자·실데이터, 다른 레포의 API 의존, 장애 호출, 운영 권한. 하나라도 생기면 운영으로 바꾸고 위험 구간 중심으로 한 번 전체 리뷰</td></tr>
+      </tbody>
+    </table></div>
+    <p>코드 리뷰는 없어지지 않고 앞 단계로 옮겨갑니다. 의도(설계·계약), 검증(테스트·계약 diff·평가), 위험 구간의 표본 리뷰가 대상입니다(<code>docs/16-team-scale-ai.md</code>).</p>
+  </div>
 </section>
 
-<!-- ============ 8c. writing and UI standard ============ -->
+<!-- 10. style -->
 <section id="style">
   <div class="sec-head">
-    <h2>글·화면 기준</h2>
-    <p>사람이 읽는 글과 사람이 쓰는 화면은 <code>docs/17-writing-and-design-standards.md</code>를 따릅니다. AI가 작성한 글과 화면에는 내용이 정확해도 과장된 수식어, 번역투, 보라색 그라데이션, 동일한 형태의 카드 세 장 같은 흔적이 남습니다. 독자는 이런 신호를 보면 내용의 신뢰도도 낮게 평가합니다.</p>
+    <h2>글과 화면 기준</h2>
+    <p>AI가 쓴 글과 화면에는 내용이 정확해도 과장된 수식어, 번역투, 보라색 그라데이션, 똑같은 카드 세 장 같은 흔적이 남고, 독자는 그 신호를 보고 내용까지 덜 믿습니다. 그래서 사람이 읽는 글과 사람이 쓰는 화면은 <code>docs/17-writing-and-design-standards.md</code>를 따릅니다.</p>
   </div>
-  <div class="tbl"><table>
-    <thead><tr><th>층</th><th>동작 시점</th><th>비용</th><th>내용</th></tr></thead>
-    <tbody>
-      <tr><td>수정 직후 검사(PostToolUse 훅)</td><td>AI가 <code>.md</code>, <code>.html</code>, <code>.css</code>, <code>.tsx</code> 등을 고칠 때마다</td><td>0.1초, 문제가 없으면 토큰 0</td><td><code>style_check.py</code>가 규칙을 검사해 결과를 AI에 반환. 수정은 차단하지 않음</td></tr>
-      <tr><td>경로 규칙</td><td>해당 파일을 열거나 수정할 때</td><td>규칙 몇 줄</td><td><code>.claude/rules/writing-and-ui.md</code>, Cursor·Copilot에도 같은 규칙</td></tr>
-      <tr><td>스킬</td><td>글이나 화면 작업일 때(설명문과 <code>paths:</code>로 자동 선택)</td><td>필요할 때만 본문 로드</td><td><code>polish-writing</code>, <code>polish-ui</code>: 규칙으로 판별할 수 없는 판단</td></tr>
-      <tr><td><code>make style</code>, pre-commit, CI</td><td>커밋할 때, PR마다</td><td>0</td><td>사람이 쓴 글과 다른 AI 도구가 쓴 글도 같은 기준으로 검사. <code>error</code>는 CI 실패</td></tr>
-      <tr><td>평가</td><td>스킬을 바꿀 때 <code>make ai-eval</code></td><td>케이스당 몇 센트</td><td>필요한 상황에서의 호출 여부, 불필요한 상황에서의 미호출 여부</td></tr>
-    </tbody>
-  </table></div>
-  <p class="muted mt">화면은 팀 디자인 시스템 "Clear"의 토큰과 컴포넌트로 만듭니다. 라이트는 흰 바탕에 파란 강조색 하나, 다크는 그래파이트 바탕입니다. 이 페이지도 같은 시스템을 씁니다(<code>docs/17</code> §2-1).</p>
-  <p class="muted mt">스킬은 훅으로 강제 로드하지 않습니다. 규칙 위반은 결정적으로 검출할 수 있고 강제 로드는 글과 무관한 작업에도 토큰을 소모합니다. 수정 직후 검사가 위반을 반환하면 AI가 즉시 수정하므로 스킬을 호출하지 않은 작업에도 기준이 적용됩니다.</p>
-
-  <h3 style="margin:24px 0 10px">팀 공용 스킬 추가 절차</h3>
-  <ol class="howto">
-    <li>자료를 조사하고 출처의 라이선스를 확인합니다. MIT·Apache-2.0은 출처를 밝히고 수정해 사용하며 CC BY-SA·CC BY-NC-SA·라이선스 없음은 인용만 합니다(<code>plugins/team-ai-workflow/THIRD_PARTY_NOTICES.md</code>).</li>
-    <li>출처 간 충돌하는 부분은 팀이 결정합니다. 이번에는 문체는 합니다체 하나, 굵은 글씨는 UI 이름과 핵심 값에만, 제목은 문장형으로 정했습니다.</li>
-    <li>기계로 검출할 수 있는 항목은 규칙(<code>rules.toml</code>)으로, 판단이 필요한 항목은 스킬(<code>SKILL.md</code>)로 분리합니다.</li>
-    <li>상시 적용할 장치를 선택하고 비용을 기록합니다. 이번에는 수정 직후 검사, 경로 규칙, CI를 선택했습니다.</li>
-    <li>평가 케이스를 추가합니다. 호출해야 하는 경우와 호출하지 않아야 하는 경우를 각각 하나 이상 작성합니다(<code>plugins/team-ai-workflow/evals/</code>).</li>
-    <li>기존 결과물에 먼저 적용합니다. 이 레포의 README, docs/, 이 해설 페이지, 구조도 이미지를 이 기준으로 다시 작성했습니다.</li>
-    <li>플러그인 버전을 올려 배포합니다. 팀원은 <code>claude plugin update</code>로 갱신하고 2주 후 경고의 실효성을 확인해 규칙을 축소하거나 수정합니다.</li>
-  </ol>
-  <p class="muted mt">규칙 목록은 <code>style_check.py --list-rules</code>로 확인합니다. 레포별로 다르게 적용하려면 <code>.style/rules.toml</code>에 같은 형식으로 규칙을 추가하거나 <code>severity = "off"</code>로 비활성화합니다.</p>
+  <div class="sec">
+    <div class="ds-table-wrap"><table class="ds-table">
+      <thead><tr><th>대상</th><th>기준</th><th>스킬</th></tr></thead>
+      <tbody>
+        <tr><td>글</td><td>합니다체 하나, 목록과 표는 개조식. 과장·번역투·의인화·독자에게 말 걸기 금지</td><td><code>polish-writing</code></td></tr>
+        <tr><td>내용 형식</td><td>설명은 짧은 문단, 실행할 것은 복사할 수 있는 명령, 3단계 이상이거나 행위자가 둘 이상이면 도식, 비교는 표</td><td><code>polish-writing</code></td></tr>
+        <tr><td>화면</td><td>팀 디자인 시스템 "Clear"의 토큰과 컴포넌트만 사용. 라이트는 흰 바탕에 파란 강조색 하나, 다크는 그래파이트. 이 페이지도 같은 시스템</td><td><code>polish-ui</code></td></tr>
+      </tbody>
+    </table></div>
+    <p>스킬은 모델이 필요하다고 판단할 때만 로드되므로 항상 쓰인다는 보장이 없습니다. 대신 기계로 판별할 수 있는 위반은 수정 직후 훅, pre-commit, CI가 같은 규칙으로 검사합니다(강제 장치 표의 포맷·스타일 훅과 pre-commit). 훅이 위반을 돌려주면 AI가 그 자리에서 고치므로 스킬을 부르지 않은 작업에도 기준이 적용됩니다.</p>
+    <h3>팀 스킬 추가</h3>
+    <p>스킬은 개인, 커뮤니티, 팀 세 등급으로 추가합니다. 명령 하나가 등급에 맞는 뼈대와 평가 케이스를 만들고, 형식·버전·평가는 CI가 확인합니다(<code>docs/18-adding-skills.md</code>).</p>
+    <div class="ds-cmd"><pre>make new-skill NAME=x TIER=community DESC="..."
+make ai-eval     <span class="ds-c"># 호출해야 할 때와 하지 않아야 할 때를 함께 평가</span></pre><button type="button">복사</button></div>
+  </div>
 </section>
 
-<!-- ============ 9. start ============ -->
+<!-- 11. start -->
 <section id="start">
   <div class="sec-head">
-    <h2>역할별 시작 절차</h2>
+    <h2>시작하기</h2>
+    <p>역할마다 처음 한 번 하는 일입니다. 설정이 끝났는지는 <code>make doctor</code>가 확인하고 남은 항목을 알려 줍니다.</p>
   </div>
   <div class="roles">
-    <div class="role">
+    <div class="ds-panel">
       <h3>팀원 (10분)</h3>
       <ol>
-        <li><code>git</code>, <code>gh</code>, <code>jq</code> 설치 후 <code>gh auth login</code></li>
-        <li><code>npm i -g @anthropic-ai/claude-code</code> 후 <code>claude</code>를 한 번 실행해 로그인</li>
-        <li>레포 클론 후 <code>make setup</code>, "ALL CHECKS PASSED" 확인</li>
+        <li><code>git</code>, <code>gh</code>, <code>jq</code> 설치 후 GitHub 로그인</li>
+        <li>Claude Code 설치 후 한 번 실행해 로그인</li>
+        <li>레포를 클론하고 <code>make setup</code>, "ALL CHECKS PASSED" 확인</li>
         <li>Claude Code에서 <code>/onboard</code>로 레포 구조 확인</li>
-        <li>매일: 커밋 전 <code>make check</code></li>
+        <li>매일 커밋 전 <code>make check</code></li>
       </ol>
       <div class="ds-cmd"><pre>gh auth login
 npm i -g @anthropic-ai/claude-code
 claude          <span class="ds-c"># 한 번 실행해 로그인</span>
 make setup      <span class="ds-c"># ALL CHECKS PASSED 확인</span></pre><button type="button">복사</button></div>
     </div>
-    <div class="role">
-      <h3>새 서비스 레포 생성</h3>
+    <div class="ds-panel">
+      <h3>새 서비스 레포</h3>
       <ol>
-        <li>허브 클론에서 <code>make new-repo REPO=org/svc-x</code></li>
-        <li><code>AGENTS.md</code>의 Project 섹션에 프로젝트 설명, <code>CODEOWNERS</code>에 담당자</li>
+        <li>허브 클론에서 새 레포 생성</li>
+        <li><code>AGENTS.md</code>의 Project 섹션과 <code>CODEOWNERS</code> 작성</li>
         <li><code>labels.yml</code>에 <code>area/*</code> 추가</li>
-        <li>첫 PR로 <code>ci-ok</code>와 PR 검사 실행 확인</li>
-        <li>이슈 하나로 <code>make ai-implement ISSUE=1 POST=1</code> 전체 과정 시험</li>
+        <li>첫 PR로 <code>ci-ok</code>와 PR 검사 확인</li>
+        <li>이슈 하나로 전체 과정 시험</li>
       </ol>
       <div class="ds-cmd"><pre>make new-repo REPO=org/svc-x
 make ai-implement ISSUE=1 POST=1</pre><button type="button">복사</button></div>
     </div>
-    <div class="role">
+    <div class="ds-panel">
       <h3>레포 관리자 (1회)</h3>
       <ol>
         <li>Settings에서 기본 브랜치 <code>main</code>, Template repository 체크</li>
         <li>Actions 설정에서 "Allow GitHub Actions to create and approve pull requests" 체크</li>
-        <li><code>make github-setup</code>: squash 전용, 자동 머지, 비밀 스캔, 라벨, 룰셋</li>
+        <li>squash 전용, 자동 머지, 비밀 스캔, 라벨, 룰셋 적용</li>
         <li>서버 자동화가 필요하면 <code>AI_BACKEND</code> 변수 설정</li>
       </ol>
       <div class="ds-cmd"><pre>make github-setup
@@ -640,11 +534,11 @@ make doctor     <span class="ds-c"># 남은 설정 항목 확인</span></pre><bu
   </div>
 </section>
 
-<!-- ============ 10. files ============ -->
+<!-- 12. files -->
 <section id="files">
   <div class="sec-head">
     <h2>파일 구조</h2>
-    <p>각 항목에 해당 층 번호를 표기합니다. 수정할 파일의 위치를 이 목록에서 확인할 수 있습니다.</p>
+    <p>원 숫자는 전체 구조의 층 번호입니다.</p>
   </div>
 <div class="tree">.
 ├── AGENTS.md                    <span class="c">① 팀 규칙의 단일 원본</span>
@@ -652,42 +546,41 @@ make doctor     <span class="ds-c"># 남은 설정 항목 확인</span></pre><bu
 ├── .claude/
 │   ├── settings.json            <span class="c">② 권한 · 공동저자 표기 · 세션 훅 · 플러그인 등록</span>
 │   ├── hooks/session-start.sh   <span class="c">② 세션 시작 준비</span>
-│   ├── rules/                   <span class="c">① 경로별 규칙 (워크플로 · 테스트 · 글과 화면)</span>
-│   └── skills/                  <span class="c">레포 전용 스킬 (/new-repo, /validate-ai-config)</span>
-├── plugins/team-ai-workflow/    <span class="c">② ⑥ 공유 플러그인: 훅 4 · 스킬 12 · 서브에이전트 5 · 글·화면 규칙(style/) · 디자인 시스템(polish-ui/design/)</span>
+│   ├── rules/                   <span class="c">① 경로별 규칙</span>
+│   └── skills/                  <span class="c">레포 전용 스킬 3개 (/new-repo · /new-skill · /validate-ai-config)</span>
+├── plugins/
+│   ├── team-ai-workflow/        <span class="c">② ⑥ 팀 플러그인: 훅 4 · 스킬 12 · 서브에이전트 5 · 글·화면 규칙 · 디자인 시스템</span>
+│   └── team-ai-community/       <span class="c">⑥ 선택 설치 스킬</span>
 ├── .claude-plugin/marketplace.json  <span class="c">⑥ 이 레포를 마켓플레이스로 공개</span>
 ├── .github/
 │   ├── ISSUE_TEMPLATE/ · pull_request_template.md   <span class="c">③ 양식</span>
 │   ├── CODEOWNERS · labels.yml · dependabot.yml     <span class="c">③ 책임자 · 라벨 · 의존성</span>
 │   ├── copilot-instructions.md · instructions/ · agents/   <span class="c">① Copilot용</span>
-│   └── workflows/               <span class="c">④ 자동화 22개 (work-board · design-check · contract-check 포함)</span>
+│   └── workflows/               <span class="c">④ 워크플로 22개</span>
 ├── .cursor/ · .gemini/ · .codex/ · .aider.conf.yml   <span class="c">① 각 도구 설정</span>
 ├── scripts/
 │   ├── ai/                      <span class="c">⑤ 키 없는 AI 작업 (triage · review · implement · fix-ci …)</span>
-│   ├── designs/board.py         <span class="c">설계 색인 · 겹침 확인 · 팀 보드 집계 (AI 없음)</span>
-│   ├── bootstrap.sh · stack.sh  <span class="c">make setup · 스택 자동 감지</span>
+│   ├── designs/board.py         <span class="c">설계 색인 · 겹침 확인 · 팀 보드 집계</span>
+│   ├── doctor.sh                <span class="c">설정 상태 점검</span>
 │   ├── setup-github.sh · rulesets/   <span class="c">③ 레포 설정 · 브랜치 보호</span>
 │   └── new-repo.sh              <span class="c">⑥ 새 레포 생성</span>
 ├── infra/local-llm/             <span class="c">⑤ llama.cpp · Ollama 서버 안내</span>
-├── docs/                        <span class="c">한국어 문서 01~17 · ADR · designs/(설계 문서) · site/(이 페이지)</span>
+├── docs/                        <span class="c">문서 01~18 · adr/ · designs/ · site/(이 페이지)</span>
 └── Makefile · .pre-commit-config.yaml · .devcontainer/   <span class="c">② 로컬 환경</span></div>
 </section>
 
-<!-- ============ 11. faq ============ -->
+<!-- 13. faq -->
 <section id="faq">
   <div class="sec-head"><h2>자주 묻는 질문</h2></div>
   <div class="faq">
-    <details open><summary>Copilot이나 Cursor만 쓰는 팀원에게도 이 구조가 적용됩니까?</summary><p>적용됩니다. 두 도구 모두 AGENTS.md를 직접 읽습니다. Claude 훅(②층)은 적용되지 않으므로 같은 규칙을 pre-commit과 GitHub 룰셋(③층)에서 한 번 더 검사합니다.</p></details>
-    <details open><summary>AI가 만든 코드를 그대로 머지할 수 있습니까?</summary><p>머지할 수 없습니다. 사람 CODEOWNER의 승인이 필요합니다. AI 리뷰는 승인으로 집계하지 않으며 AI 커밋이 있는 PR은 별도의 사람 승인 검사를 통과해야 합니다.</p></details>
-    <details><summary>AI 워크플로가 모두 "skipped"로 표시됩니다.</summary><p>정상 동작입니다. 레포 변수 <code>AI_BACKEND</code>를 설정하지 않으면 AI 워크플로는 건너뜁니다. 개발자 PC에서 <code>make ai-*</code>로 같은 작업을 실행하거나 서버 자동화가 필요하면 변수를 설정하십시오.</p></details>
-    <details><summary>훅이 수정을 차단했습니다.</summary><p>보호 경로에 대한 수정입니다. 비밀·락파일·정책 파일은 사람이 직접 수정하고 PR 본문에 이유를 기재합니다. 목록은 <code>protect-files.sh</code>에 있고 AGENTS.md "Things to know"에 요약되어 있습니다.</p></details>
-    <details><summary>글 수정 후 스타일 검사 결과가 출력되었습니다. 모두 수정해야 합니까?</summary><p><code>error</code>는 거의 항상 잘못된 표현이며 CI 실패 원인이 되므로 수정합니다. <code>warning</code>은 자주 잘못 쓰이는 표현이므로 맥락을 보고 판단합니다. 나쁜 예시를 의도적으로 인용한 경우 해당 줄에 <code>style-ignore</code>를 표시합니다. 규칙이 오탐하면 예외 표시를 늘리지 않고 규칙을 수정합니다(<code>docs/17-writing-and-design-standards.md</code>).</p></details>
-    <details><summary>PR이 400줄을 넘으면 안 됩니까?</summary><p>400줄은 목표치입니다. 크기 라벨이 자동으로 지정되고 XL(800줄 초과)이면 분할을 요청하는 댓글이 작성됩니다. 분할할 수 없으면 PR 본문에 이유를 기재합니다.</p></details>
-    <details><summary>규칙을 변경하는 절차는 무엇입니까?</summary><p>AGENTS.md를 수정하는 PR을 엽니다. CODEOWNERS 리뷰가 필요합니다. 설계 결정이 바뀌면 <code>/write-adr</code>로 ADR도 작성합니다. "지우면 AI가 실수하는가" 기준을 통과한 줄만 추가하고 긴 설명은 docs/로 옮깁니다.</p></details>
+    <details open><summary>Copilot이나 Cursor만 쓰는 팀원에게도 적용됩니까?</summary><p>적용됩니다. 두 도구 모두 AGENTS.md를 직접 읽습니다. Claude 훅은 적용되지 않으므로 같은 규칙을 pre-commit과 GitHub 룰셋에서 한 번 더 검사합니다.</p></details>
+    <details><summary>훅이 수정을 막았습니다.</summary><p>보호 경로에 대한 수정입니다. 비밀·락파일·정책 파일은 사람이 직접 수정하고 PR 본문에 이유를 적습니다. 전체 목록은 <code>protect-files.sh</code>에 있습니다.</p></details>
+    <details><summary>수정 후 스타일 검사 결과가 나왔습니다. 모두 고쳐야 합니까?</summary><p><code>error</code>는 거의 항상 잘못된 표현이고 CI 실패 원인이므로 고칩니다. <code>warning</code>은 맥락을 보고 판단합니다. 나쁜 예시를 일부러 인용했다면 그 줄에 <code>style-ignore</code>를 표시합니다. 규칙이 잘못 잡으면 예외 표시를 늘리지 말고 규칙을 고칩니다.</p></details>
+    <details><summary>규칙은 어떻게 바꿉니까?</summary><p>AGENTS.md를 수정하는 PR을 열고 CODEOWNER 리뷰를 받습니다. 설계 결정이 바뀌면 <code>/write-adr</code>로 ADR도 씁니다. "지우면 AI가 실수하는가"를 통과한 줄만 추가하고 긴 설명은 <code>docs/</code>로 옮깁니다.</p></details>
   </div>
 </section>
 
 <footer>
-  원본 레포: github.com/jungrok5/ai-code-collaboration-best-practices · 상세 문서: 레포의 <code>docs/</code> 폴더 · 이 페이지 원본: <code>docs/site/</code>
+  원본 레포: github.com/jungrok5/ai-code-collaboration-best-practices · 상세 문서: 레포의 <code>docs/</code> · 이 페이지 원본: <code>docs/site/</code>
 </footer>
 </div>
