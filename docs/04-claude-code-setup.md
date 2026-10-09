@@ -40,6 +40,7 @@ CLAUDE.md                         # @AGENTS.md + Claude 전용 메모
 | PreToolUse `Edit\|Write\|MultiEdit\|NotebookEdit` | `protect-files.sh` | 보호 경로 편집 차단 | 2 = 차단(사유를 stderr로 Claude에 전달) |
 | PreToolUse `Bash` | `git-guard.sh` → `git_guard.py` | 명령을 셸처럼 토큰화(`&&`, `;`, `$(…)`, `cd`, `-C`, `--git-dir`)해 보호 브랜치 커밋과, 기능 접두어(`feat/`, `fix/`, `ai/` …)가 아닌 브랜치로의 force-push(`+refspec`, `--mirror` 포함)·삭제를 차단. 쉘 키워드(`if`/`for`/`{ }`)·서브셸 `cd`·`GIT_DIR=`도 해석. 크기 제한은 없앰([15](15-lean-harness.md)) | 2 |
 | PostToolUse `Edit\|Write\|MultiEdit` | `format-after-edit.sh` | prettier/ruff/gofmt 등 자동 포맷 | 항상 0 |
+| PostToolUse `Edit\|Write\|MultiEdit` | `style/style_check.py --hook` | 글·화면 기준 검사 결과를 AI에게 돌려줌(막지 않음, [17](17-writing-and-design-standards.md)) | 항상 0 |
 | SessionStart | `.claude/hooks/session-start.sh` | 의존성 설치, pre-commit 설치, 팀의 활성 설계·작업 영역 요약(`board.py brief`)을 컨텍스트에 주입 | 0 |
 
 훅 입력은 stdin JSON(`tool_name`, `tool_input.file_path`/`command` …). `type: command` 외에 `prompt`(LLM 판정), `agent`(검증 에이전트), `http` 훅도 있다. 지원 이벤트: PreToolUse, PostToolUse, PostToolUseFailure, PermissionRequest, UserPromptSubmit, Notification, Stop, SubagentStart/Stop, PreCompact/PostCompact, SessionStart/End, TaskCompleted, ConfigChange, WorktreeCreate/Remove 등(`settings` JSON 스키마 참조).
@@ -57,6 +58,8 @@ CLAUDE.md                         # @AGENTS.md + Claude 전용 메모
 
 | 스킬 | 용도 | 호출 |
 | --- | --- | --- |
+| `polish-writing` | 글의 AI 말투를 걷어내고 구체적으로(제품 문구, 문서, PR) | 글 파일을 다룰 때 자동 |
+| `polish-ui` | 화면의 AI 티를 걷어내고 접근성·한글 타이포 최소선 지키기 | UI 파일을 다룰 때 자동 |
 | `design` | 1쪽 설계 + Mermaid 구조도 작성 → 겹침 확인 → 설계 PR | `/design "결제 재시도"` |
 | `check-overlap` | 내가 건드릴 경로·영역을 팀 보드와 비교 | `/check-overlap src/auth/**` |
 | `implement-issue` | 이슈 → 브랜치 → 테스트 → 구현 → 검증 → 커밋(푸시 전 정지) | `/implement-issue 123` |

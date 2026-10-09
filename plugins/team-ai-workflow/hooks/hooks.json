@@ -33,6 +33,12 @@
             "command": "bash \"${CLAUDE_PLUGIN_ROOT}/scripts/format-after-edit.sh\"",
             "timeout": 30,
             "statusMessage": "Formatting changed file"
+          },
+          {
+            "type": "command",
+            "command": "python3 \"${CLAUDE_PLUGIN_ROOT}/style/style_check.py\" --hook",
+            "timeout": 15,
+            "statusMessage": "Checking writing and UI style"
           }
         ]
       }

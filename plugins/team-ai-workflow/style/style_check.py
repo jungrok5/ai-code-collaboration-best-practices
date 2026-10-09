@@ -118,6 +118,9 @@ def check_file(path: Path, rules: list[Rule]) -> list[dict]:
     has_ko = bool(HANGUL.search(views["prose"] or ""))
     findings = []
     for rule in rules:
+        if rule.kind == "register":
+            findings += register_mix(path, views["prose"], rule, skip) if has_ko else []
+            continue
         body = views.get(rule.kind)
         if body is None or (rule.lang == "ko" and not has_ko):
             continue
@@ -136,6 +139,34 @@ def check_file(path: Path, rules: list[Rule]) -> list[dict]:
             hits[0]["message"] += f" ({len(list(rule.pattern.finditer(body)))}회, 기준 {rule.max_per_file}회)"
         findings += hits
     return sorted(findings, key=lambda f: (f["file"], f["line"], f["col"]))
+
+
+FORMAL = re.compile(r"(니다|니까)[.?!]")
+POLITE = re.compile(r"[가-힣](?<!니)요[.?!]")
+PLAIN = re.compile(r"[가-힣](?<!니)다[.!]")
+REGISTERS = {"합니다체": FORMAL, "해요체": POLITE, "한다체": PLAIN}
+
+
+def register_mix(path: Path, prose: str | None, rule: Rule, skip: set[int]) -> list[dict]:
+    """Flag a file that mixes speech levels (합니다체 / 해요체 / 한다체) in running sentences.
+
+    Table cells and list items written as noun phrases (개조식) have no sentence ending and are not counted.
+    A level counts as mixed in when it has 3+ endings and at least 10% of all endings.
+    """
+    if not prose:
+        return []
+    lines = prose.splitlines()
+    hits = {k: [(n, m) for n, l in enumerate(lines, 1) if n not in skip for m in rx.finditer(l)] for k, rx in REGISTERS.items()}
+    total = sum(map(len, hits.values()))
+    used = sorted(((k, v) for k, v in hits.items() if len(v) >= 3 and len(v) >= 0.1 * total), key=lambda kv: len(kv[1]))
+    if len(used) < 2:
+        return []
+    kind, occ = used[0]
+    n, m = occ[0]
+    counts = ", ".join(f"{k} {len(v)}곳" for k, v in hits.items() if v)
+    return [{"file": str(path), "line": n, "col": m.start() + 1, "rule": rule.id, "severity": rule.severity,
+             "match": m.group(0), "suggest": rule.suggest,
+             "message": f"{rule.message} ({counts}; 소수인 {kind}의 첫 위치)"}]
 
 
 def fmt(f: dict) -> str:

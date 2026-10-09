@@ -51,3 +51,12 @@ repos:
       - id: conventional-pre-commit
         stages: [commit-msg]
         args: [--strict, feat, fix, chore, docs, refactor, test, ci, perf, build, revert]
+
+  - repo: local
+    hooks:
+      - id: team-style
+        name: Writing and UI style (AI tone / AI look, docs/17)
+        entry: python3 plugins/team-ai-workflow/style/style_check.py
+        language: system
+        files: \.(md|mdx|html|css|scss|tsx|jsx|vue|svelte|astro)$
+        exclude: ^(docs/site/index\.html|plugins/team-ai-workflow/evals/)

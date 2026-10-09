@@ -2,7 +2,7 @@
 SHELL := /bin/bash
 .DEFAULT_GOAL := help
 
-.PHONY: ai-eval designs overlap help setup setup-ci lint typecheck test build check ai-validate labels github-setup new-repo hooks ai-check ai-triage ai-review ai-implement ai-fix-ci ai-respond ai-maintenance ai-queue ai-local-check
+.PHONY: style ai-eval designs overlap help setup setup-ci lint typecheck test build check ai-validate labels github-setup new-repo hooks ai-check ai-triage ai-review ai-implement ai-fix-ci ai-respond ai-maintenance ai-queue ai-local-check
 
 help: ## Show this help
 	@grep -E '^[a-zA-Z_-]+:.*?## ' $(MAKEFILE_LIST) | awk 'BEGIN {FS = ":.*?## "}; {printf "  \033[36m%-14s\033[0m %s\n", $$1, $$2}'
@@ -25,7 +25,12 @@ test: ## Unit tests (auto-detects stack)
 build: ## Build (auto-detects stack)
 	@scripts/stack.sh build
 
-check: lint typecheck test ## Full fast check — run before every commit
+check: lint style typecheck test ## Full fast check — run before every commit
+
+STYLE_CHECK ?= $(firstword $(wildcard plugins/team-ai-workflow/style/style_check.py) $(wildcard $(HOME)/.claude/plugins/*/team-ai-workflow/style/style_check.py))
+style: ## Writing + UI style check (AI tone / AI look; docs/17). FILES="a.md b.tsx" to limit
+	@if [ -z "$(STYLE_CHECK)" ]; then echo "style: team-ai-workflow plugin not found, skipped"; \
+	else python3 "$(STYLE_CHECK)" $(or $(FILES),$$(git ls-files '*.md' '*.mdx' '*.html' '*.css' '*.scss' '*.tsx' '*.jsx' '*.vue' '*.svelte' '*.astro' | grep -v '^docs/site/index.html$$' | grep -v '/evals/')); fi
 
 ai-validate: ## Validate AI/automation config (plugin manifests, settings schema, workflows, hooks)
 	@scripts/check-ai-config.sh

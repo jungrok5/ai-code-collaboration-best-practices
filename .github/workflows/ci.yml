@@ -72,6 +72,9 @@ jobs:
       - name: Lint
         run: make lint
 
+      - name: Writing and UI style (docs/17)
+        run: make style
+
       - name: Typecheck
         run: make typecheck
 
