@@ -472,4 +472,20 @@ kind = "markup"
 severity = "warning"
 pattern = 'font-family:\s*["\x27]?(Inter|Geist|Poppins)\b|next/font/google[^;]*\b(Inter|Poppins)\b'
 message = "Default AI font choice"
-suggest = "team type tokens (Korean: Pretendard or the system stack)"
+suggest = "font-family: var(--font-sans) from the design tokens"
+
+[[rule]]
+id = "ui-raw-color"
+kind = "markup"
+severity = "warning"
+pattern = '(?<![\w-])(?:color|background(?:-color)?|border(?:-(?:top|right|bottom|left))?(?:-color)?|outline(?:-color)?|fill|stroke|box-shadow|text-decoration-color|caret-color|accent-color)\s*:\s*[^;{}"\n]*?(?:#[0-9a-fA-F]{3,8}\b|\brgba?\(|\bhsla?\()|\b(?:bg|text|border|fill|stroke|ring|from|via|to)-\[#[0-9a-fA-F]{3,8}\]'
+message = "Raw color outside the design tokens"
+suggest = "var(--token) from the design system (team default: polish-ui/design/tokens.css); add a token if none fits"
+
+[[rule]]
+id = "ui-raw-font"
+kind = "markup"
+severity = "warning"
+pattern = '(?<![\w-])font-family\s*:\s*(?!\s*(?:var\(|inherit|initial|unset))'
+message = "Font stack outside the design tokens"
+suggest = "font-family: var(--font-sans) or var(--font-mono)"

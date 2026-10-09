@@ -17,4 +17,6 @@ is copied verbatim.
 | [pbakaus/impeccable](https://github.com/pbakaus/impeccable) | Apache-2.0 | AI-look anti-pattern list |
 | [Wikipedia: Signs of AI writing](https://en.wikipedia.org/wiki/Wikipedia:Signs_of_AI_writing) | CC BY-SA 4.0 | cited only; categories paraphrased |
 | [toss/technical-writing](https://github.com/toss/technical-writing), [토스 8가지 라이팅 원칙](https://toss.tech/article/8-writing-principles-of-toss) | CC BY-NC-SA 4.0 / all rights reserved | cited only; ideas paraphrased |
+| [Tailwind CSS color palette](https://tailwindcss.com/docs/colors) | MIT, © Tailwind Labs | light-theme color values in `skills/polish-ui/design/tokens.css` |
+| [IBM Plex Mono](https://github.com/IBM/plex), [Noto Sans KR](https://github.com/notofonts/noto-cjk) | SIL OFL 1.1 | fonts named by the design tokens (loaded from Google Fonts, not bundled) |
 | [WCAG 2.2](https://www.w3.org/TR/WCAG22/) | W3C document license | contrast, focus and target-size numbers |

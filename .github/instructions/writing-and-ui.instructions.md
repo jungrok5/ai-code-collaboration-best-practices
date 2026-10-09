@@ -3,4 +3,4 @@ applyTo: "**/*.md,**/*.mdx,**/*.html,**/*.css,**/*.scss,**/*.tsx,**/*.jsx,**/*.v
 ---
 
 Follow `docs/17-writing-and-design-standards.md` for any text people read and any UI people use.
-Run `make style FILES="<changed files>"` and fix every error. Never add facts or numbers while polishing.
+Run `make style FILES="<changed files>"` and fix every error. UI uses design tokens only (docs/17 §2-1). Never add facts or numbers while polishing.

@@ -1,41 +1,39 @@
 <!doctype html>
-<html lang="ko"><head><meta charset="utf-8"><title>AI 협업 템플릿 전체 구조도</title>
+<html lang="ko" data-theme="light"><head><meta charset="utf-8"><title>AI 협업 템플릿 전체 구조도</title>
 <!-- Source of docs/images/architecture.png. Re-render: node scripts/render-diagram.mjs -->
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&amp;family=Noto+Sans+KR:wght@400;500;700&amp;display=swap">
+<link rel="stylesheet" href="../../plugins/team-ai-workflow/skills/polish-ui/design/tokens.css">
 <style>
-  /* Fixed 1600px canvas rendered to PNG. Neutral surfaces; each layer keeps one color on its left rule and number. */
-  :root{--ink:#1f2933;--muted:#56616d;--line:#ccd4dc;--bg:#f6f7f9;--surface:#fff;
-        --c1:#2457c5;--c2:#a3366b;--c3:#0f7a5c;--c4:#b2481a;--c5:#86600a;--c6:#4b5868;
-        color-scheme:light}
+  /* Fixed 1600px canvas rendered to PNG, on the team design system "Clear" (light). Tokens only.
+     Layers are told apart by number and position; the one accent marks a person's checkpoint. */
   *{box-sizing:border-box;margin:0;padding:0}
-  body{font-family:"Noto Sans CJK KR","Noto Sans KR","Apple SD Gothic Neo","Malgun Gothic",sans-serif;background:var(--surface);color:var(--ink);
-       width:1600px;padding:36px 40px;word-break:keep-all;line-height:1.5}
-  code{font-family:ui-monospace,Menlo,monospace;font-size:.92em}
-  h1{font-size:28px;font-weight:700;letter-spacing:-.01em}
-  .sub{color:var(--muted);font-size:16px;margin:6px 0 22px}
-  .row{display:flex;gap:10px;align-items:stretch}
-  .people{border:1px solid var(--line);background:var(--bg);border-radius:6px;padding:12px 16px;display:flex;gap:8px;align-items:center;margin-bottom:6px}
+  body{font-family:var(--font-sans);background:var(--bg);color:var(--fg);width:1600px;padding:40px 44px;word-break:keep-all;line-height:1.5}
+  code{font-family:var(--font-mono);font-size:.9em}
+  h1{font-size:30px;font-weight:700;letter-spacing:-.02em}
+  .sub{color:var(--muted);font-size:16px;margin:8px 0 24px}
+  .row{display:flex;gap:8px;align-items:stretch}
+  .people{border:var(--border);background:var(--surface);border-radius:var(--radius-l);padding:12px 16px;display:flex;gap:8px;align-items:center;margin-bottom:6px}
   .people b{font-size:17px;white-space:nowrap;margin-right:6px}
-  .chip{border:1px solid var(--line);border-radius:4px;padding:2px 9px;font-size:14px;background:var(--surface);white-space:nowrap}
-  .conn{text-align:center;color:var(--muted);font-size:14px;margin:6px 0}
-  .layer{border:1px solid var(--line);border-left:5px solid var(--c);border-radius:6px;padding:12px 14px;background:var(--bg)}
+  .chip{border:var(--border);border-radius:4px;padding:2px 9px;font-size:14px;background:var(--bg);white-space:nowrap}
+  .conn{text-align:center;color:var(--subtle);font-size:14px;margin:6px 0}
+  .layer{border:var(--border);border-radius:var(--radius-l);padding:14px 16px;background:var(--bg)}
   .layer h2{font-size:18px;margin-bottom:10px;display:flex;align-items:baseline;gap:10px}
-  .layer h2 .n{color:var(--c)}
-  .layer h2 small{font-size:13.5px;color:var(--muted);font-weight:400}
-  .box{background:var(--surface);border:1px solid var(--line);border-radius:4px;padding:9px 11px;font-size:13.5px;line-height:1.5;flex:1}
+  .layer h2 small{font-size:13.5px;color:var(--subtle);font-weight:400}
+  .box{background:var(--surface);border:var(--border);border-radius:var(--radius-s);padding:9px 11px;font-size:13.5px;line-height:1.5;flex:1}
   .box b{display:block;font-size:14.5px;margin-bottom:2px}
-  .box.main{border-color:var(--c)}
-  .l1{--c:var(--c1)}.l2{--c:var(--c2)}.l3{--c:var(--c3)}.l4{--c:var(--c4)}.l5{--c:var(--c5)}.l6{--c:var(--c6)}
+  .box.main{background:var(--bg);border-color:var(--line-strong)}
   .flow{display:flex;align-items:center;gap:4px;flex-wrap:nowrap}
-  .step{background:var(--surface);border:1px solid var(--line);border-radius:4px;padding:8px 8px;font-size:13px;line-height:1.4;text-align:center;flex:1;min-height:78px;display:flex;flex-direction:column;justify-content:center}
+  .step{background:var(--surface);border:var(--border);border-radius:var(--radius-s);padding:8px;font-size:13px;line-height:1.4;text-align:center;flex:1;min-height:82px;display:flex;flex-direction:column;justify-content:center}
   .step b{font-size:13.5px}
-  .step.h{border:2px solid var(--c4)}
-  .to{color:var(--muted);font-size:14px}
-  .tag{display:inline-block;font-size:12px;border-radius:4px;padding:0 6px;margin-top:4px;border:1px solid var(--line);color:var(--muted);background:var(--bg)}
+  .step.h{background:var(--accent-soft);border-color:var(--accent)}
+  .step.h b{color:var(--accent)}
+  .to{color:var(--subtle);font-size:14px}
+  .tag{display:inline-block;font-size:12px;font-weight:700;border-radius:4px;padding:0 6px;margin-top:4px;color:var(--muted);background:var(--sunk)}
   .grid2{display:grid;grid-template-columns:1.25fr 1fr;gap:10px}
   .note{font-size:13px;color:var(--muted);margin-top:8px}
-  .note b{color:var(--ink);font-weight:600}
-  .foot{margin-top:14px;font-size:13px;color:var(--muted);display:flex;justify-content:space-between}
-  .spoke{display:flex;gap:6px;margin-top:8px}.spoke span{border:1px dashed var(--c6);border-radius:4px;padding:2px 10px;font-size:13px;background:var(--surface)}
+  .note b{color:var(--fg)}
+  .foot{margin-top:16px;font-size:13px;color:var(--subtle);display:flex;justify-content:space-between}
+  .spoke{display:flex;gap:6px;margin-top:8px}.spoke span{border:1px dashed var(--line-strong);border-radius:4px;padding:2px 10px;font-size:13px;background:var(--surface)}
 </style></head>
 <body>
 <h1>AI Code Collaboration Template 전체 구조도</h1>
@@ -50,7 +48,7 @@
 </div>
 <div class="conn">지시는 ①, 강제는 ②·③</div>
 
-<div class="layer l1">
+<div class="layer">
   <h2><span class="n">①</span> 규칙 레이어: 단일 원본 <small>지시 = 맥락(advisory)</small></h2>
   <div class="row">
     <div class="box main" style="flex:1.4"><b>AGENTS.md (약 60줄)</b>명령(make setup/check/overlap) · 작업 크기별 절차(T0/T1/T2) · 삭제하면 실수가 생기는 규칙만</div>
@@ -61,15 +59,15 @@
 </div>
 
 <div class="grid2" style="margin-top:10px">
-  <div class="layer l2">
+  <div class="layer">
     <h2><span class="n">②</span> 로컬 가드레일 <small>결정적 강제, 내 PC</small></h2>
     <div class="row">
-      <div class="box"><b>플러그인 team-ai-workflow</b>훅: 보호 경로 차단 · main 커밋/force-push 차단 · 자동 포맷 · 글·화면 스타일 검사<br>스킬 12 (/design · /check-overlap · polish-writing · polish-ui 포함) · 서브에이전트 5</div>
+      <div class="box"><b>플러그인 team-ai-workflow</b>훅: 보호 경로 차단 · main 커밋/force-push 차단 · 자동 포맷 · 글·화면 스타일 검사<br>스킬 12 (/design · /check-overlap · polish-writing · polish-ui 포함) · 팀 디자인 시스템 Clear · 서브에이전트 5</div>
       <div class="box"><b>.claude/settings.json</b>권한 allow/ask/deny · 공동저자 표기 · SessionStart 훅 · 마켓플레이스 등록</div>
       <div class="box"><b>pre-commit · make check</b>gitleaks · actionlint · shellcheck · yamllint · 글·화면 스타일 · conventional commit · devcontainer</div>
     </div>
   </div>
-  <div class="layer l3">
+  <div class="layer">
     <h2><span class="n">③</span> GitHub 거버넌스 <small>결정적 강제, 서버</small></h2>
     <div class="row">
       <div class="box"><b>템플릿</b>이슈 폼(AI-ready) · PR 템플릿(AI 공개 필수)</div>
@@ -79,8 +77,8 @@
   </div>
 </div>
 
-<div class="layer l4" style="margin-top:10px">
-  <h2><span class="n">④</span> 자동화: 에이전트의 이슈·PR 처리 <small>굵은 주황 테두리 = 사람 체크포인트</small></h2>
+<div class="layer" style="margin-top:10px">
+  <h2><span class="n">④</span> 자동화: 에이전트의 이슈·PR 처리 <small>파란 칸 = 사람 체크포인트</small></h2>
   <div class="flow">
     <div class="step h"><b>설계 먼저 (큰 일만)</b>/design, 겹침 확인, 설계 PR 머지 = 승인</div><span class="to">→</span>
     <div class="step"><b>이슈 생성</b>템플릿: 배경·수용 기준·범위·테스트</div><span class="to">→</span>
@@ -98,7 +96,7 @@
 </div>
 
 <div class="grid2" style="margin-top:10px">
-  <div class="layer l5">
+  <div class="layer">
     <h2><span class="n">⑤</span> AI 실행 주체 (선택) <small>레포 변수 AI_BACKEND</small></h2>
     <div class="row">
       <div class="box main"><b>① 내 자리 (기본, 키 없음)</b>본인 claude 로그인으로 <code>claude -p</code><br>make ai-triage · ai-review · ai-implement · ai-fix-ci · ai-queue</div>
@@ -107,7 +105,7 @@
     </div>
     <p class="note">변수가 없으면 AI 잡은 skipped 처리됩니다. CI, 검사, 라벨, 릴리스는 그대로 동작합니다.</p>
   </div>
-  <div class="layer l6">
+  <div class="layer">
     <h2><span class="n">⑥</span> 여러 레포 배포 <small>허브 1개, 서비스 레포 N개</small></h2>
     <div class="row">
       <div class="box"><b>템플릿 복사</b>make new-repo<br>(gh repo create --template)</div>

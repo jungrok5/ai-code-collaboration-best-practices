@@ -1,6 +1,6 @@
 ---
 name: polish-ui
-description: Remove the generic AI look from web UI and make it fit the product — landing pages, developer/API docs sites, SaaS dashboards — and meet the team's accessibility and Korean typography floor. Use whenever you build, restyle or review HTML/CSS/Tailwind/JSX/TSX/Vue/Svelte UI, or when asked to 디자인 다듬기, AI 티 빼기, polish the UI, make it look less generic, or review a page.
+description: Build and restyle web UI on the team design system (tokens + components; default "Clear") and remove the generic AI look — landing pages, developer/API docs sites, SaaS dashboards — and meet the team's accessibility and Korean typography floor. Use whenever you build, restyle or review HTML/CSS/Tailwind/JSX/TSX/Vue/Svelte UI, or when asked to 디자인 다듬기, AI 티 빼기, polish the UI, make it look less generic, or review a page.
 paths:
   - "**/*.html"
   - "**/*.css"
@@ -18,14 +18,23 @@ The team standard is `docs/17-writing-and-design-standards.md`. A deterministic 
 reports the mechanical tells (purple gradients, gradient text, emoji icons, disabled zoom…). This skill is the part
 that needs judgment. Copy on the page follows `polish-writing`.
 
-## 1. Start from the product, not a template
+## 1. Design system first
 
-- Name the page's one job (Redis-like product page: show what it does with a real command and a real number; API docs:
-  get a developer to a working call; dashboard: let a user read a result and act on it).
-- Use the product's own material as the visual: a code sample, a live console, a real result screen, a diagram of
-  how it works. Not 3D blobs, stock gradients or a generic hero.
-- Reuse the repo's design tokens (colors, type, spacing, radius). If none exist, define a small set first and use
-  only those. One accent color, used for actions and state, not decoration.
+Before writing any CSS, find the design system and use only its tokens and components.
+
+1. The repo's own system: a tokens file (`tokens.css`, `theme.ts`, `tailwind.config.*` theme, `design/DESIGN.md`).
+   If one exists, use it and stop here.
+2. Otherwise use the team default "Clear" in `design/` next to this file: read `design/DESIGN.md`, copy
+   `tokens.css`, `components.css` and `copy.js` into the repo (for example `assets/design/`), and build with the
+   `ds-` components. Content form decides the component (explanation, command to copy, steps, diagram, table).
+3. If the user wants a look of their own, do not guess one: show 2–3 small mockups of the real page in the
+   chosen style, get a pick, then write it down as tokens before building pages.
+
+Never introduce a raw color, font stack or radius outside the tokens file; add a token instead. The style check
+reports raw values (`ui-raw-color`, `ui-raw-font`).
+
+Then start from the product: name the page's one job and use the product's own material as the visual (a real
+command, a real result screen, a diagram of how it works), not blobs, stock gradients or a generic hero.
 
 ## 2. Avoid the defaults that read as generated
 
@@ -40,8 +49,7 @@ from the content.
 
 - Layout follows content: tables for comparisons and specs, code next to its explanation, steps only for sequences.
 - Korean text: `lang="ko"`, `word-break: keep-all` with `overflow-wrap: anywhere` for long URLs and code,
-  body line-height about 1.6–1.8, Pretendard or the system stack (`-apple-system, "Apple SD Gothic Neo",
-  "Malgun Gothic", sans-serif`). Numbers in tables: `font-variant-numeric: tabular-nums`.
+  body line-height about 1.6–1.8, fonts from the type tokens. Numbers in tables: `font-variant-numeric: tabular-nums`.
 - Sentence-case headings. Spend boldness in one place per page.
 
 ## 4. Quality floor (not optional)
