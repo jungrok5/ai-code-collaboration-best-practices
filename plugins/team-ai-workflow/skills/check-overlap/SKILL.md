@@ -7,4 +7,4 @@ description: Before starting work, check whether teammates already have an activ
 
 Run `python3 scripts/designs/board.py overlap <paths, globs or named areas you expect to touch>` (or `--diff origin/main` for work already started). Set `DESIGN_BOARD` to the hub's `board.json` (see `docs/14-design-first-and-overlap.md`) to include other repos and every open PR.
 
-Report the result in two lines: either "no overlap", or for each hit the owner, the design or PR link, and the shared area — followed by a concrete suggestion (talk to the owner, join their design, split the area, or sequence the work). Do not start the overlapping part yourself.
+Report the result in two lines: either "no overlap", or for each hit the owner, the design or PR link, and the shared area, followed by a concrete suggestion (talk to the owner, join their design, split the area, or sequence the work). Do not start the overlapping part yourself.

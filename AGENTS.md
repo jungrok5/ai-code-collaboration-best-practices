@@ -27,9 +27,9 @@ everything else lives in `docs/`. Hard limits are enforced by hooks, CI and bran
 
 Size the work first, because the cost of being wrong grows with it:
 
-- **One-sentence change** (bug fix, small feature): issue → branch `<type>/<issue>-<slug>` → PR.
-- **Several files or an unclear approach**: put a short plan at the top of a draft PR and get a reviewer's OK before building.
-- **Cross-module or cross-repo, a public interface or schema, more than a day, or a vague area**: write a one-page design
+- One-sentence change (bug fix, small feature): issue → branch `<type>/<issue>-<slug>` → PR.
+- Several files or an unclear approach: put a short plan at the top of a draft PR and get a reviewer's OK before building.
+- Cross-module or cross-repo, a public interface or schema, more than a day, or a vague area: write a one-page design
   with a Mermaid diagram in `docs/designs/` (`/design`), merge it as its own small PR (that merge is the approval),
   then link it from the implementation PRs. Run `/check-overlap` first: if someone already owns the area, talk to them.
 

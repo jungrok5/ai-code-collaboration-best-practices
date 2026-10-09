@@ -13,7 +13,7 @@ is copied verbatim.
 | [amondnet/yoonmoon](https://github.com/amondnet/yoonmoon) | MIT, © 2026 Minsu Lee | Korean polishing workflow ideas |
 | [vercel-labs/writing-guidelines](https://github.com/vercel-labs/writing-guidelines) | MIT, © 2026 Vercel Labs | units, sentence-case headings, user-shaped titles |
 | [vercel-labs/web-interface-guidelines](https://github.com/vercel-labs/web-interface-guidelines) | MIT, © 2025 Vercel Labs | accessibility and interaction floor |
-| [anthropics/skills — frontend-design](https://github.com/anthropics/skills/tree/main/skills/frontend-design) | Apache-2.0 | "start from the subject", calibration of generated-design defaults |
+| [anthropics/skills: frontend-design](https://github.com/anthropics/skills/tree/main/skills/frontend-design) | Apache-2.0 | "start from the subject", calibration of generated-design defaults |
 | [pbakaus/impeccable](https://github.com/pbakaus/impeccable) | Apache-2.0 | AI-look anti-pattern list |
 | [Wikipedia: Signs of AI writing](https://en.wikipedia.org/wiki/Wikipedia:Signs_of_AI_writing) | CC BY-SA 4.0 | cited only; categories paraphrased |
 | [toss/technical-writing](https://github.com/toss/technical-writing), [토스 8가지 라이팅 원칙](https://toss.tech/article/8-writing-principles-of-toss) | CC BY-NC-SA 4.0 / all rights reserved | cited only; ideas paraphrased |

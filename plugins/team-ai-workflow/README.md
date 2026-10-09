@@ -4,7 +4,7 @@ Guard rails, skills and subagents that make AI-assisted work on GitHub predictab
 
 | Component | What it does |
 | --- | --- |
-| `hooks/hooks.json` | **PreToolUse** blocks edits to protected paths (secrets, lockfiles, policy files) and enforces git rules (no commits on `main`/`master`/`develop`/`release/*`, no force-push — including `+refspec` and `--mirror` — or branch deletion except on feature-prefixed branches such as `feat/`, `fix/`, `ai/`; the hook cannot tell who else committed to a branch, so shared-branch etiquette still relies on people and rulesets). **PostToolUse** formats edited files and runs the team style check (`style/style_check.py`, rules in `style/rules.toml`), returning AI-tone/AI-look findings to the agent without blocking. |
+| `hooks/hooks.json` | **PreToolUse** blocks edits to protected paths (secrets, lockfiles, policy files) and enforces git rules (no commits on `main`/`master`/`develop`/`release/*`, no force-push (including `+refspec` and `--mirror`) or branch deletion except on feature-prefixed branches such as `feat/`, `fix/`, `ai/`; the hook cannot tell who else committed to a branch, so shared-branch etiquette still relies on people and rulesets). **PostToolUse** formats edited files and runs the team style check (`style/style_check.py`, rules in `style/rules.toml`), returning AI-tone/AI-look findings to the agent without blocking. |
 | `skills/` | `/polish-writing`, `/polish-ui` (team writing and UI standard), `/design`, `/check-overlap`, `/implement-issue`, `/create-pr`, `/review-pr`, `/fix-ci`, `/split-pr`, `/triage-issue`, `/write-adr`, `/onboard` |
 | `agents/` | `code-reviewer`, `security-reviewer`, `test-writer`, `issue-triager`, `docs-writer` |
 
@@ -39,4 +39,4 @@ claude plugin validate ./plugins/team-ai-workflow --strict
 claude plugin validate . --strict          # marketplace manifest at repo root
 ```
 
-Bump `version` in `.claude-plugin/plugin.json` and in `.claude-plugin/marketplace.json` together (CI checks they agree).
+Bump `version` in `.claude-plugin/plugin.json` and in the repo root's `.claude-plugin/marketplace.json` together (CI checks they agree).

@@ -12,8 +12,8 @@ Output: `docs/designs/NNNN-slug.md` following `docs/designs/TEMPLATE.md` (front 
 What matters:
 
 - Read the relevant code first; the diagram shows the real components and data flow, not generic boxes.
-- `areas` in the front matter is what the overlap check matches — list the path globs and named areas (`api:/x`, `db:table`, `ui:screen`) the work will touch, across every repo in `repos`.
-- Run `python3 scripts/designs/board.py overlap --design <file>` (set `DESIGN_BOARD` to the hub's board.json for cross-repo). If it reports overlap, stop and tell the user who owns it — joining their design or splitting the area beats a parallel one.
+- `areas` in the front matter is what the overlap check matches: list the path globs and named areas (`api:/x`, `db:table`, `ui:screen`) the work will touch, across every repo in `repos`.
+- Run `python3 scripts/designs/board.py overlap --design <file>` (set `DESIGN_BOARD` to the hub's board.json for cross-repo). If it reports overlap, stop and tell the user who owns it; joining their design or splitting the area beats a parallel one.
 - Keep it to one page. Unknowns go under "open questions"; approval waits until they are answered.
 - Status stays `draft` in the PR. Merging the PR is the human approval; the author then flips it to `approved`, and to `in-progress`/`done` as work proceeds. Each line of the work split becomes an issue that links the design.
 - Do not write implementation code in this step.

@@ -44,7 +44,7 @@ body:
     id: out-of-scope
     attributes:
       label: Out of scope / non-goals
-      description: Things the implementer must NOT change (refactors, renames, other modules).
+      description: Things the implementer must not change (refactors, renames, other modules).
   - type: textarea
     id: test-plan
     attributes:

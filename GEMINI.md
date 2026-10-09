@@ -1,4 +1,4 @@
-# GEMINI.md — Gemini CLI notes
+# GEMINI.md: Gemini CLI notes
 
 `.gemini/settings.json` makes Gemini CLI load `AGENTS.md` (the single source of truth) together with this file.
 Do not duplicate rules here.
