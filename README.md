@@ -1,290 +1,170 @@
 # AI Code Collaboration Best Practices: 팀 템플릿 레포
 
-이 레포는 AI 코딩 에이전트(Claude Code · Copilot · Cursor · Codex · Gemini)를 쓰는 팀이 여러 레포에서 같은 규칙을
-적용하기 위한 템플릿입니다. `git clone`(또는 "Use this template") 뒤 `make setup`을 한 번 실행하면 다음이 구성됩니다.
+팀원마다 다른 AI 코딩 도구(Claude Code, Copilot, Cursor, Codex, Gemini)를 쓰고 레포가 여러 개인 팀을 위한 템플릿입니다.
+어떤 도구로 작업하든 같은 규칙을 읽고 같은 검사를 통과해야 main에 반영됩니다. API 키는 필요하지 않습니다. AI 작업은
+각자 자리에서 본인의 `claude` 로그인으로 실행합니다. 서버 자동화는 필요할 때만 켭니다.
 
-- 규칙 파일 `AGENTS.md` 하나를 사람과 모든 에이전트가 공통으로 읽습니다. 도구별 파일은 이 파일을 가리키기만 합니다.
-- Claude Code 플러그인 `team-ai-workflow`가 설치됩니다. 플러그인 훅은 `.env*`·락파일·CODEOWNERS 같은 보호 경로 수정,
-  `main` 커밋, 공유 브랜치 force-push를 차단하고 파일을 수정할 때마다 자동 포맷과 글·UI 기준 검사를 실행합니다.
-- pre-commit 훅(gitleaks·actionlint·shellcheck·yamllint·markdownlint·글·UI 기준·Conventional Commit)과 커밋
-  템플릿이 설치됩니다.
-- `make check` 하나로 CI와 같은 린트 → 글·UI 기준 → 타입체크 → 테스트를 실행합니다. 스택(node/python/go/rust)은
-  자동으로 감지합니다.
-- GitHub 워크플로 22개가 포함됩니다. 관리자가 `make github-setup`을 실행하면 squash-only, 라벨, 룰셋(PR 필수, 사람
-  승인, `ci-ok`)도 적용됩니다.
+**해설 페이지:** https://jungrok5.github.io/ai-code-collaboration-best-practices/
 
-API 키는 필요하지 않습니다. AI 작업은 각자 자리에서 본인의 `claude` 구독 로그인으로 실행합니다(`make ai-*`). 서버가
-있으면 로컬 LLM(llama.cpp/Ollama)을 연결할 수 있으며, 둘 다 없어도 AI 작업을 제외한 나머지 기능은 모두 동작합니다.
-
-> 2026-10 기준 1차 문서(Anthropic · GitHub · OpenAI · Google · DORA · Thoughtworks 등)를 직접 확인해 작성했습니다.
-> Gemini 조사 내용과의 교차검증 결과는 [docs/10-research-crosscheck.md](docs/10-research-crosscheck.md)에 정리했습니다.
-
-## 구성 요소
-
-| 영역 | 내용 |
-| --- | --- |
-| 규칙(컨텍스트) 단일화 | `AGENTS.md` 하나가 사람과 모든 에이전트의 규칙. `CLAUDE.md` · Copilot · Cursor · Gemini · Codex · Aider · Zed용 파일은 얇은 포인터 |
-| Claude Code 팀 설정 | `.claude/settings.json`(권한 allow/ask/deny, 공동저자 표기, 세션 시작 훅, 플러그인 자동 등록), 경로별 규칙 |
-| 플러그인 + 마켓플레이스 | `plugins/team-ai-workflow`. 훅: 보호 경로 차단 · git 규칙 · 자동 포맷 · 글·UI 기준 검사. 스킬 12개: `/design` `/check-overlap` `/implement-issue` `/create-pr` `/review-pr` `/fix-ci` `/split-pr` `/triage-issue` `/write-adr` `/onboard` `/polish-writing` `/polish-ui`. 서브에이전트: `code-reviewer` `security-reviewer` `test-writer` `issue-triager` `docs-writer`. 이 레포 자체가 마켓플레이스(`.claude-plugin/marketplace.json`) |
-| GitHub 템플릿·거버넌스 | 에이전트용 이슈 폼 3종, PR 템플릿(AI 사용 공개 필수), CODEOWNERS, 라벨-as-code, Dependabot, 룰셋 JSON(브랜치 보호), squash-only 설정 스크립트 |
-| 설계 먼저 + 팀 작업 보드 | 작업 크기별 T0/T1/T2 구분. 큰 작업은 1쪽 설계 + 구조도(`docs/designs/`, `/design`)를 먼저 머지. 여러 레포의 활성 설계와 열린 PR 파일을 모은 `board.json`을 세션 시작 시 한 줄씩 표시, PR마다 겹침을 댓글로 알림(LLM 토큰 0). [docs/14](docs/14-design-first-and-overlap.md) |
-| 가벼운 하네스 | 최신 모델 기준으로 줄인 규칙·스킬·훅(AGENTS.md 약 60줄, 워크플로 스킬 10개 합계 약 100줄). 결정적 안전장치만 유지. 권한의 auto + 좁은 deny 전환은 사람이 `scripts/apply-lean-permissions.sh`로 적용. [docs/15](docs/15-lean-harness.md) |
-| 팀 규모 운영 | 1인당 리뷰 대기 PR 상한·Reviewer guide, 계약(API/스키마) 우선 + 호환성을 깨는 변경 자동 탐지(`contract-check`), 반복되는 리뷰 지적 → 규칙 제안, 스킬 평가(`make ai-eval`), 프로토타입/운영 레포 프로필. [docs/16](docs/16-team-scale-ai.md) |
-| 스킬 추가 | 개인·커뮤니티·팀 3등급. `make new-skill`이 등급별 뼈대와 평가 케이스를 생성하고, 형식·버전·평가는 CI가 확인. 선택 설치용 `team-ai-community` 플러그인 포함. [docs/18](docs/18-adding-skills.md) |
-| 글과 화면 기준 | 과장 수식어, 번역투, 말투 혼용, AI 기본 그라데이션 같은 AI 티를 규칙으로 검출. Claude가 `.md`·`.html`·`.tsx` 등을 수정할 때마다 PostToolUse 훅이 `style_check.py`를 실행해 결과를 반환(수정은 차단하지 않음). `make style` · pre-commit · CI가 같은 규칙을 적용(`error`는 CI 실패). 규칙으로 판단할 수 없는 부분은 `polish-writing` · `polish-ui` 스킬이 담당. [docs/17](docs/17-writing-and-design-standards.md) |
-| 자동화 22개 워크플로 | CI(스택 자동 감지, 글·UI 기준 포함) · PR 위생(제목/크기/라벨/AI 공개) · `@claude` 응답 · AI 코드 리뷰(참고용) · 이슈 트리아지 · `ai:ready` 라벨 → 에이전트 구현 → 초안 PR · CI 실패 자동 수정 PR · 에이전트 커밋 사람 승인 게이트 · 라벨 상태 동기화 · 주간 유지보수 리포트 · release-please · CodeQL · Dependabot 자동 머지 · stale · Copilot 환경 · 레포 부트스트랩 · 설정 검증 · 설계 겹침 확인 · 작업 보드/Pages · 계약 변경 검사 |
-| 키 없는 AI 실행 경로 | `make ai-triage/ai-review/ai-implement/ai-fix-ci/ai-queue`: 개인 자리에서 `claude -p`(헤드리스)로 이슈 트리아지·PR 리뷰·구현·CI 수정·주간 리포트. 서버는 `infra/local-llm/`(llama.cpp/Ollama) + self-hosted 러너(`ai-local-runner.yml`). GitHub 호스티드 러너에서의 Anthropic 사용은 선택(`AI_BACKEND=anthropic`) |
-| 로컬 재현 환경 | `Makefile`(스택 무관 `make check`), `scripts/bootstrap.sh`, pre-commit(gitleaks·actionlint·shellcheck·yamllint·markdownlint·글·UI 기준·conventional commit), devcontainer, EditorConfig, VS Code 권장 확장·MCP |
-| 문서(한국어) | 플레이북, 브랜치/PR, 컨텍스트 파일, Claude 설정, 자동화, 리뷰 정책, 멀티 레포, 보안, 지표, 교차검증, 도구 매트릭스, 체크리스트, AI 백엔드, 설계 먼저·겹침, 가벼운 하네스, 팀 규모 운영, 글·화면 기준, ADR 7건 |
-
-## 빠른 시작
-
-```bash
-# A. 새 제품 레포를 이 템플릿으로 만들기 (허브 클론 안에서)
-make new-repo REPO=my-org/svc-payments VISIBILITY=private
-
-# B. GitHub UI "Use this template"로 만든 뒤 / 또는 기존 레포에 파일을 복사한 뒤
-git clone <repo> && cd <repo>
-make setup            # 도구 확인 → 의존성 → pre-commit → Claude 플러그인 → 설정 검증
-make github-setup     # (관리자, gh auth login) squash-only·자동머지·시크릿스캔·라벨·룰셋
-# (선택) 서버에서도 AI를 실행할 경우: gh variable set AI_BACKEND -b local|anthropic  → docs/13-ai-backends.md
-
-# C. 팀원 (매일)
-make check            # 린트 + 글·UI 기준 + 타입체크 + 테스트 = CI와 동일
-claude                # /onboard, /implement-issue 123, /create-pr, /review-pr, /fix-ci
-
-# D. AI 작업을 내 자리에서, API 키 없이 (본인 claude 로그인 사용)
-make ai-triage ISSUE=12 POST=1     # 라벨 제안·적용 + 댓글 (닫지 않음)
-make ai-review PR=34 POST=1        # 리뷰 코멘트 (승인 안 함)
-make ai-implement ISSUE=12 POST=1  # 격리 worktree에서 구현 → 초안 PR
-make ai-queue POST=1               # ai:ready 이슈를 순서대로 처리
-```
-
-## 전체 구조도
-
-> 처음 보는 경우 해설 페이지부터 읽으십시오. 6개 층 상세, 이슈→머지 단계별 예시, 라벨 상태, 차단되는 동작, 역할별
-> 시작 방법, 파일 지도를 담고 있습니다. 원본은 [docs/site/](docs/site/)입니다. GitHub Pages(Settings → Pages →
-> Source: GitHub Actions)를 켜면 `work-board.yml`이 페이지와 팀 작업 보드(`board.json`)를 함께 배포합니다.
+처음 보는 경우 해설 페이지부터 읽으십시오. 이슈 하나가 머지되기까지의 예시, 강제 장치와 막혔을 때의 대안, 워크플로 전체
+표, 역할별 시작 방법을 담고 있습니다. 이 README는 레포를 쓰는 데 필요한 요약과 명령만 둡니다.
 
 ![AI 협업 템플릿 전체 구조도](docs/images/architecture.png)
 
-> 이미지 원본: [docs/images/architecture.html](docs/images/architecture.html) · 다시 그리기: `node scripts/render-diagram.mjs` · 아래는 같은 내용의 Mermaid 버전입니다.
+## 구성
+
+| 층 | 내용 |
+| --- | --- |
+| ① 규칙 | `AGENTS.md` 하나(약 60줄)가 사람과 모든 에이전트의 규칙. 도구별 파일(`CLAUDE.md`, `copilot-instructions.md`, `.cursor/rules/` 등)은 이 파일을 가리키기만 함 |
+| ② 로컬 가드레일 | Claude Code 플러그인 `team-ai-workflow`: 보호 경로 수정·main 커밋·강제 푸시 차단 훅, 수정 직후 포맷과 글·화면 검사, 스킬 12개, 서브에이전트 5개. pre-commit과 `make check`가 같은 검사를 사람의 커밋에도 적용 |
+| ③ GitHub 거버넌스 | 이슈 양식 3종, PR 템플릿(AI 사용 공개 필수), CODEOWNERS, 라벨, 룰셋(PR·사람 승인·`ci-ok`·squash만), CodeQL·비밀 스캔·Dependabot |
+| ④ 자동화 | 워크플로 22개. 분류, `ai:ready` 이슈 구현, 초안 PR, AI 리뷰(참고용), CI 실패 수정, 설계 겹침 알림, 계약 변경 검사, 릴리스 |
+| ⑤ AI 실행 주체 | 내 자리(`make ai-*`, 키 없음)가 기본. 서버 자동화는 사내 로컬 LLM 또는 Anthropic 중 선택(`AI_BACKEND`) |
+| ⑥ 여러 레포 배포 | 템플릿 복사(`make new-repo`)로 시작하고 플러그인 마켓플레이스(`claude plugin update`)로 훅·스킬을 계속 갱신 |
+
+팀 단위로 일할 때 필요한 운영 장치도 함께 들어 있습니다.
+
+- **설계 먼저와 겹침 확인:** 큰 작업은 1쪽 설계를 먼저 머지합니다. 여러 레포의 활성 설계와 열린 PR을 모은 팀 작업 보드로 같은 영역의 중복 작업을 미리 찾습니다([docs/14](docs/14-design-first-and-overlap.md)).
+- **가벼운 하네스:** 최신 모델 기준으로 규칙과 확인 절차를 줄이고 결정적 안전장치만 남겼습니다([docs/15](docs/15-lean-harness.md)).
+- **팀 규모 운영:** 리뷰 대기 상한, 계약 우선, 반복되는 리뷰 지적의 규칙화, 스킬 평가, 프로토타입·운영 프로필을 둡니다([docs/16](docs/16-team-scale-ai.md)).
+- **글과 화면 기준:** 합니다체 문서 기준, 내용 형식 규칙, 팀 디자인 시스템 "Clear"를 정했습니다. 수정 직후 훅, pre-commit, CI가 같은 규칙으로 검사합니다([docs/17](docs/17-writing-and-design-standards.md)).
+- **스킬 추가:** 개인, 커뮤니티, 팀 세 등급으로 추가합니다. 선택 설치용 `team-ai-community` 플러그인도 들어 있습니다([docs/18](docs/18-adding-skills.md)).
+
+## 빠른 시작
+
+새 서비스 레포를 만들 때는 허브(이 레포) 클론 안에서 실행합니다. GitHub의 "Use this template"으로 만들어도 됩니다.
+
+```bash
+make new-repo REPO=my-org/svc-payments VISIBILITY=private
+```
+
+레포 관리자는 처음 한 번 GitHub 설정을 적용합니다. 서버에서도 AI를 실행하려면 `AI_BACKEND` 변수를 설정합니다([docs/13](docs/13-ai-backends.md)).
+
+```bash
+make github-setup     # squash 전용, 자동 머지, 비밀 스캔, 라벨, 룰셋 (gh auth login 필요)
+make doctor           # 남은 설정 항목 확인
+```
+
+팀원은 클론 후 한 번 준비합니다. 그리고 매일 커밋 전에 CI와 같은 검사를 실행합니다.
+
+```bash
+make setup            # 도구 확인, 의존성, pre-commit, Claude 플러그인, 설정 검증
+make check            # 린트, 글·화면 기준, 타입체크, 테스트 (CI와 동일)
+```
+
+AI 작업은 내 자리에서 API 키 없이 실행합니다. `POST=1`을 붙일 때만 결과를 GitHub에 기록합니다.
+
+```bash
+make ai-triage ISSUE=12 POST=1     # 라벨 적용과 댓글 (이슈를 닫지 않음)
+make ai-review PR=34 POST=1        # 리뷰 댓글 (승인하지 않음)
+make ai-implement ISSUE=12 POST=1  # 별도 worktree에서 구현 후 초안 PR
+make ai-queue POST=1               # ai:ready 이슈를 차례로 처리
+make overlap AREAS="src/auth/**"   # 같은 영역을 작업 중인 사람 확인
+```
+
+## 작업 흐름
+
+사람이 판단하는 지점은 두 곳입니다. 이 작업을 AI에 맡길지(`ai:ready`), 그리고 결과 코드를 받아들일지(CODEOWNER 승인)입니다.
 
 ```mermaid
-flowchart TB
-  subgraph PEOPLE["사람 + AI 도구"]
-    H["개발자 · 리뷰어 · CODEOWNERS"]
-    CC["Claude Code"]
-    CP["Copilot · Cursor · Codex · Gemini CLI · Aider"]
-  end
-
-  subgraph CONTEXT["① 규칙 레이어: 단일 소스"]
-    A["AGENTS.md<br/>명령 · 워크플로 · 코딩/테스트/git 규칙 · 보호 경로 · 에이전트 행동"]
-    W["얇은 래퍼<br/>CLAUDE.md(@import) · copilot-instructions.md · .cursor/rules · GEMINI.md · .codex · .aider.conf.yml · .rules"]
-    PR_["경로 규칙<br/>.claude/rules · .github/instructions · *.mdc globs"]
-    RV["REVIEW.md<br/>리뷰 기준"]
-  end
-
-  subgraph LOCAL["② 로컬 가드레일: 결정적 강제"]
-    PL["플러그인 team-ai-workflow<br/>훅: 보호 경로 차단 · git 규칙 · 자동 포맷 · 글·UI 검사<br/>스킬 12개 · 서브에이전트 5개"]
-    ST[".claude/settings.json<br/>권한 allow/ask/deny · attribution · SessionStart 훅 · 마켓플레이스 등록"]
-    PC["pre-commit · Makefile(make check) · devcontainer"]
-  end
-
-  subgraph GH["③ GitHub 거버넌스"]
-    T["이슈 폼(AI-ready) · PR 템플릿(AI 공개)"]
-    O["CODEOWNERS · 라벨 as code · 룰셋 JSON(PR+사람승인+ci-ok+Conventional)"]
-    D["Dependabot · CodeQL · 시크릿 스캔"]
-  end
-
-  subgraph AUTO["④ 자동화: 에이전트의 이슈/PR 읽기·쓰기"]
-    CI["ci.yml → ci-ok"]
-    PRC["pr-checks: 제목 · size/* · area/* · AI 공개"]
-    TR["issue-triage: 라벨 제안 (닫지 않음)"]
-    IMP["implement-issue: ai:ready → 브랜치 → 테스트·구현 → 초안 PR(ai:generated)"]
-    REV["code-review: 인라인 + 요약 (승인 없음)"]
-    FIX["ci-fix: 실패 로그 → 수정 PR"]
-    GATE["agent-approval-check: 에이전트 커밋 = 사람 승인 N명"]
-    REL["release-please · labels-sync · state-sync · stale · maintenance"]
-    WB["work-board: 레포들의 활성 설계 + 열린 PR → board.json<br/>design-check: PR 겹침 알림 (LLM 없음)"]
-    BK["AI 백엔드 (선택)<br/>① 내 자리 claude -p (키 없음) · ② self-hosted 로컬 LLM · ③ Anthropic API/구독 토큰<br/>미설정 시 AI 잡 skip, 나머지 정상 동작"]
-  end
-
-  subgraph DIST["⑤ 멀티 레포 배포"]
-    TPL["GitHub 템플릿 복사<br/>make new-repo"]
-    MK["플러그인 마켓플레이스<br/>enabledPlugins · plugin update"]
-    RW["재사용 워크플로 · 조직 룰셋 · 조직 .github"]
-    S1["svc-a"]; S2["svc-b"]; S3["web"]
-  end
-
-  H --> CC & CP
-  CC --> A; CP --> A
-  A --> W; A --> PR_; RV --> REV
-  CC --> PL; CC --> ST; H --> PC
-  PL -. 차단/포맷 .-> CC
-  PC --> GH
-  T --> TR --> IMP --> CI --> PRC --> REV --> GATE --> REL
-  FIX --> CI
-  BK -. 실행 주체 .-> TR & IMP & REV & FIX
-  O --> GATE; D --> CI
-  TPL --> S1 & S2 & S3; MK --> S1 & S2 & S3; RW --> S1 & S2 & S3
+flowchart LR
+  A["이슈 등록"] --> B["AI 분류<br/>라벨 제안"]
+  B --> C(["사람: ai:ready"])
+  C --> D["AI 구현<br/>테스트 먼저"]
+  D --> E["초안 PR<br/>CI · AI 리뷰"]
+  E --> F(["사람: CODEOWNER 승인"])
+  F --> G["squash 머지<br/>ai:done · 릴리스"]
 ```
 
-<details>
-<summary>텍스트 버전(Mermaid가 렌더되지 않을 때)</summary>
+- AI 리뷰는 승인으로 집계하지 않습니다. 에이전트 커밋이 있는 PR은 `agent-approval-check`가 사람 승인을 따로 요구합니다.
+- 비밀 파일, 락파일, CODEOWNERS, 룰셋, `.claude/settings.json`은 사람만 수정합니다. 훅, CODEOWNERS, 룰셋이 막습니다.
+- AI 관련 워크플로는 `AI_BACKEND`가 설정된 경우에만 실행됩니다. 설정이 없으면 skipped로 끝납니다. 나머지 워크플로는 그대로 동작합니다.
 
-```text
-사람 + AI 도구 (Claude Code / Copilot / Cursor / Codex / Gemini / Aider)
-        │ 모든 도구가 같은 규칙을 읽음
-        ▼
-① 규칙 레이어   AGENTS.md (단일 소스) ← CLAUDE.md(@import) · copilot-instructions · .cursor/rules · GEMINI.md · .codex · .aider · .rules
-                경로 규칙(.claude/rules, .github/instructions, *.mdc) · REVIEW.md
-        │ 지시는 컨텍스트 역할만 함 → 강제는 아래 두 층이 담당
-        ▼
-② 로컬 가드레일 플러그인 훅(보호 경로·git 규칙·포맷·글/UI 검사) · settings.json 권한 · pre-commit · make check(글·UI 기준 포함)
-        ▼
-③ GitHub 거버넌스 이슈 폼 · PR 템플릿(AI 공개) · CODEOWNERS · 라벨 · 룰셋(PR + 사람 승인 + ci-ok) · Dependabot · CodeQL
-        ▼
-④ 자동화        (큰 일은 설계 PR 먼저) 이슈 → 트리아지 → ai:ready → 에이전트 구현 → 초안 PR → CI + AI 리뷰(참고) → 사람 승인(+에이전트 게이트) → squash 머지 → 릴리스
-                팀 작업 보드: work-board가 모든 레포의 설계·열린 PR을 수집, design-check가 겹침을 알림
-                AI 실행 주체(선택): ① 내 자리 claude -p(키 없음) · ② self-hosted 로컬 LLM · ③ Anthropic API/구독 토큰 · 없으면 AI 잡 skip
-        ▼
-⑤ 배포          템플릿 복사(make new-repo) + 플러그인 마켓플레이스(plugin update) + 재사용 워크플로/조직 룰셋 → svc-a, svc-b, web …
-```
+단계별 예시와 라벨 상태, 워크플로별 역할은 [해설 페이지](https://jungrok5.github.io/ai-code-collaboration-best-practices/#flow)에 있습니다.
 
-</details>
+## 도구별 지원
 
-## 이슈에서 머지까지 (에이전트 포함 흐름)
+| 도구 | 읽는 파일 | 비고 |
+| --- | --- | --- |
+| Claude Code | `CLAUDE.md`(→`AGENTS.md`), `.claude/*`, 플러그인 | 훅, 스킬, 서브에이전트, 마켓플레이스 모두 지원 |
+| GitHub Copilot | `AGENTS.md`, `copilot-instructions.md`, `instructions/`, `agents/`, `REVIEW.md` | `copilot-setup-steps.yml`로 클라우드 에이전트 환경 준비 |
+| Cursor | `AGENTS.md`, `.cursor/rules/*.mdc`, `BUGBOT.md` | |
+| OpenAI Codex | `AGENTS.md`, `.codex/config.toml` | `@codex review` |
+| Gemini CLI · Code Assist | `AGENTS.md`, `GEMINI.md`, `.gemini/*` | |
+| Aider · Zed · Jules 등 | `AGENTS.md`, `.aider.conf.yml`, `.rules` | [도구 매트릭스](docs/11-tool-support-matrix.md) |
 
-```mermaid
-sequenceDiagram
-  autonumber
-  participant Dev as 개발자/리드
-  participant GH as GitHub
-  participant Tri as Claude 트리아지
-  participant Ag as Claude 에이전트
-  participant CI as CI / 리뷰 봇
-  participant Rev as 사람 리뷰어(CODEOWNER)
-
-  Dev->>GH: 이슈 생성 (템플릿: 배경·수용 기준·범위·테스트 계획)
-  GH->>Tri: issues.opened
-  Tri-->>GH: type/area/priority 라벨 + 누락 항목·중복 댓글 (닫지 않음)
-  Dev->>GH: 검토 후 ai:ready 라벨 (쓰기 권한자 = 1차 체크포인트)
-  GH->>Ag: issues.labeled(ai:ready) → ai:in-progress
-  Ag->>Ag: 테스트 먼저 → 구현 → make check (훅이 보호 경로·main 커밋·force-push 차단)
-  Ag-->>GH: 서명 커밋 push → 초안 PR (ai:generated, Closes #n) → 이슈 ai:review
-  GH->>CI: ci.yml(ci-ok) · pr-checks(제목/크기/라벨) · Claude 리뷰(인라인+요약, 승인 없음)
-  CI-->>GH: 상태 체크 + 코멘트 (agent-approval-check: 사람 승인 필요)
-  Rev->>GH: 코드 읽기 → 수정 요청 또는 승인 (AI 승인은 집계 안 됨)
-  Dev->>GH: ready for review → squash 머지 (PR 제목 = 커밋)
-  GH-->>GH: issue-state-sync: 이슈 ai:done · release-please: 릴리스 PR
-```
-
-CI가 실패하면 `claude-ci-fix.yml`이 로그를 분석해 PR 브랜치를 대상으로 하는 수정 PR을 열거나 진단 댓글을 남깁니다.
-모든 단계에서 `@claude`로 질문하거나 수정을 요청할 수 있습니다.
+Claude 훅은 Claude Code에서만 동작합니다. 다른 도구로 만든 변경은 pre-commit과 GitHub 룰셋이 같은 규칙으로 검사합니다.
 
 ## 레포 구조
 
 ```text
 .
-├── AGENTS.md                      # ★ 단일 소스: 명령·워크플로·규칙·보호 경로·에이전트 행동 (짧게: 약 60줄, 150줄 넘으면 경고)
-├── CLAUDE.md                      # @AGENTS.md + Claude Code 전용 메모
-├── GEMINI.md · REVIEW.md · .rules # Gemini 메모 · 리뷰 기준 · Zed 포인터
+├── AGENTS.md                       # 팀 규칙의 단일 원본
+├── CLAUDE.md · GEMINI.md · .rules  # 도구별 연결 파일
+├── REVIEW.md                       # 리뷰 기준
 ├── .claude/
-│   ├── settings.json              # 팀 정책: 권한, attribution, SessionStart 훅, 마켓플레이스·플러그인
-│   ├── hooks/session-start.sh     # 클론 직후/클라우드 세션에서 의존성·pre-commit·컨텍스트 준비
-│   ├── rules/                     # paths: 경로별 규칙 (워크플로·테스트·AI 설정·글/UI)
-│   └── skills/                    # 레포 전용 스킬: /new-repo, /validate-ai-config
-├── .claude-plugin/marketplace.json# 이 레포 = 팀 마켓플레이스 "ai-collab"
-├── plugins/team-ai-workflow/      # 공유 플러그인 (모든 레포에 배포)
-│   ├── hooks/hooks.json + scripts/# protect-files · git-guard · format-after-edit · 글/UI 검사(style_check.py)
-│   ├── skills/                    # design · check-overlap · implement-issue · create-pr · review-pr · fix-ci · split-pr · triage-issue · write-adr · onboard · polish-writing · polish-ui
-│   ├── style/                     # rules.toml + style_check.py: 글·UI 규칙 (make style, 수정 직후 훅, CI)
-│   └── agents/                    # code-reviewer · security-reviewer · test-writer · issue-triager · docs-writer
+│   ├── settings.json               # 팀 정책: 권한, 공동저자 표기, 세션 훅, 플러그인 등록 (사람만 수정)
+│   ├── hooks/session-start.sh      # 의존성·pre-commit 준비, 팀 작업 보드 요약
+│   ├── rules/                      # 경로별 규칙 (워크플로, 테스트, AI 설정, 글과 화면)
+│   └── skills/                     # 레포 전용 스킬: /new-repo, /new-skill, /validate-ai-config
+├── .claude-plugin/marketplace.json # 이 레포 = 팀 마켓플레이스 "ai-collab"
+├── plugins/
+│   ├── team-ai-workflow/           # 팀 플러그인: hooks/, skills/(12), agents/(5), style/(글·화면 규칙), evals/
+│   │   └── skills/polish-ui/design/  # 팀 디자인 시스템 "Clear" (토큰, 컴포넌트)
+│   └── team-ai-community/          # 선택 설치 스킬
 ├── .github/
-│   ├── ISSUE_TEMPLATE/            # Task(AI-ready) · Bug · Feature + config.yml
-│   ├── pull_request_template.md   # 요약·변경·테스트 증거·AI 공개·체크리스트
-│   ├── CODEOWNERS · labels.yml · labeler.yml · dependabot.yml
-│   ├── copilot-instructions.md · instructions/*.instructions.md · agents/*.agent.md
-│   ├── zizmor.yml                 # 워크플로 보안 감사 설정
-│   └── workflows/                 # 22개 (아래 표)
-├── .cursor/ (rules/*.mdc, BUGBOT.md) · .gemini/ (settings.json, config.yaml, styleguide.md) · .codex/config.toml
-├── .aider.conf.yml · .coderabbit.yaml · .mcp.json · .vscode/ (settings, extensions, mcp.json)
+│   ├── ISSUE_TEMPLATE/ · pull_request_template.md
+│   ├── CODEOWNERS · labels.yml · labeler.yml · dependabot.yml · zizmor.yml
+│   ├── copilot-instructions.md · instructions/ · agents/
+│   └── workflows/                  # 22개
+├── .cursor/ · .gemini/ · .codex/ · .aider.conf.yml · .coderabbit.yaml · .mcp.json · .vscode/
 ├── scripts/
-│   ├── ai/                        # 키 없는 헤드리스 AI 작업: triage · review · implement · fix-ci · respond · maintenance · queue · dispatch
-│   ├── bootstrap.sh               # make setup
-│   ├── stack.sh                   # 스택 자동 감지 (node/python/go/rust) → lint/typecheck/test/build
-│   ├── check-ai-config.sh         # make ai-validate (플러그인·스키마·actionlint·shellcheck·yamllint·markdownlint)
-│   ├── setup-github.sh            # make github-setup (설정·라벨·룰셋)
-│   ├── new-repo.sh                # make new-repo
-│   ├── pin-actions.sh             # 액션 SHA 핀
-│   ├── designs/board.py           # 설계 색인 · 겹침 확인 · 팀 보드 집계 (make designs / make overlap)
-│   ├── apply-lean-permissions.sh  # 사람이 실행: settings.json을 auto 모드 + 좁은 deny로 (docs/15)
-│   ├── build-site.sh · render-diagram.mjs  # 해설 페이지 · 구조도 PNG 생성
-│   └── rulesets/*.json            # 브랜치 보호 룰셋 (main · feature-branches · optional copilot review)
-├── infra/local-llm/               # llama.cpp/Ollama 로컬 LLM 서버 + self-hosted 러너 가이드
-├── docs/                          # 한국어 문서 01~17 + adr/ + designs/(설계 문서) + site/(해설 페이지)
-├── Makefile · .pre-commit-config.yaml · .devcontainer/ · .editorconfig · .gitattributes · .gitmessage.txt
-├── release-please-config.json · .release-please-manifest.json · version.txt
-└── CONTRIBUTING.md · SECURITY.md · SUPPORT.md · CODE_OF_CONDUCT.md · LICENSE (MIT)
+│   ├── ai/                         # 키 없는 AI 작업 (triage, review, implement, fix-ci, respond, maintenance, queue)
+│   ├── bootstrap.sh · stack.sh     # make setup, 스택 자동 감지 (node, python, go, rust)
+│   ├── doctor.sh                   # make doctor: 설정 상태와 남은 항목
+│   ├── check-ai-config.sh          # make ai-validate
+│   ├── setup-github.sh · rulesets/ # make github-setup, 브랜치 보호 룰셋
+│   ├── new-repo.sh · new-skill.sh  # 새 레포, 새 스킬
+│   ├── designs/board.py            # 설계 색인, 겹침 확인, 팀 보드 집계
+│   ├── apply-lean-permissions.sh   # 사람이 실행: 권한을 auto 모드와 좁은 deny로 (docs/15)
+│   └── build-site.sh · render-diagram.mjs  # 해설 페이지, 구조도 PNG 생성
+├── infra/local-llm/                # llama.cpp · Ollama 로컬 LLM 서버와 self-hosted 러너 안내
+├── docs/                           # 문서 01~18, adr/, designs/, site/(해설 페이지), images/
+├── Makefile · .pre-commit-config.yaml · .devcontainer/ · .editorconfig
+└── CONTRIBUTING.md · SECURITY.md · SUPPORT.md · CODE_OF_CONDUCT.md · LICENSE
 ```
 
-### 워크플로 요약
+## 레포에 맞게 바꿀 곳
 
-`claude*.yml`은 레포 변수 `AI_BACKEND=anthropic`, `ai-local-runner.yml`은 `AI_BACKEND=local`일 때만 실행됩니다. 변수가
-없으면 해당 워크플로는 skipped로 종료되며, 나머지 워크플로는 그대로 동작합니다.
+| 파일 | 바꿀 내용 |
+| --- | --- |
+| `AGENTS.md` | Project 섹션(목적, 스택, 패키지 매니저) |
+| `.github/CODEOWNERS` | `@OWNER`를 실제 담당자로 |
+| `.github/ISSUE_TEMPLATE/config.yml` | `OWNER/REPO` |
+| `.github/labels.yml` | `area/*` 라벨 |
+| `.claude/settings.json` | 마켓플레이스 경로 |
+| `ci.yml` · `codeql.yml` | 언어 |
+| `release-please-config.json` | `release-type` |
+| 레포 변수 | `AI_BACKEND`, `AI_BASE_URL`, `AI_MODEL` |
+| `.style/rules.toml` | 레포별 글·화면 규칙 추가 또는 끄기 |
 
-| 워크플로 | 트리거 | 역할 |
-| --- | --- | --- |
-| `ci.yml` | PR · main · merge_group | `make setup-ci → lint → style → typecheck → test → build`, 필수 체크 `ci-ok` |
-| `pr-checks.yml` | PR(메타데이터) | Conventional 제목 · `size/*` · `area/*` · AI 공개 체크 → `ai:assisted`/`ai:generated` |
-| `ai-local-runner.yml` | 이슈·PR·댓글·CI 실패·주간 (`AI_BACKEND=local`) | self-hosted 러너 + 로컬 LLM에서 `scripts/ai/*` 실행 |
-| `claude.yml` | `@claude` 멘션 (`AI_BACKEND=anthropic`) | 질문 응답 · 요청 변경 커밋 |
-| `claude-code-review.yml` | PR | 인라인 코멘트 + 스티키 요약(승인 없음, 초안·봇·포크 제외) |
-| `claude-issue-triage.yml` | 이슈 생성 | 라벨 제안·적용, 누락/중복 댓글(닫지 않음) |
-| `claude-implement-issue.yml` | 라벨 `ai:ready` | 브랜치 → 테스트·구현 → 서명 커밋 → 초안 PR → `ai:review` / 실패 시 `ai:needs-human` |
-| `claude-ci-fix.yml` | CI 실패(같은 레포 PR) | 로그 분석 → 수정 PR 또는 진단 댓글 |
-| `agent-approval-check.yml` | PR · 리뷰 · 댓글 | 에이전트 커밋 포함 PR에 사람 승인 N명 상태 체크 |
-| `issue-state-sync.yml` | PR 생성/머지 | 에이전트 PR 라벨, 머지 시 이슈 `ai:done` |
-| `claude-maintenance.yml` | 매주 | 유지보수 리포트 이슈 |
-| `validate-ai-config.yml` | 설정 변경 | `check-ai-config.sh` + zizmor |
-| `contract-check.yml` | PR (계약 파일 변경 시) | OpenAPI/protobuf 깨지는 변경 탐지, `breaking-change` 라벨 없으면 실패, 소비자·설계 링크 안내 |
-| `work-board.yml` · `design-check.yml` | 30분마다·main / PR | 팀 작업 보드(`board.json`)와 해설 페이지를 Pages에 배포 · PR의 설계/영역 겹침을 댓글로 알림(차단 안 함, LLM 없음) |
-| `labels-sync.yml` · `release-please.yml` · `dependabot-auto-merge.yml` · `codeql.yml` · `stale.yml` · `copilot-setup-steps.yml` · `bootstrap-repo.yml` | 각각 | 라벨 동기화 · 릴리스 · 의존성 자동 머지 · 코드 스캐닝 · 정리 · Copilot 환경 · 레포 설정 적용 |
-
-## 사람이 결정하는 지점(의도적)
-
-1. `ai:ready` 라벨: 쓰기 권한자만 부착 가능(액션이 권한을 다시 확인)
-2. 에이전트 PR: 초안으로 생성, AI 리뷰는 승인으로 집계하지 않음
-3. 에이전트 커밋이 포함된 PR: `agent-approval-check`가 사람 승인을 요구
-4. 보호 경로(`.env*`, 락파일, CODEOWNERS, 룰셋, `.claude/settings.json`): 훅·CODEOWNERS·룰셋이 수정을 차단
-5. 테스트를 끄거나 느슨하게 만드는 변경: 규칙·리뷰·프롬프트 세 곳에서 차단
-
-## 도구별 지원 (요약)
-
-| 도구 | 읽는 파일 | 비고 |
-| --- | --- | --- |
-| Claude Code | `CLAUDE.md`(→`AGENTS.md`), `.claude/*`, 플러그인 | 훅·스킬·서브에이전트·마켓플레이스 전부 지원 |
-| GitHub Copilot(클라우드 에이전트·코드 리뷰·CLI·VS Code) | `AGENTS.md`, `copilot-instructions.md`, `instructions/`, `agents/`, `REVIEW.md`, `.claude/skills` | `copilot-setup-steps.yml`로 환경 준비 |
-| Cursor | `AGENTS.md`, `.cursor/rules/*.mdc`, `BUGBOT.md` | |
-| OpenAI Codex | `AGENTS.md`, `.codex/config.toml` | `@codex review` |
-| Gemini CLI / Code Assist | `AGENTS.md`(설정), `GEMINI.md`, `.gemini/*` | |
-| Aider · Zed · Jules · Amp · Warp · Devin · Junie · Kiro … | `AGENTS.md` (+ `.aider.conf.yml`, `.rules`) | [도구 매트릭스](docs/11-tool-support-matrix.md) |
-
-## 문서
-
-[docs/README.md](docs/README.md): 01 플레이북 · 02 브랜치/PR · 03 컨텍스트 파일 · 04 Claude Code 설정 · 05 GitHub 자동화 · 06 리뷰 정책 · 07 멀티 레포 · 08 보안/거버넌스 · 09 지표 · 10 교차검증 · 11 도구 매트릭스 · 12 셋업 체크리스트 · 13 AI 백엔드 · 14 설계 먼저·겹침 · 15 가벼운 하네스 · 16 팀 규모 운영 · 17 글·화면 기준 · 18 스킬 추가 가이드 · ADR
-
-## 커스터마이즈 포인트
-
-`AGENTS.md`의 Project 섹션 · `.github/CODEOWNERS`의 `@OWNER` · `.github/ISSUE_TEMPLATE/config.yml`의 `OWNER/REPO` · `.claude/settings.json`의 마켓플레이스 경로 · `labels.yml`의 `area/*` · `ci.yml`/`codeql.yml` 언어 · `release-please-config.json`의 `release-type` · 워크플로의 `--max-turns`/모델 · AI 백엔드 변수(`AI_BACKEND`, `AI_BASE_URL`, `AI_MODEL`) · 레포별 글 규칙 추가·끄기(`.style/rules.toml`). 체크리스트: [docs/12-setup-checklist.md](docs/12-setup-checklist.md).
+전체 체크리스트는 [docs/12-setup-checklist.md](docs/12-setup-checklist.md)에 있고, `make doctor`가 같은 항목을 점검합니다.
 
 ## 검증
 
-`make ai-validate`가 플러그인·마켓플레이스 매니페스트(`claude plugin validate --strict`), `settings.json` JSON 스키마,
-스킬/에이전트 프런트매터, 워크플로(actionlint), 셸 훅(shellcheck), YAML, Markdown, `AGENTS.md` 길이를 검사합니다.
-같은 검사가 pre-commit과 CI(`validate-ai-config.yml`)에서도 실행됩니다. 글·UI 기준은 `make style`이 별도로 검사합니다.
+`make ai-validate`는 플러그인·마켓플레이스 매니페스트, `settings.json` 스키마, 스킬·에이전트 프런트매터, 워크플로(actionlint),
+셸 스크립트(shellcheck), YAML, Markdown, `AGENTS.md` 길이를 검사합니다. 글·화면 기준은 `make style`이 검사합니다. 두 검사
+모두 pre-commit과 CI에서도 실행됩니다.
+
+## 문서
+
+[docs/README.md](docs/README.md): 01 플레이북 · 02 브랜치와 PR · 03 컨텍스트 파일 · 04 Claude Code 설정 · 05 GitHub 자동화 ·
+06 리뷰 정책 · 07 여러 레포 · 08 보안과 거버넌스 · 09 지표 · 10 교차검증 · 11 도구 매트릭스 · 12 설정 체크리스트 ·
+13 AI 백엔드 · 14 설계 먼저와 겹침 · 15 가벼운 하네스 · 16 팀 규모 운영 · 17 글과 화면 기준 · 18 스킬 추가 · ADR
+
+2026년 10월 기준 1차 문서(Anthropic, GitHub, OpenAI, Google, DORA, Thoughtworks 등)를 직접 확인해 작성했습니다.
+다른 조사 결과와의 교차검증은 [docs/10](docs/10-research-crosscheck.md)에 있습니다.
 
 ## 라이선스
 
-MIT. 복제와 수정에 제한이 없습니다. 문서에 인용한 외부 수치는 각 출처의 라이선스를 따릅니다.
+MIT. 문서에 인용한 외부 수치는 각 출처의 라이선스를 따릅니다.
