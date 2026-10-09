@@ -44,6 +44,14 @@ regex cannot judge.
 7. **Read it aloud.** If a sentence carries two ideas, split it. If a paragraph's first sentence repeats the heading,
    delete it.
 
+## Content form
+
+Match the form to the content: explanation (why/what) as short paragraphs; actions as copyable command blocks or
+numbered steps (with a copy button on pages); structure, flow or relations with three or more steps or two or more
+actors as a diagram first, prose only for conditions and exceptions; comparisons and criteria as tables; numeric trends
+as charts. Never write an action as an explanation, an explanation as a list of commands, or repeat one fact in prose,
+table and diagram.
+
 ## Output
 
 When asked to polish existing text, return the revised text, then at most 5 bullets naming the biggest changes. When
