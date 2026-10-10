@@ -31,6 +31,10 @@
   --code-bg: #0f172a;
   --code-fg: #e2e8f0;
   --code-muted: #94a3b8;
+  --code-line: #334155;
+  --code-ok: #86efac;
+  --code-warn: #fcd34d;
+  --code-danger: #fca5a5;
   --focus: #1d4ed8;
 
   /* type */
@@ -58,7 +62,8 @@
     --fg: #e4e6e8; --muted: #b4b9be; --subtle: #9ba1a6;
     --accent: #7cb7e8; --accent-hover: #a9d0f0; --accent-fg: #10151a; --accent-soft: #233240;
     --ok: #47cd89; --ok-soft: #16322a; --warn: #fdb022; --warn-soft: #3a2c12; --danger: #f97066; --danger-soft: #3b1f1d;
-    --code-bg: #141618; --code-fg: #e4e6e8; --code-muted: #7d8389; --focus: #7cb7e8;
+    --code-bg: #111315; --code-fg: #e4e6e8; --code-muted: #8a9096; --code-line: #33373b;
+    --code-ok: #86e0b0; --code-warn: #f5c45e; --code-danger: #f6a19a; --focus: #7cb7e8;
     color-scheme: dark;
   }
 }
@@ -67,7 +72,8 @@
   --fg: #e4e6e8; --muted: #b4b9be; --subtle: #9ba1a6;
   --accent: #7cb7e8; --accent-hover: #a9d0f0; --accent-fg: #10151a; --accent-soft: #233240;
   --ok: #47cd89; --ok-soft: #16322a; --warn: #fdb022; --warn-soft: #3a2c12; --danger: #f97066; --danger-soft: #3b1f1d;
-  --code-bg: #141618; --code-fg: #e4e6e8; --code-muted: #7d8389; --focus: #7cb7e8;
+  --code-bg: #111315; --code-fg: #e4e6e8; --code-muted: #8a9096; --code-line: #33373b;
+    --code-ok: #86e0b0; --code-warn: #f5c45e; --code-danger: #f6a19a; --focus: #7cb7e8;
   color-scheme: dark;
 }
 /* Design system "Clear" (ai-design) — base and components. Needs tokens.css first.
@@ -134,12 +140,25 @@ code, kbd, pre { font-family: var(--font-mono); }
   font-size: var(--text-s); line-height: 1.7; white-space: pre; overflow-x: auto;
 }
 .ds-cmd .ds-c { color: var(--code-muted); }
+/* The copy button stays quiet so a page with several commands keeps one primary action. */
 .ds-cmd button {
   align-self: flex-start; flex: none; min-height: 36px; padding: 0 var(--space-3); border-radius: var(--radius-s);
-  border: 0; background: var(--accent); color: var(--accent-fg); font: 700 13px / 1 var(--font-sans); cursor: pointer;
+  border: 1px solid var(--code-line); background: transparent; color: var(--code-fg);
+  font: 500 13px / 1 var(--font-sans); cursor: pointer;
 }
-.ds-cmd button:hover { background: var(--accent-hover); }
+.ds-cmd button:hover { border-color: var(--code-muted); }
 .ds-cmd button:focus-visible { outline-color: var(--code-fg); }
+@media (max-width: 600px) { .ds-cmd code, .ds-cmd pre { white-space: pre-wrap; overflow-wrap: anywhere; } }
+
+/* real output: what a command printed, pasted from an actual run; not copyable, lines marked by meaning */
+.ds-output {
+  margin: 0; background: var(--code-bg); color: var(--code-fg); border-radius: var(--radius-l);
+  padding: var(--space-4); font: var(--text-s) / 1.7 var(--font-mono); white-space: pre-wrap; overflow-wrap: anywhere;
+}
+.ds-output .ds-prompt { color: var(--code-muted); }
+.ds-output .ds-err { color: var(--code-danger); }
+.ds-output .ds-warn { color: var(--code-warn); }
+.ds-output .ds-ok { color: var(--code-ok); }
 
 /* numbered steps: a sequence; .is-human marks a person's decision */
 .ds-steps { list-style: none; margin: 0; padding: 0; counter-reset: ds-step; }
