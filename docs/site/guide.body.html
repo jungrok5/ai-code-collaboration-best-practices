@@ -15,7 +15,8 @@ body{font-size:17px}
 .bar nav{display:flex;gap:var(--space-5);overflow-x:auto;scrollbar-width:none}
 .bar nav a{color:var(--muted);text-decoration:none;font-size:15px;white-space:nowrap;min-height:44px;display:inline-flex;align-items:center}
 .bar nav a:hover{color:var(--fg)}
-.bar .ds-btn{margin-left:auto;flex:none}
+.bar-actions{margin-left:auto;display:flex;gap:var(--space-2);flex:none}
+@media (max-width:480px){.bar-actions a.ds-btn{display:none}}
 @media (max-width:1020px){.bar nav{display:none}}
 
 /* hero */
@@ -100,7 +101,10 @@ footer{padding:var(--space-6) 0 var(--space-8);font-size:var(--text-s);color:var
   <div class="container">
     <a class="brand" href="#top">AI 협업 템플릿</a>
     <nav aria-label="주요 절"><a href="#overview">전체 구조</a><a href="#flow">작업 흐름</a><a href="#design">설계와 겹침</a><a href="#guards">규칙과 장치</a><a href="#automation">자동화</a><a href="#backend">AI 실행 주체</a><a href="#start">시작하기</a></nav>
-    <a class="ds-btn" href="https://github.com/jungrok5/ai-code-collaboration-best-practices">GitHub에서 보기</a>
+    <div class="bar-actions">
+      <button class="ds-btn theme-toggle" type="button" aria-pressed="false">다크 모드</button>
+      <a class="ds-btn" href="https://github.com/jungrok5/ai-code-collaboration-best-practices">GitHub에서 보기</a>
+    </div>
   </div>
 </header>
 

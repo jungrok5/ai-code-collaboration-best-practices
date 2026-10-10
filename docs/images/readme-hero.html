@@ -1,0 +1,48 @@
+<!doctype html>
+<html lang="ko" data-theme="light"><head><meta charset="utf-8"><title>AI 협업 템플릿 README 배너</title>
+<!-- Source of docs/images/readme-hero.png and readme-hero-dark.png. Re-render: node scripts/render-diagram.mjs -->
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&amp;family=Noto+Sans+KR:wght@400;500;700&amp;display=swap">
+<link rel="stylesheet" href="../../plugins/team-ai-workflow/skills/polish-ui/design/tokens.css">
+<link rel="stylesheet" href="../../plugins/team-ai-workflow/skills/polish-ui/design/components.css">
+<style>
+  /* README banner: the explainer page's hero as an image, since GitHub README cannot carry CSS. Tokens only. */
+  body{width:1600px;padding:72px 80px 64px;font-size:17px}
+  .hero{display:grid;grid-template-columns:minmax(0,1.05fr) minmax(0,1fr);gap:80px;align-items:start}
+  .copy{display:grid;gap:28px}
+  .kicker{font-size:17px;font-weight:700;color:var(--accent)}
+  h1{font-size:56px;line-height:1.18;letter-spacing:-.025em}
+  .ds-lede{font-size:21px;line-height:1.7}
+  .facts{display:flex;flex-wrap:wrap;gap:8px 28px;list-style:none;margin:0;padding:0;font-size:17px;color:var(--muted)}
+  .facts b{color:var(--fg)}
+  .ds-cmd code{font-size:17px}
+  .ds-cmd button{min-height:40px;font-size:15px}
+  .cap{font-size:16px;font-weight:700;color:var(--subtle);margin-bottom:6px}
+  .ds-steps > li{padding:15px 0;align-items:center}
+  .ds-steps > li::before{width:32px;height:32px;font-size:15px}
+  .ds-steps h3{font-size:20px;font-weight:500}
+  .ds-steps .is-human h3{font-weight:700}
+  .ds-steps .ds-who{font-size:15px}
+</style></head>
+<body>
+<div class="hero">
+  <div class="copy">
+    <div class="kicker">AI Code Collaboration Best Practices</div>
+    <h1>AI 에이전트와 함께 일하는<br>팀의 GitHub 구조</h1>
+    <p class="ds-lede">팀원마다 다른 AI 도구를 쓰고 레포가 여러 개인 팀을 위한 템플릿입니다. 어떤 도구로 작업하든 같은 규칙을 읽고 같은 검사를 통과해야 main에 반영됩니다.</p>
+    <ul class="facts"><li>API 키 없이 동작</li><li>규칙 원본 <b>1</b>개</li><li>워크플로 <b>22</b></li><li>스킬 <b>15</b></li></ul>
+    <div class="ds-cmd"><code>make setup</code><button type="button">복사</button></div>
+  </div>
+  <div>
+    <div class="cap">이슈 하나가 머지되기까지</div>
+    <ol class="ds-steps">
+      <li><div><h3>이슈 등록</h3></div></li>
+      <li><div><h3>AI 분류와 라벨 제안</h3></div></li>
+      <li class="is-human"><div><h3>ai:ready 부여</h3></div><span class="ds-who">사람</span></li>
+      <li><div><h3>AI 구현, 테스트 먼저</h3></div></li>
+      <li><div><h3>초안 PR, CI, AI 리뷰</h3></div></li>
+      <li class="is-human"><div><h3>CODEOWNER 승인</h3></div><span class="ds-who">사람</span></li>
+      <li><div><h3>squash 머지와 릴리스</h3></div></li>
+    </ol>
+  </div>
+</div>
+</body></html>

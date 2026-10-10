@@ -7,9 +7,10 @@ dark theme "그래파이트". A repo that has its own design system uses that in
 | --- | --- |
 | `tokens.css` | every color, font, size, space and radius as a CSS variable, light and dark |
 | `components.css` | base styles and `ds-` components built only from tokens |
+| `theme.js` | light/dark switch for a `.theme-toggle` button; load in `<head>`, remembers the choice, fires `themechange` |
 | `copy.js` | copy button for `.ds-cmd` command blocks |
 
-Load order: `tokens.css`, `components.css`, then product CSS. Optional web fonts (the stacks fall back to system fonts):
+Load order: `tokens.css`, `components.css`, then product CSS; `theme.js` in `<head>`, `copy.js` at the end of `<body>`. Optional web fonts (the stacks fall back to system fonts):
 
 ```html
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=Noto+Sans+KR:wght@400;500;700&display=swap">

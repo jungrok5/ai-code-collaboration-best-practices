@@ -1,15 +1,21 @@
-# AI Code Collaboration Best Practices: 팀 템플릿 레포
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="docs/images/readme-hero-dark.png">
+  <img alt="AI 에이전트와 함께 일하는 팀의 GitHub 구조. 팀원마다 다른 AI 도구를 쓰고 레포가 여러 개인 팀을 위한 템플릿. 이슈 하나가 머지되기까지 7단계 중 ai:ready 부여와 CODEOWNER 승인을 사람이 판단합니다." src="docs/images/readme-hero.png">
+</picture>
 
-팀원마다 다른 AI 코딩 도구(Claude Code, Copilot, Cursor, Codex, Gemini)를 쓰고 레포가 여러 개인 팀을 위한 템플릿입니다.
-어떤 도구로 작업하든 같은 규칙을 읽고 같은 검사를 통과해야 main에 반영됩니다. API 키는 필요하지 않습니다. AI 작업은
-각자 자리에서 본인의 `claude` 로그인으로 실행합니다. 서버 자동화는 필요할 때만 켭니다.
+어떤 AI 도구(Claude Code, Copilot, Cursor, Codex, Gemini)로 작업하든 같은 규칙을 읽고 같은 검사를 통과해야 main에
+반영됩니다. API 키는 필요하지 않습니다. AI 작업은 각자 자리에서 본인의 `claude` 로그인으로 실행합니다. 서버 자동화는
+필요할 때만 켭니다.
 
 **해설 페이지:** https://jungrok5.github.io/ai-code-collaboration-best-practices/
 
 처음 보는 경우 해설 페이지부터 읽으십시오. 이슈 하나가 머지되기까지의 예시, 강제 장치와 막혔을 때의 대안, 워크플로 전체
 표, 역할별 시작 방법을 담고 있습니다. 이 README는 레포를 쓰는 데 필요한 요약과 명령만 둡니다.
 
-![AI 협업 템플릿 전체 구조도](docs/images/architecture.png)
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="docs/images/architecture-dark.png">
+  <img alt="AI 협업 템플릿 전체 구조도: 이슈에서 머지까지의 7단계, 규칙과 PC·서버 차단, AI 실행 위치와 배포 방법" src="docs/images/architecture.png">
+</picture>
 
 ## 구성
 
@@ -127,7 +133,7 @@ Claude 훅은 Claude Code에서만 동작합니다. 다른 도구로 만든 변�
 │   ├── new-repo.sh · new-skill.sh  # 새 레포, 새 스킬
 │   ├── designs/board.py            # 설계 색인, 겹침 확인, 팀 보드 집계
 │   ├── apply-lean-permissions.sh   # 사람이 실행: 권한을 auto 모드와 좁은 deny로 (docs/15)
-│   └── build-site.sh · render-diagram.mjs  # 해설 페이지, 구조도 PNG 생성
+│   └── build-site.sh · render-diagram.mjs  # 해설 페이지, README 이미지(라이트·다크) 생성
 ├── infra/local-llm/                # llama.cpp · Ollama 로컬 LLM 서버와 self-hosted 러너 안내
 ├── docs/                           # 문서 01~18, adr/, designs/, site/(해설 페이지), images/
 ├── Makefile · .pre-commit-config.yaml · .devcontainer/ · .editorconfig

@@ -188,6 +188,29 @@ code, kbd, pre { font-family: var(--font-mono); }
 .ds-figure { margin: 0; border: var(--border); border-radius: var(--radius-l); padding: var(--space-4); overflow-x: auto; background: var(--bg); }
 .ds-figure figcaption { font-size: 13px; color: var(--subtle); margin-top: var(--space-2); }
 </style>
+<script>
+// Team design system "Clear": light/dark switch. Load in <head> so the saved theme applies before first paint.
+// Without a saved choice the page follows the OS (tokens.css). A .theme-toggle button flips it and the choice is
+// remembered per browser. Fires a "themechange" event on document so diagrams can redraw.
+(() => {
+  const root = document.documentElement, KEY = "clear-theme";
+  const dark = () => root.dataset.theme ? root.dataset.theme === "dark" : matchMedia("(prefers-color-scheme: dark)").matches;
+  try { const saved = localStorage.getItem(KEY); if (saved) root.dataset.theme = saved; } catch {}
+  const sync = () => document.querySelectorAll(".theme-toggle").forEach((b) => {
+    b.setAttribute("aria-pressed", String(dark()));
+    b.textContent = dark() ? "라이트 모드" : "다크 모드";
+  });
+  window.clearTheme = { isDark: dark };
+  document.addEventListener("DOMContentLoaded", sync);
+  document.addEventListener("click", (e) => {
+    if (!e.target.closest(".theme-toggle")) return;
+    root.dataset.theme = dark() ? "light" : "dark";
+    try { localStorage.setItem(KEY, root.dataset.theme); } catch {}
+    sync();
+    document.dispatchEvent(new Event("themechange"));
+  });
+})();
+</script>
 <title>AI 협업 템플릿 가이드</title>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&amp;family=Noto+Sans+KR:wght@400;500;700&amp;display=swap">
 <style>
@@ -205,7 +228,8 @@ body{font-size:17px}
 .bar nav{display:flex;gap:var(--space-5);overflow-x:auto;scrollbar-width:none}
 .bar nav a{color:var(--muted);text-decoration:none;font-size:15px;white-space:nowrap;min-height:44px;display:inline-flex;align-items:center}
 .bar nav a:hover{color:var(--fg)}
-.bar .ds-btn{margin-left:auto;flex:none}
+.bar-actions{margin-left:auto;display:flex;gap:var(--space-2);flex:none}
+@media (max-width:480px){.bar-actions a.ds-btn{display:none}}
 @media (max-width:1020px){.bar nav{display:none}}
 
 /* hero */
@@ -292,7 +316,10 @@ footer{padding:var(--space-6) 0 var(--space-8);font-size:var(--text-s);color:var
   <div class="container">
     <a class="brand" href="#top">AI 협업 템플릿</a>
     <nav aria-label="주요 절"><a href="#overview">전체 구조</a><a href="#flow">작업 흐름</a><a href="#design">설계와 겹침</a><a href="#guards">규칙과 장치</a><a href="#automation">자동화</a><a href="#backend">AI 실행 주체</a><a href="#start">시작하기</a></nav>
-    <a class="ds-btn" href="https://github.com/jungrok5/ai-code-collaboration-best-practices">GitHub에서 보기</a>
+    <div class="bar-actions">
+      <button class="ds-btn theme-toggle" type="button" aria-pressed="false">다크 모드</button>
+      <a class="ds-btn" href="https://github.com/jungrok5/ai-code-collaboration-best-practices">GitHub에서 보기</a>
+    </div>
   </div>
 </header>
 
@@ -822,18 +849,27 @@ document.addEventListener("click", async (e) => {
 <script src="https://cdn.jsdelivr.net/npm/mermaid@11.4.1/dist/mermaid.min.js"></script>
 <script>
 (() => {
-  const css = getComputedStyle(document.documentElement), v = (n) => css.getPropertyValue(n).trim();
-  mermaid.initialize({startOnLoad: true, theme: "base", themeVariables: {
-    darkMode: matchMedia("(prefers-color-scheme: dark)").matches, fontFamily: v("--font-sans"), fontSize: "15px",
-    background: v("--bg"), textColor: v("--fg"), lineColor: v("--subtle"),
-    primaryColor: v("--accent-soft"), primaryBorderColor: v("--accent"), primaryTextColor: v("--fg"),
-    secondaryColor: v("--sunk"), tertiaryColor: v("--surface"), mainBkg: v("--accent-soft"), nodeBorder: v("--accent"),
-    clusterBkg: v("--surface"), clusterBorder: v("--line-strong"), edgeLabelBackground: v("--bg"),
-    actorBkg: v("--accent-soft"), actorBorder: v("--accent"), actorTextColor: v("--fg"), actorLineColor: v("--line-strong"),
-    signalColor: v("--fg"), signalTextColor: v("--fg"), labelBoxBkgColor: v("--sunk"), labelBoxBorderColor: v("--line-strong"),
-    labelTextColor: v("--fg"), loopTextColor: v("--fg"), noteBkgColor: v("--sunk"), noteTextColor: v("--fg"),
-    noteBorderColor: v("--line-strong"), sequenceNumberColor: v("--accent-fg")
-  }});
+  const nodes = [...document.querySelectorAll("pre.mermaid")];
+  nodes.forEach((n) => { n.dataset.src = n.textContent; });
+  const draw = () => {
+    const css = getComputedStyle(document.documentElement), v = (n) => css.getPropertyValue(n).trim();
+    mermaid.initialize({startOnLoad: false, theme: "base", themeVariables: {
+      darkMode: window.clearTheme.isDark(), fontFamily: v("--font-sans"), fontSize: "15px",
+      background: v("--bg"), textColor: v("--fg"), lineColor: v("--subtle"),
+      primaryColor: v("--accent-soft"), primaryBorderColor: v("--accent"), primaryTextColor: v("--fg"),
+      secondaryColor: v("--sunk"), tertiaryColor: v("--surface"), mainBkg: v("--accent-soft"), nodeBorder: v("--accent"),
+      clusterBkg: v("--surface"), clusterBorder: v("--line-strong"), edgeLabelBackground: v("--bg"),
+      actorBkg: v("--accent-soft"), actorBorder: v("--accent"), actorTextColor: v("--fg"), actorLineColor: v("--line-strong"),
+      signalColor: v("--fg"), signalTextColor: v("--fg"), labelBoxBkgColor: v("--sunk"), labelBoxBorderColor: v("--line-strong"),
+      labelTextColor: v("--fg"), loopTextColor: v("--fg"), noteBkgColor: v("--sunk"), noteTextColor: v("--fg"),
+      noteBorderColor: v("--line-strong"), sequenceNumberColor: v("--accent-fg")
+    }});
+    nodes.forEach((n) => { n.removeAttribute("data-processed"); n.textContent = n.dataset.src; });
+    mermaid.run({nodes});
+  };
+  draw();
+  document.addEventListener("themechange", draw);
+  matchMedia("(prefers-color-scheme: dark)").addEventListener("change", () => { if (!document.documentElement.dataset.theme) draw(); });
 })();
 </script>
 </body>
