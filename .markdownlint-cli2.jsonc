@@ -15,5 +15,5 @@
     "MD060": false,          // table pipe alignment is cosmetic
     "MD025": { "front_matter_title": "" } // design docs: front-matter title is data for board.py, H1 is for readers
   },
-  "ignores": ["node_modules/**", ".venv/**", "CHANGELOG.md"]
+  "ignores": ["node_modules/**", ".venv/**", ".cache/**", "CHANGELOG.md"]
 }
