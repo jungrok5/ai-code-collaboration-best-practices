@@ -8,7 +8,7 @@ on:
     - cron: "*/30 * * * *"
   push:
     branches: [main]
-    paths: ["docs/designs/**", "docs/site/**", "docs/images/**", "plugins/team-ai-workflow/skills/polish-ui/design/**", ".github/work-board-repos.txt", ".github/workflows/work-board.yml"]
+    paths: ["docs/designs/**", "docs/site/**", "docs/images/**", ".claude-plugin/marketplace.json", "scripts/ai-design.sh", ".github/work-board-repos.txt", ".github/workflows/work-board.yml"]
   workflow_dispatch:
 
 permissions:

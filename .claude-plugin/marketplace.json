@@ -11,14 +11,32 @@
     {
       "name": "team-ai-workflow",
       "source": "./plugins/team-ai-workflow",
-      "description": "Guard-rail hooks (protected paths, no commits on main, no force-push to shared branches, auto-format), skills (polish-writing, polish-ui, design, check-overlap, implement-issue, create-pr, review-pr, fix-ci, split-pr, triage-issue, write-adr, onboard) and review subagents.",
-      "version": "1.5.0",
+      "description": "Guard-rail hooks (protected paths, no commits on main, no force-push to shared branches, auto-format), skills (design, check-overlap, implement-issue, create-pr, review-pr, fix-ci, split-pr, triage-issue, write-adr, onboard) and review subagents. Pulls in ai-design for the writing and UI standard.",
+      "version": "1.6.0",
       "category": "development",
       "tags": [
         "workflow",
         "github",
         "review",
         "guardrails"
+      ]
+    },
+    {
+      "name": "ai-design",
+      "source": {
+        "source": "git-subdir",
+        "url": "jungrok5/ai-design",
+        "path": "plugins/ai-design",
+        "sha": "c5bd85fe73ebe35cf9af6780bbe636731adca710"
+      },
+      "description": "Writing and UI standard from jungrok5/ai-design: polish-writing and polish-ui skills, the design system \"Clear\", and a style check after every edit. Pinned to a reviewed commit; required by team-ai-workflow.",
+      "version": "1.0.0",
+      "category": "productivity",
+      "tags": [
+        "writing",
+        "ui",
+        "design-system",
+        "style"
       ]
     },
     {

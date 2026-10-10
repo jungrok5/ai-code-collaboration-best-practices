@@ -64,6 +64,9 @@ if [ "$MODE" = project ]; then
   fi
   if [ -d plugins ] || [ -d .claude-plugin ]; then
     if [ "$YES" = 1 ] || { read -r -p "  Remove hub-only files (plugins/, .claude-plugin/, docs/10-research-crosscheck.md)? [y/N] " a && [ "${a:-n}" = y ]; }; then
+      # keep the ai-design commit the hub pins, so make style / pre-commit / CI here use the same rules
+      jq -r '.plugins[] | select(.name=="ai-design") | .source.sha // empty' .claude-plugin/marketplace.json 2>/dev/null > .ai-design-version || true
+      [ -s .ai-design-version ] || rm -f .ai-design-version
       git rm -rq --cached plugins .claude-plugin docs/10-research-crosscheck.md 2>/dev/null || true
       rm -rf plugins .claude-plugin docs/10-research-crosscheck.md
       ok "hub-only files removed; this repo now consumes plugins from the marketplace: ${MARKETPLACE:-<unset>}"

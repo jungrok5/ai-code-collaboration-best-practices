@@ -7,9 +7,12 @@
 import { chromium } from "playwright";
 import { fileURLToPath } from "node:url";
 import path from "node:path";
+import { execFileSync } from "node:child_process";
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const images = path.join(root, "docs/images");
+// The HTML sources load the design tokens from the pinned ai-design checkout in .cache/.
+execFileSync(path.join(root, "scripts/ai-design.sh"), { stdio: ["ignore", "ignore", "inherit"] });
 const browser = await chromium.launch({ executablePath: process.env.CHROMIUM_PATH || undefined });
 const page = await browser.newPage({ viewport: { width: 1600, height: 300 }, deviceScaleFactor: 2 });
 for (const name of ["architecture", "readme-hero"]) {

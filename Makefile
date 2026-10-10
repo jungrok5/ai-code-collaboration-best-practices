@@ -27,10 +27,8 @@ build: ## Build (auto-detects stack)
 
 check: lint style typecheck test ## Full fast check — run before every commit
 
-STYLE_CHECK ?= $(firstword $(wildcard plugins/team-ai-workflow/style/style_check.py) $(wildcard $(HOME)/.claude/plugins/*/team-ai-workflow/style/style_check.py))
-style: ## Writing + UI style check (AI tone / AI look; docs/17). FILES="a.md b.tsx" to limit
-	@if [ -z "$(STYLE_CHECK)" ]; then echo "style: team-ai-workflow plugin not found, skipped"; \
-	else python3 "$(STYLE_CHECK)" $(or $(FILES),$$(git ls-files '*.md' '*.mdx' '*.html' '*.css' '*.scss' '*.tsx' '*.jsx' '*.vue' '*.svelte' '*.astro' | grep -v '^docs/site/index.html$$' | grep -v '/evals/')); fi
+style: ## Writing + UI style check from jungrok5/ai-design (pinned; docs/17). FILES="a.md b.tsx" to limit
+	@scripts/ai-design.sh style $(or $(FILES),$$(git ls-files '*.md' '*.mdx' '*.html' '*.css' '*.scss' '*.tsx' '*.jsx' '*.vue' '*.svelte' '*.astro' | grep -v '^docs/site/index.html$$' | grep -v '/evals/'))
 
 doctor: ## What is set up and what is left (tools, auth, plugin, GitHub settings). SCOPE=local|github JSON=1 FIX=1
 	@scripts/doctor.sh --scope $(or $(SCOPE),all) $(if $(JSON),--json) $(if $(FIX),--fix-safe)

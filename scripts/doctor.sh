@@ -105,6 +105,13 @@ local_checks() {
     if [ "$FIX" = 1 ] && claude plugin update "$PLUGIN_ID" >/dev/null 2>&1; then emit PASS local.plugin "$PLUGIN_ID updated to the latest version (fixed)"
     else emit WARN local.plugin "$PLUGIN_ID $inst installed, marketplace has $want" "claude plugin update $PLUGIN_ID"; fi
   else emit PASS local.plugin "$PLUGIN_ID ${inst} installed"; fi
+  # team-ai-workflow depends on ai-design (writing and UI standard). New installs pull it in; older installs may lack it.
+  if have claude && [ -n "$inst" ]; then
+    if jq -e '.plugins["ai-design@ai-collab"]' "$HOME/.claude/plugins/installed_plugins.json" >/dev/null 2>&1; then
+      emit PASS local.ai-design "ai-design installed (writing and UI skills, style check after edits)"
+    elif [ "$FIX" = 1 ] && claude plugin install ai-design@ai-collab >/dev/null 2>&1; then emit PASS local.ai-design "ai-design installed (fixed)"
+    else emit WARN local.ai-design "ai-design is not installed: no polish-writing/polish-ui skills or style check after edits" "claude plugin install ai-design@ai-collab (or rerun with --fix-safe)"; fi
+  fi
 
   local ph=()
   grep -qsF '<one line>' AGENTS.md && ph+=("AGENTS.md Project section")

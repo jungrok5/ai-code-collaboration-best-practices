@@ -7,6 +7,11 @@ AI가 작성한 글과 화면은 내용이 정확해도 AI가 만들었다는 �
 보라색 그라데이션, 똑같은 모양의 카드 세 장이 대표적입니다. 독자는 이런 신호를 보면 내용의 신뢰도까지 낮게
 평가합니다. 이 기준을 팀 협업의 기본 도구에 포함한 이유입니다.
 
+기준을 적용하는 스킬, 검사 규칙, 디자인 시스템의 원본은 별도 레포 [jungrok5/ai-design](https://github.com/jungrok5/ai-design)에
+있습니다. 다른 프로젝트에서도 그대로 쓰기 위해서입니다. 이 레포는 `.claude-plugin/marketplace.json`의 `ai-design` 항목에
+고정한 커밋 하나를 씁니다. `team-ai-workflow` 플러그인을 설치하면 `ai-design` 플러그인이 의존성으로 함께 설치되고,
+`make style`·pre-commit·CI·해설 페이지 빌드는 `scripts/ai-design.sh`로 같은 커밋을 받아 씁니다.
+
 ## 1. 글 기준
 
 팀 문서(README, docs/, 설계 문서, ADR)는 합니다체를 쓰며, 기술 문서·보고서에 맞는 문어체로 작성합니다. 목록과 표의
@@ -81,7 +86,7 @@ AI가 작성한 글과 화면은 내용이 정확해도 AI가 만들었다는 �
 
 AI가 만든 화면이 서로 비슷해 보이는 이유는 매번 기본값에서 색과 모양을 새로 정하기 때문입니다. 그래서 화면 작업은
 디자인 시스템의 토큰과 컴포넌트에서 시작합니다. 레포에 자체 디자인 시스템이 있으면 그것을 쓰고, 없으면 팀 기본값
-"Clear"를 씁니다. 원본은 `plugins/team-ai-workflow/skills/polish-ui/design/`에 있습니다.
+"Clear"를 씁니다. 원본은 ai-design 레포의 `plugins/ai-design/skills/polish-ui/design/`에 있습니다.
 
 | 항목 | 라이트: 선명한 블루 | 다크: 그래파이트 |
 | --- | --- | --- |
@@ -120,7 +125,8 @@ AI가 만든 화면이 서로 비슷해 보이는 이유는 매번 기본값에�
 
 ## 4. 규칙 관리
 
-- 규칙 목록: `python3 plugins/team-ai-workflow/style/style_check.py --list-rules`
+- 규칙 목록: `scripts/ai-design.sh style --list-rules`
+- 규칙이나 스킬을 바꿀 때: ai-design 레포에서 고치고 버전을 올린 뒤, 이 레포의 `ai-design` 항목 `sha`를 새 커밋으로 바꾸는 PR을 엽니다.
 - 심각도: `error`는 거의 항상 잘못된 표현이므로 CI가 실패합니다. `warning`은 자주 잘못 쓰이는 표현이므로 알림만 표시합니다.
 - 문체 규칙: `ko-register-mix`(한 문서 안의 문체 혼용), `ko-haeyo`(해요체 문장), `ko-colloquial`(구어체 표현),
   `ko-personify`(일·도구의 의인화), `ko-reader-talk`(독자에게 말 거는 문장). 모두 `error`입니다.
@@ -140,7 +146,7 @@ AI가 만든 화면이 서로 비슷해 보이는 이유는 매번 기본값에�
 1. **조사하고 출처의 라이선스를 확인합니다.** MIT·Apache-2.0은 출처를 밝히고 수정해 사용할 수 있습니다. CC BY-SA,
    CC BY-NC-SA, 라이선스 없음은 인용만 하고 문장은 새로 작성합니다. 이번에는 humanizer, im-not-ai, DaleSeo,
    Vercel, Anthropic frontend-design, Impeccable을 참고했고, 토스 가이드와 위키백과는 인용만 했습니다
-   (`plugins/team-ai-workflow/THIRD_PARTY_NOTICES.md`).
+   (ai-design 레포의 `plugins/ai-design/THIRD_PARTY_NOTICES.md`).
 2. **외부 기준을 그대로 도입하지 않습니다.** 출처끼리 충돌하는 부분은 팀이 결정합니다. 이번 결정은 다음과 같습니다.
    - 문체: 자연스러움을 이유로 문체 혼용을 권하는 의견이 있었으나, 일관성을 우선해 한 문서에는 한 가지 문체만 씁니다.
      처음에는 해요체를 기본으로 정했으나 팀 문서가 전문적으로 읽히지 않는다는 검토 의견에 따라 팀 문서는 합니다체(문어체)로
@@ -152,7 +158,7 @@ AI가 만든 화면이 서로 비슷해 보이는 이유는 매번 기본값에�
    규칙이 탐지하는 내용을 스킬에 중복 기재하지 않습니다.
 4. **항상 적용되게 할 장치를 고르고 비용을 기록합니다.** 이번에는 수정 직후 검사, 경로 규칙, CI를 선택했고, 모든 요청에
    주입하는 방식은 쓰지 않았습니다(§3).
-5. **평가 케이스를 추가합니다.** 호출해야 하는 경우와 호출하지 않아야 하는 경우를 하나씩(`plugins/team-ai-workflow/evals/`).
+5. **평가 케이스를 추가합니다.** 호출해야 하는 경우와 호출하지 않아야 하는 경우를 하나씩(지금은 ai-design 레포의 `plugins/ai-design/evals/`).
 6. **기존 결과물에 먼저 적용합니다.** 이번에는 이 레포의 README, docs/, 해설 페이지, 구조도 이미지를 이 기준으로
    다시 작성했습니다. 직접 적용해 보면 규칙이 잘못된 부분이 드러납니다.
 7. **플러그인 버전을 올려 배포합니다.** 팀원은 `claude plugin update`로 받습니다. 2주 후 경고가 실제로 도움이 되었는지

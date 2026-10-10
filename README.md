@@ -22,7 +22,7 @@
 | 층 | 내용 |
 | --- | --- |
 | ① 규칙 | `AGENTS.md` 하나(약 60줄)가 사람과 모든 에이전트의 규칙. 도구별 파일(`CLAUDE.md`, `copilot-instructions.md`, `.cursor/rules/` 등)은 이 파일을 가리키기만 함 |
-| ② 로컬 가드레일 | Claude Code 플러그인 `team-ai-workflow`: 보호 경로 수정·main 커밋·강제 푸시 차단 훅, 수정 직후 포맷과 글·화면 검사, 스킬 12개, 서브에이전트 5개. pre-commit과 `make check`가 같은 검사를 사람의 커밋에도 적용 |
+| ② 로컬 가드레일 | Claude Code 플러그인 `team-ai-workflow`: 보호 경로 수정·main 커밋·강제 푸시 차단 훅, 수정 직후 포맷, 스킬 10개, 서브에이전트 5개. 글·화면 스킬 2개와 수정 직후 검사는 의존 플러그인 `ai-design`이 함께 설치됨. pre-commit과 `make check`가 같은 검사를 사람의 커밋에도 적용 |
 | ③ GitHub 거버넌스 | 이슈 양식 3종, PR 템플릿(AI 사용 공개 필수), CODEOWNERS, 라벨, 룰셋(PR·사람 승인·`ci-ok`·squash만), CodeQL·비밀 스캔·Dependabot |
 | ④ 자동화 | 워크플로 22개. 분류, `ai:ready` 이슈 구현, 초안 PR, AI 리뷰(참고용), CI 실패 수정, 설계 겹침 알림, 계약 변경 검사, 릴리스 |
 | ⑤ AI 실행 주체 | 내 자리(`make ai-*`, 키 없음)가 기본. 서버 자동화는 사내 로컬 LLM 또는 Anthropic 중 선택(`AI_BACKEND`) |
@@ -33,7 +33,7 @@
 - **설계 먼저와 겹침 확인:** 큰 작업은 1쪽 설계를 먼저 머지합니다. 여러 레포의 활성 설계와 열린 PR을 모은 팀 작업 보드로 같은 영역의 중복 작업을 미리 찾습니다([docs/14](docs/14-design-first-and-overlap.md)).
 - **가벼운 하네스:** 최신 모델 기준으로 규칙과 확인 절차를 줄이고 결정적 안전장치만 남겼습니다([docs/15](docs/15-lean-harness.md)).
 - **팀 규모 운영:** 리뷰 대기 상한, 계약 우선, 반복되는 리뷰 지적의 규칙화, 스킬 평가, 프로토타입·운영 프로필을 둡니다([docs/16](docs/16-team-scale-ai.md)).
-- **글과 화면 기준:** 합니다체 문서 기준, 내용 형식 규칙, 팀 디자인 시스템 "Clear"를 정했습니다. 수정 직후 훅, pre-commit, CI가 같은 규칙으로 검사합니다([docs/17](docs/17-writing-and-design-standards.md)).
+- **글과 화면 기준:** 합니다체 문서 기준, 내용 형식 규칙, 디자인 시스템 "Clear"를 정했습니다. 수정 직후 훅, pre-commit, CI가 같은 규칙으로 검사합니다. 스킬과 규칙의 원본은 다른 프로젝트에서도 쓸 수 있도록 [jungrok5/ai-design](https://github.com/jungrok5/ai-design)에 두고, 이 레포는 고정한 커밋을 씁니다([docs/17](docs/17-writing-and-design-standards.md)).
 - **스킬 추가:** 개인, 커뮤니티, 팀 세 등급으로 추가합니다. 선택 설치용 `team-ai-community` 플러그인도 들어 있습니다([docs/18](docs/18-adding-skills.md)).
 
 ## 빠른 시작
@@ -113,10 +113,9 @@ Claude 훅은 Claude Code에서만 동작합니다. 다른 도구로 만든 변�
 │   ├── hooks/session-start.sh      # 의존성·pre-commit 준비, 팀 작업 보드 요약
 │   ├── rules/                      # 경로별 규칙 (워크플로, 테스트, AI 설정, 글과 화면)
 │   └── skills/                     # 레포 전용 스킬: /new-repo, /new-skill, /validate-ai-config
-├── .claude-plugin/marketplace.json # 이 레포 = 팀 마켓플레이스 "ai-collab"
+├── .claude-plugin/marketplace.json # 이 레포 = 팀 마켓플레이스 "ai-collab" (ai-design은 고정 커밋으로 등록)
 ├── plugins/
-│   ├── team-ai-workflow/           # 팀 플러그인: hooks/, skills/(12), agents/(5), style/(글·화면 규칙), evals/
-│   │   └── skills/polish-ui/design/  # 팀 디자인 시스템 "Clear" (토큰, 컴포넌트)
+│   ├── team-ai-workflow/           # 팀 플러그인: hooks/, skills/(10), agents/(5), evals/. 의존 플러그인 ai-design
 │   └── team-ai-community/          # 선택 설치 스킬
 ├── .github/
 │   ├── ISSUE_TEMPLATE/ · pull_request_template.md
@@ -128,6 +127,7 @@ Claude 훅은 Claude Code에서만 동작합니다. 다른 도구로 만든 변�
 │   ├── ai/                         # 키 없는 AI 작업 (triage, review, implement, fix-ci, respond, maintenance, queue)
 │   ├── bootstrap.sh · stack.sh     # make setup, 스택 자동 감지 (node, python, go, rust)
 │   ├── doctor.sh                   # make doctor: 설정 상태와 남은 항목
+│   ├── ai-design.sh                # 고정 커밋의 ai-design을 .cache/에 받아 스타일 검사·디자인 파일 제공
 │   ├── check-ai-config.sh          # make ai-validate
 │   ├── setup-github.sh · rulesets/ # make github-setup, 브랜치 보호 룰셋
 │   ├── new-repo.sh · new-skill.sh  # 새 레포, 새 스킬

@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <style>
-/* Team design system "Clear" — tokens. Light: 선명한 블루. Dark: 그래파이트.
+/* Design system "Clear" (ai-design) — tokens. Light: 선명한 블루. Dark: 그래파이트.
    Use only these variables in product CSS; the style check warns on raw colors and font stacks elsewhere.
    Spec and component rules: DESIGN.md. Colors adapted from the Tailwind CSS palette (MIT). */
 :root {
@@ -70,7 +70,7 @@
   --code-bg: #141618; --code-fg: #e4e6e8; --code-muted: #7d8389; --focus: #7cb7e8;
   color-scheme: dark;
 }
-/* Team design system "Clear" — base and components. Needs tokens.css first.
+/* Design system "Clear" (ai-design) — base and components. Needs tokens.css first.
    Every value comes from a token. Class names start with ds- so they can sit next to product CSS. */
 *, *::before, *::after { box-sizing: border-box; }
 body {
@@ -189,7 +189,7 @@ code, kbd, pre { font-family: var(--font-mono); }
 .ds-figure figcaption { font-size: 13px; color: var(--subtle); margin-top: var(--space-2); }
 </style>
 <script>
-// Team design system "Clear": light/dark switch. Load in <head> so the saved theme applies before first paint.
+// Design system "Clear" (ai-design): light/dark switch. Load in <head> so the saved theme applies before first paint.
 // Without a saved choice the page follows the OS (tokens.css). A .theme-toggle button flips it and the choice is
 // remembered per browser. Fires a "themechange" event on document so diagrams can redraw.
 (() => {
@@ -708,10 +708,11 @@ flowchart LR
       <tbody>
         <tr><td>글</td><td>합니다체 하나, 목록과 표는 개조식. 과장·번역투·의인화·독자에게 말 걸기 금지</td><td><code>polish-writing</code></td></tr>
         <tr><td>내용 형식</td><td>설명은 짧은 문단, 실행할 것은 복사할 수 있는 명령, 3단계 이상이거나 행위자가 둘 이상이면 도식, 비교는 표</td><td><code>polish-writing</code></td></tr>
-        <tr><td>화면</td><td>팀 디자인 시스템 "Clear"의 토큰과 컴포넌트만 사용. 라이트는 흰 바탕에 파란 강조색 하나, 다크는 그래파이트. 이 페이지도 같은 시스템</td><td><code>polish-ui</code></td></tr>
+        <tr><td>화면</td><td>디자인 시스템 "Clear"의 토큰과 컴포넌트만 사용. 라이트는 흰 바탕에 파란 강조색 하나, 다크는 그래파이트. 이 페이지도 같은 시스템</td><td><code>polish-ui</code></td></tr>
       </tbody>
     </table></div>
     <p>스킬은 모델이 필요하다고 판단할 때만 로드되므로 항상 쓰인다는 보장이 없습니다. 대신 기계로 판별할 수 있는 위반은 수정 직후 훅, pre-commit, CI가 같은 규칙으로 검사합니다(강제 장치 표의 포맷·스타일 훅과 pre-commit). 훅이 위반을 돌려주면 AI가 그 자리에서 고치므로 스킬을 부르지 않은 작업에도 기준이 적용됩니다.</p>
+    <p>두 스킬과 검사 규칙, 디자인 시스템의 원본은 다른 프로젝트에서도 쓸 수 있도록 별도 레포 <a href="https://github.com/jungrok5/ai-design">jungrok5/ai-design</a>에 있습니다. 이 레포는 마켓플레이스에 고정한 커밋 하나를 쓰고, <code>team-ai-workflow</code>를 설치하면 <code>ai-design</code> 플러그인이 의존성으로 함께 설치됩니다.</p>
     <h3>팀 스킬 추가</h3>
     <p>스킬은 개인, 커뮤니티, 팀 세 등급으로 추가합니다. 명령 하나가 등급에 맞는 뼈대와 평가 케이스를 만들고, 형식·버전·평가는 CI가 확인합니다(<code>docs/18-adding-skills.md</code>).</p>
     <div class="ds-cmd"><pre>make new-skill NAME=x TIER=community DESC="..."
@@ -788,7 +789,7 @@ make doctor     <span class="ds-c"># 남은 설정 항목 확인</span></pre><bu
 │   ├── rules/                   <span class="c">① 경로별 규칙</span>
 │   └── skills/                  <span class="c">레포 전용 스킬 3개 (/new-repo · /new-skill · /validate-ai-config)</span>
 ├── plugins/
-│   ├── team-ai-workflow/        <span class="c">② ⑥ 팀 플러그인: 훅 4 · 스킬 12 · 서브에이전트 5 · 글·화면 규칙 · 디자인 시스템</span>
+│   ├── team-ai-workflow/        <span class="c">② ⑥ 팀 플러그인: 훅 3 · 스킬 10 · 서브에이전트 5 · 의존 플러그인 ai-design</span>
 │   └── team-ai-community/       <span class="c">⑥ 선택 설치 스킬</span>
 ├── .claude-plugin/marketplace.json  <span class="c">⑥ 이 레포를 마켓플레이스로 공개</span>
 ├── .github/
@@ -801,6 +802,7 @@ make doctor     <span class="ds-c"># 남은 설정 항목 확인</span></pre><bu
 │   ├── ai/                      <span class="c">⑤ 키 없는 AI 작업 (triage · review · implement · fix-ci …)</span>
 │   ├── designs/board.py         <span class="c">설계 색인 · 겹침 확인 · 팀 보드 집계</span>
 │   ├── doctor.sh                <span class="c">설정 상태 점검</span>
+│   ├── ai-design.sh             <span class="c">고정 커밋의 ai-design 받기 · 스타일 검사</span>
 │   ├── setup-github.sh · rulesets/   <span class="c">③ 레포 설정 · 브랜치 보호</span>
 │   └── new-repo.sh              <span class="c">⑥ 새 레포 생성</span>
 ├── infra/local-llm/             <span class="c">⑤ llama.cpp · Ollama 서버 안내</span>
@@ -832,7 +834,7 @@ make doctor     <span class="ds-c"># 남은 설정 항목 확인</span></pre><bu
   <div class="container">원본 레포: github.com/jungrok5/ai-code-collaboration-best-practices · 상세 문서: 레포의 <code>docs/</code> · 이 페이지 원본: <code>docs/site/</code></div>
 </footer>
 <script>
-// Team design system "Clear": copy button for .ds-cmd blocks. Include once per page.
+// Design system "Clear" (ai-design): copy button for .ds-cmd blocks. Include once per page.
 // Text inside .ds-c (comments) is left out, so a block can explain each line and still paste cleanly.
 document.addEventListener("click", async (e) => {
   const btn = e.target.closest(".ds-cmd button");

@@ -5,7 +5,7 @@
 set -euo pipefail
 cd "$(git rev-parse --show-toplevel 2>/dev/null || pwd)" || exit 1
 body=docs/site/guide.body.html
-design=plugins/team-ai-workflow/skills/polish-ui/design
+design="$(scripts/ai-design.sh)/plugins/ai-design/skills/polish-ui/design"
 out=docs/site/index.html
 {
   printf '<!doctype html>\n<html lang="ko">\n<head>\n<meta charset="utf-8">\n<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">\n'
