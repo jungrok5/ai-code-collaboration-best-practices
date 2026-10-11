@@ -21,6 +21,7 @@
 | `work-board.yml` | 30분마다, main의 설계·사이트 변경, 수동 | 등록된 레포의 활성 설계 + 열린 PR 변경 파일을 모아 `board.json` 생성, 해설 페이지와 함께 Pages 배포. LLM 없음 | pages | 없음 |
 | `labels-sync.yml` | labels.yml 변경 | 라벨 동기화(PR에서는 dry-run) | issues | 없음 |
 | `release-please.yml` | main push | 릴리스 PR/태그 | contents/PR | 없음 |
+| `plugin-deps.yml` | 매주 월요일, 수동 | 다른 레포에서 가져온 플러그인마다 새 커밋(최신 버전 태그, 없으면 기본 브랜치)을 찾아 고정 커밋을 올리는 PR 생성. 실행 코드 변경을 본문 맨 위에 표시([18](18-adding-skills.md#다른-레포의-플러그인)) | contents/PR | 없음 |
 | `dependabot-auto-merge.yml` | Dependabot PR | minor/patch 자동 승인·자동 머지 | contents/PR | 없음 |
 | `codeql.yml` | PR, main, 주간 | 코드 스캐닝(기본은 Actions 워크플로, 언어는 추가) | security-events | 없음 |
 | `stale.yml` | 매일 | 60일 무활동 → 7일 후 닫힘(`ai:in-progress`, p0 제외. 이슈는 `status/blocked`도 제외) | issues/PR | 없음 |

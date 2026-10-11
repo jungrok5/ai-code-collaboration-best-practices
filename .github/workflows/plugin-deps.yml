@@ -1,0 +1,64 @@
+# Weekly: for every plugin .claude-plugin/marketplace.json pins from another repository (ours or third-party alike),
+# open or refresh one PR that moves the pin to the upstream's newest release tag, or to its default branch head when
+# it has no tags. The upstream needs no settings, tags or bots; only this repository does:
+#   - Settings → Actions → General → "Allow GitHub Actions to create and approve pull requests" (Save), and
+#   - optional secret DEPS_TOKEN (fine-grained PAT or GitHub App token with contents + pull-requests write). PRs opened
+#     with the default GITHUB_TOKEN do not start other workflows, so without DEPS_TOKEN CI does not run on them.
+# Uses only git, Python and gh (no third-party actions), so it also runs on GitHub Enterprise Server when the runner
+# can reach the upstream host. Review rule for the PRs: docs/18-adding-skills.md.
+name: Plugin dependency updates
+
+on:
+  schedule:
+    - cron: "17 2 * * 1"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: plugin-deps
+  cancel-in-progress: false
+
+jobs:
+  bump:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    permissions:
+      contents: write
+      pull-requests: write
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          token: ${{ secrets.DEPS_TOKEN || github.token }}
+      - name: Open or update one PR per plugin
+        env:
+          GH_TOKEN: ${{ secrets.DEPS_TOKEN || github.token }}
+          GH_ENTERPRISE_TOKEN: ${{ secrets.DEPS_TOKEN || github.token }}
+          HAS_DEPS_TOKEN: ${{ secrets.DEPS_TOKEN != '' }}
+          BASE: ${{ github.event.repository.default_branch }}
+        run: |
+          set -euo pipefail
+          export GH_HOST="${GITHUB_SERVER_URL#https://}"
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          updates="$(python3 scripts/deps-update.py check)"
+          echo "updates: $updates"
+          for name in $(python3 -c 'import json,sys; print(" ".join(u["name"] for u in json.loads(sys.argv[1])))' "$updates"); do
+            branch="deps/plugin-$name"
+            git fetch -q --depth=1 origin "$BASE"
+            git checkout -q -B "$branch" FETCH_HEAD
+            info="$(python3 scripts/deps-update.py apply "$name" "$RUNNER_TEMP/body.md")"
+            title="$(python3 -c 'import json,sys; print(json.loads(sys.argv[1])["title"])' "$info")"
+            if [ "$HAS_DEPS_TOKEN" != "true" ]; then
+              printf '\n> CI does not start on PRs opened with the default GITHUB_TOKEN. Set the DEPS_TOKEN secret so it does.\n' >> "$RUNNER_TEMP/body.md"
+            fi
+            git commit -q -am "$title"
+            git push -q --force origin "$branch"
+            pr="$(gh pr list --head "$branch" --state open --json number -q '.[0].number // empty')"
+            if [ -n "$pr" ]; then
+              gh pr edit "$pr" --title "$title" --body-file "$RUNNER_TEMP/body.md"
+            else
+              gh pr create --base "$BASE" --head "$branch" --title "$title" --body-file "$RUNNER_TEMP/body.md"
+            fi
+          done

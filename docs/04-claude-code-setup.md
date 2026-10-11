@@ -68,6 +68,10 @@ JSON 스키마 참조).
 `claude plugin marketplace add OWNER/REPO && claude plugin install team-ai-workflow@ai-collab`. 로컬 테스트:
 `claude --plugin-dir ./plugins/team-ai-workflow`.
 
+`team-ai-workflow`가 의존하는 `ai-design`처럼 다른 레포에 있는 플러그인은 프로젝트 설정만으로 내려받지 않습니다.
+팀원마다 한 번 `claude plugin install ai-design@ai-collab --scope project`를 실행합니다. 다른 레포 플러그인을
+들이고 갱신하는 방법은 [docs/18](18-adding-skills.md#다른-레포의-플러그인)에 있습니다.
+
 ## 3. 스킬 (`SKILL.md`)
 
 | 스킬 | 용도 | 호출 |
