@@ -44,7 +44,7 @@ jobs:
       - name: Build site
         run: |
           scripts/build-site.sh
-          cp docs/site/index.html _site/index.html
+          cp docs/site/index.html docs/site/map.html _site/
           cp docs/images/architecture.png _site/images/
       - uses: actions/configure-pages@983d7736d9b0ae728b81ab479565c72886d7745b # v5
       - uses: actions/upload-pages-artifact@56afc609e74202658d3ffba0e8f6dda462b719fa # v3

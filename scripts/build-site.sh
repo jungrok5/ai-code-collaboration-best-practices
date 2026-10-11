@@ -1,12 +1,15 @@
 #!/usr/bin/env bash
-# Build docs/site/index.html (standalone page for GitHub Pages) from docs/site/guide.body.html and the team
-# design system "Clear" (tokens.css + components.css + theme.js + copy.js, inlined so the page is one file).
+# Build the GitHub Pages pages from their body files and the team design system "Clear" (tokens.css + components.css
+# + theme.js + copy.js, inlined so each page is one file):
+#   docs/site/guide.body.html → docs/site/index.html   (explainer, with Mermaid diagrams)
+#   docs/site/map.body.html   → docs/site/map.html     (pan-and-zoom map of the whole repository)
 # The same build is published as the claude.ai Artifact.
 set -euo pipefail
 cd "$(git rev-parse --show-toplevel 2>/dev/null || pwd)" || exit 1
-body=docs/site/guide.body.html
 design="$(scripts/ai-design.sh)/plugins/ai-design/skills/polish-ui/design"
-out=docs/site/index.html
+
+page() {  # page BODY OUT MERMAID(yes|no)
+local body=$1 out=$2 mermaid=$3
 {
   printf '<!doctype html>\n<html lang="ko">\n<head>\n<meta charset="utf-8">\n<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">\n'
   printf '<style>\n'; cat "$design/tokens.css" "$design/components.css"; printf '</style>\n'
@@ -16,6 +19,7 @@ out=docs/site/index.html
   printf '</head>\n<body>\n'
   sed -n '/<\/style>/,$p' "$body" | tail -n +2
   printf '<script>\n'; cat "$design/copy.js"; printf '</script>\n'
+  if [ "$mermaid" = no ]; then printf '</body>\n</html>\n'; return; fi
   printf '<script src="https://cdn.jsdelivr.net/npm/mermaid@11.4.1/dist/mermaid.min.js"></script>\n'
   # Mermaid colors come from the design tokens, so diagrams follow the light/dark theme of the page.
   cat <<'JS'
@@ -48,3 +52,7 @@ JS
   printf '</body>\n</html>\n'
 } > "$out"
 echo "wrote $out"
+}
+
+page docs/site/guide.body.html docs/site/index.html yes
+page docs/site/map.body.html docs/site/map.html no

@@ -9,6 +9,8 @@
 
 **해설 페이지:** https://jungrok5.github.io/ai-code-collaboration-best-practices/
 
+**구조 지도:** https://jungrok5.github.io/ai-code-collaboration-best-practices/map.html (규칙, 훅, 워크플로, 플러그인·스킬 관리를 드래그와 확대로 보는 페이지)
+
 처음 보는 경우 해설 페이지부터 읽으십시오. 이슈 하나가 머지되기까지의 예시, 강제 장치와 막혔을 때의 대안, 워크플로 전체
 표, 역할별 시작 방법을 담고 있습니다. 이 README는 레포를 쓰는 데 필요한 요약과 명령만 둡니다.
 

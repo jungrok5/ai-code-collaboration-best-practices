@@ -1,0 +1,856 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<style>
+/* Design system "Clear" (ai-design) — tokens. Light: 선명한 블루. Dark: 그래파이트.
+   Use only these variables in product CSS; the style check warns on raw colors and font stacks elsewhere.
+   Spec and component rules: DESIGN.md. Colors adapted from the Tailwind CSS palette (MIT). */
+:root {
+  /* color: surfaces */
+  --bg: #ffffff;
+  --surface: #f8fafc;
+  --sunk: #f1f5f9;
+  --line: #e2e8f0;
+  --line-strong: #cbd5e1;
+  /* color: text */
+  --fg: #0f172a;
+  --muted: #475569;
+  --subtle: #64748b;
+  /* color: the one accent (actions, links, current state, human gates) */
+  --accent: #1d4ed8;
+  --accent-hover: #1e40af;
+  --accent-fg: #ffffff;
+  --accent-soft: #eff6ff;
+  /* color: status (meaning only, never decoration) */
+  --ok: #067647;      --ok-soft: #ecfdf3;
+  --warn: #b54708;    --warn-soft: #fffaeb;
+  --danger: #b42318;  --danger-soft: #fef3f2;
+  /* color: code and terminals */
+  --code-bg: #0f172a;
+  --code-fg: #e2e8f0;
+  --code-muted: #94a3b8;
+  --code-line: #334155;
+  --code-ok: #86efac;
+  --code-warn: #fcd34d;
+  --code-danger: #fca5a5;
+  --focus: #1d4ed8;
+
+  /* type */
+  --font-sans: "Noto Sans KR", -apple-system, BlinkMacSystemFont, "Apple SD Gothic Neo", "Malgun Gothic", system-ui, sans-serif;
+  --font-mono: "IBM Plex Mono", ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  --text-xs: 12px; --text-s: 14px; --text-m: 16px; --text-l: 18px;
+  --text-h3: 18px; --text-h2: 24px; --text-h1: clamp(30px, 4.4vw, 44px);
+  --leading: 1.7; --leading-tight: 1.3;
+
+  /* space, shape */
+  --space-1: 4px; --space-2: 8px; --space-3: 12px; --space-4: 16px;
+  --space-5: 24px; --space-6: 32px; --space-7: 48px; --space-8: 64px;
+  --radius-s: 6px; --radius-m: 8px; --radius-l: 10px;
+  --border: 1px solid var(--line);
+  --measure: 72ch;
+  --page: 1120px;
+  --motion: 180ms ease-out;
+  color-scheme: light;
+}
+
+/* Dark follows the OS unless the page sets data-theme. Keep both blocks identical. */
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #1e2124; --surface: #25292c; --sunk: #191b1e; --line: #33373b; --line-strong: #454b51;
+    --fg: #e4e6e8; --muted: #b4b9be; --subtle: #9ba1a6;
+    --accent: #7cb7e8; --accent-hover: #a9d0f0; --accent-fg: #10151a; --accent-soft: #233240;
+    --ok: #47cd89; --ok-soft: #16322a; --warn: #fdb022; --warn-soft: #3a2c12; --danger: #f97066; --danger-soft: #3b1f1d;
+    --code-bg: #111315; --code-fg: #e4e6e8; --code-muted: #8a9096; --code-line: #33373b;
+    --code-ok: #86e0b0; --code-warn: #f5c45e; --code-danger: #f6a19a; --focus: #7cb7e8;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #1e2124; --surface: #25292c; --sunk: #191b1e; --line: #33373b; --line-strong: #454b51;
+  --fg: #e4e6e8; --muted: #b4b9be; --subtle: #9ba1a6;
+  --accent: #7cb7e8; --accent-hover: #a9d0f0; --accent-fg: #10151a; --accent-soft: #233240;
+  --ok: #47cd89; --ok-soft: #16322a; --warn: #fdb022; --warn-soft: #3a2c12; --danger: #f97066; --danger-soft: #3b1f1d;
+  --code-bg: #111315; --code-fg: #e4e6e8; --code-muted: #8a9096; --code-line: #33373b;
+    --code-ok: #86e0b0; --code-warn: #f5c45e; --code-danger: #f6a19a; --focus: #7cb7e8;
+  color-scheme: dark;
+}
+/* Design system "Clear" (ai-design) — base and components. Needs tokens.css first.
+   Every value comes from a token. Class names start with ds- so they can sit next to product CSS. */
+*, *::before, *::after { box-sizing: border-box; }
+body {
+  margin: 0; background: var(--bg); color: var(--fg);
+  font-family: var(--font-sans); font-size: var(--text-m); line-height: var(--leading);
+  word-break: keep-all; overflow-wrap: break-word;
+}
+h1, h2, h3, h4 { margin: 0; line-height: var(--leading-tight); font-weight: 700; text-wrap: balance; }
+h1 { font-size: var(--text-h1); letter-spacing: -0.02em; }
+h2 { font-size: var(--text-h2); letter-spacing: -0.01em; }
+h3 { font-size: var(--text-h3); }
+p { margin: 0; }
+a { color: var(--accent); text-underline-offset: 3px; }
+a:hover { color: var(--accent-hover); }
+:focus-visible { outline: 2px solid var(--focus); outline-offset: 2px; }
+code, kbd, pre { font-family: var(--font-mono); }
+:not(pre) > code {
+  font-size: 0.88em; background: var(--sunk); border: var(--border); border-radius: 4px;
+  padding: 0 4px; overflow-wrap: anywhere; word-break: normal;
+}
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation: none !important; transition: none !important; scroll-behavior: auto !important; }
+}
+
+/* layout */
+.ds-page { max-width: var(--page); margin: 0 auto; padding: var(--space-6) var(--space-4) var(--space-8); }
+@media (min-width: 720px) { .ds-page { padding-inline: var(--space-5); } }
+.ds-stack { display: grid; gap: var(--space-4); }
+.ds-lede { font-size: var(--text-l); color: var(--muted); max-width: var(--measure); }
+.ds-eyebrow { font-size: var(--text-s); font-weight: 700; color: var(--accent); }
+.ds-muted { color: var(--muted); }
+
+/* top bar */
+.ds-topbar {
+  display: flex; align-items: center; gap: var(--space-5); min-height: 60px;
+  padding: 0 var(--space-4); border-bottom: var(--border); background: var(--bg);
+}
+.ds-topbar a { color: var(--muted); text-decoration: none; font-size: var(--text-s); }
+.ds-topbar a[aria-current="page"] { color: var(--fg); font-weight: 700; }
+
+/* buttons: one primary per view */
+.ds-btn {
+  display: inline-flex; align-items: center; justify-content: center; gap: var(--space-2);
+  min-height: 44px; padding: 0 var(--space-4); border-radius: var(--radius-m);
+  font: 700 var(--text-s) / 1 var(--font-sans); cursor: pointer; text-decoration: none;
+  background: var(--bg); color: var(--fg); border: 1px solid var(--line-strong);
+  transition: background-color var(--motion), border-color var(--motion);
+}
+.ds-btn:hover { border-color: var(--subtle); }
+.ds-btn--primary { background: var(--accent); color: var(--accent-fg); border-color: var(--accent); }
+.ds-btn--primary:hover { background: var(--accent-hover); border-color: var(--accent-hover); color: var(--accent-fg); }
+
+/* copyable command: an action the reader runs */
+.ds-cmd {
+  display: flex; align-items: center; gap: var(--space-2); min-width: 0;
+  background: var(--code-bg); color: var(--code-fg); border-radius: var(--radius-l);
+  padding: var(--space-2) var(--space-2) var(--space-2) var(--space-4);
+}
+.ds-cmd code, .ds-cmd pre {
+  flex: 1; min-width: 0; margin: 0; background: none; border: 0; padding: 0; color: inherit;
+  font-size: var(--text-s); line-height: 1.7; white-space: pre; overflow-x: auto;
+}
+.ds-cmd .ds-c { color: var(--code-muted); }
+/* The copy button stays quiet so a page with several commands keeps one primary action. */
+.ds-cmd button {
+  align-self: flex-start; flex: none; min-height: 36px; padding: 0 var(--space-3); border-radius: var(--radius-s);
+  border: 1px solid var(--code-line); background: transparent; color: var(--code-fg);
+  font: 500 13px / 1 var(--font-sans); cursor: pointer;
+}
+.ds-cmd button:hover { border-color: var(--code-muted); }
+.ds-cmd button:focus-visible { outline-color: var(--code-fg); }
+@media (max-width: 600px) { .ds-cmd code, .ds-cmd pre { white-space: pre-wrap; overflow-wrap: anywhere; } }
+
+/* real output: what a command printed, pasted from an actual run; not copyable, lines marked by meaning */
+.ds-output {
+  margin: 0; background: var(--code-bg); color: var(--code-fg); border-radius: var(--radius-l);
+  padding: var(--space-4); font: var(--text-s) / 1.7 var(--font-mono); white-space: pre-wrap; overflow-wrap: anywhere;
+}
+.ds-output .ds-prompt { color: var(--code-muted); }
+.ds-output .ds-err { color: var(--code-danger); }
+.ds-output .ds-warn { color: var(--code-warn); }
+.ds-output .ds-ok { color: var(--code-ok); }
+
+/* numbered steps: a sequence; .is-human marks a person's decision */
+.ds-steps { list-style: none; margin: 0; padding: 0; counter-reset: ds-step; }
+.ds-steps > li {
+  display: grid; grid-template-columns: 28px minmax(0, 1fr) auto; gap: var(--space-3); align-items: start;
+  padding: var(--space-3) 0; border-bottom: var(--border);
+}
+.ds-steps > li:last-child { border-bottom: 0; }
+.ds-steps > li::before {
+  counter-increment: ds-step; content: counter(ds-step);
+  width: 28px; height: 28px; border-radius: 50%; display: grid; place-items: center;
+  background: var(--sunk); color: var(--fg); font: 700 13px / 1 var(--font-sans);
+}
+.ds-steps > li.is-human::before { background: var(--accent); color: var(--accent-fg); }
+.ds-steps .ds-who { font-size: 13px; font-weight: 700; color: var(--accent); white-space: nowrap; padding-top: 3px; }
+.ds-steps h3, .ds-steps h4 { font-size: var(--text-m); }
+.ds-steps p { font-size: 15px; color: var(--muted); margin-top: 2px; }
+
+/* table: comparisons and lists of facts */
+.ds-table-wrap { overflow-x: auto; }
+.ds-table { width: 100%; border-collapse: collapse; font-size: 15px; font-variant-numeric: tabular-nums; }
+.ds-table th, .ds-table td { text-align: left; vertical-align: top; padding: 10px 16px 10px 0; border-bottom: var(--border); }
+.ds-table thead th { font-size: 13px; font-weight: 500; color: var(--subtle); border-bottom-color: var(--line-strong); }
+.ds-table tbody tr:last-child > * { border-bottom: 0; }
+
+/* panel: groups related content; border only, no shadow, no side stripe */
+.ds-panel { background: var(--bg); border: var(--border); border-radius: var(--radius-l); padding: var(--space-5); min-width: 0; }
+.ds-panel--sunk { background: var(--surface); }
+
+/* note: a short remark that must not be missed */
+.ds-note { display: grid; gap: var(--space-1); background: var(--accent-soft); border-radius: var(--radius-m); padding: var(--space-3) var(--space-4); font-size: 15px; }
+.ds-note--warn { background: var(--warn-soft); }
+.ds-note--danger { background: var(--danger-soft); }
+
+/* badge: state, owner, kind */
+.ds-badge {
+  display: inline-flex; align-items: center; min-height: 22px; padding: 0 var(--space-2); border-radius: 4px;
+  font-size: var(--text-xs); font-weight: 700; background: var(--sunk); color: var(--muted); white-space: nowrap;
+}
+.ds-badge--accent { background: var(--accent-soft); color: var(--accent); }
+.ds-badge--ok { background: var(--ok-soft); color: var(--ok); }
+.ds-badge--warn { background: var(--warn-soft); color: var(--warn); }
+.ds-badge--danger { background: var(--danger-soft); color: var(--danger); }
+
+/* diagram frame (Mermaid or element-built diagrams) */
+.ds-figure { margin: 0; border: var(--border); border-radius: var(--radius-l); padding: var(--space-4); overflow-x: auto; background: var(--bg); }
+.ds-figure figcaption { font-size: 13px; color: var(--subtle); margin-top: var(--space-2); }
+
+/* Long, secondary content (a full output, a prompt, the hand-made examples) folded behind its one-line summary. */
+.ds-details { border-top: var(--border); border-bottom: var(--border); }
+.ds-details > summary { cursor: pointer; padding: var(--space-3) 0; min-height: 44px; display: flex; align-items: center;
+  gap: var(--space-2); color: var(--fg); font-weight: 500; list-style: none; }
+.ds-details > summary::-webkit-details-marker { display: none; }
+.ds-details > summary::before { content: ""; width: 7px; height: 7px; border-right: 1.5px solid var(--muted);
+  border-bottom: 1.5px solid var(--muted); transform: rotate(-45deg); transition: transform 150ms ease-out; flex: none; }
+.ds-details[open] > summary::before { transform: rotate(45deg); }
+.ds-details > summary:focus-visible { outline: 2px solid var(--focus); outline-offset: 2px; }
+.ds-details > :not(summary) { margin-bottom: var(--space-4); }
+@media (prefers-reduced-motion: reduce) { .ds-details > summary::before { transition: none; } }
+</style>
+<script>
+// Design system "Clear" (ai-design): light/dark switch. Load in <head> so the saved theme applies before first paint.
+// Without a saved choice the page follows the OS (tokens.css). A .theme-toggle button flips it and the choice is
+// remembered per browser. Fires a "themechange" event on document so diagrams can redraw.
+(() => {
+  const root = document.documentElement, KEY = "clear-theme";
+  const dark = () => root.dataset.theme ? root.dataset.theme === "dark" : matchMedia("(prefers-color-scheme: dark)").matches;
+  try { const saved = localStorage.getItem(KEY); if (saved) root.dataset.theme = saved; } catch {}
+  const sync = () => document.querySelectorAll(".theme-toggle").forEach((b) => {
+    b.setAttribute("aria-pressed", String(dark()));
+    b.textContent = dark() ? "라이트 모드" : "다크 모드";
+  });
+  window.clearTheme = { isDark: dark };
+  document.addEventListener("DOMContentLoaded", sync);
+  document.addEventListener("click", (e) => {
+    if (!e.target.closest(".theme-toggle")) return;
+    root.dataset.theme = dark() ? "light" : "dark";
+    try { localStorage.setItem(KEY, root.dataset.theme); } catch {}
+    sync();
+    document.dispatchEvent(new Event("themechange"));
+  });
+})();
+</script>
+<title>AI 협업 레포 지도</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=Noto+Sans+KR:wght@400;500;700&display=swap">
+<style>
+/* Repo map (docs/site/map.html). Layout: one pannable, zoomable world of labelled zones; toolbar on top, minimap and detail panel float above it.
+   Built with the team design system "Clear" like the guide page. */
+/* Clear tokens come from the pinned ai-design (scripts/build-site.sh); only the canvas parts are defined here. */
+:root { --grid: var(--sunk); --edge: var(--subtle); }
+[hidden] { display: none !important; }
+html, body { height: 100%; }
+body { background: var(--bg); color: var(--fg); font-family: var(--font-sans); font-size: 14px; line-height: 1.6;
+  overflow: hidden; word-break: keep-all; }
+.app { height: 100%; display: grid; grid-template-rows: auto minmax(0, 1fr); }
+
+/* toolbar */
+.bar { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 16px; padding: 10px 16px;
+  border-bottom: 1px solid var(--line); background: var(--bg); position: relative; z-index: 5; }
+.bar h1 { font-size: 16px; font-weight: 700; margin: 0; white-space: nowrap; }
+.bar .meta { color: var(--subtle); font-size: 12px; font-family: var(--font-mono); white-space: nowrap; }
+.tools { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; margin-left: auto; }
+.btn { font: 500 13px var(--font-sans); color: var(--fg); background: var(--bg); border: 1px solid var(--line-strong);
+  border-radius: 6px; min-height: 34px; padding: 0 10px; cursor: pointer; }
+.btn:hover { background: var(--surface); }
+.btn[aria-pressed="true"] { background: var(--sunk); }
+.btn:focus-visible, .chip:focus-visible, .node:focus-visible, #q:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.search { position: relative; }
+#q { font: 13px var(--font-sans); color: var(--fg); background: var(--surface); border: 1px solid var(--line-strong);
+  border-radius: 6px; min-height: 34px; padding: 0 10px; width: 200px; }
+.results { position: absolute; top: 40px; right: 0; width: 280px; max-height: 320px; overflow: auto; background: var(--bg);
+  border: 1px solid var(--line-strong); border-radius: 8px; padding: 4px; }
+.results button { display: block; width: 100%; text-align: left; border: 0; background: none; color: var(--fg);
+  font: 13px var(--font-sans); padding: 6px 8px; border-radius: 6px; cursor: pointer; }
+.results button:hover, .results button[aria-selected="true"] { background: var(--accent-soft); }
+.results small { color: var(--subtle); font-family: var(--font-mono); font-size: 11px; display: block; }
+.zones { display: flex; flex-wrap: wrap; gap: 6px; width: 100%; }
+.chip { font: 12px var(--font-sans); color: var(--muted); background: var(--surface); border: 1px solid var(--line);
+  border-radius: 999px; padding: 3px 10px; cursor: pointer; }
+.chip:hover { color: var(--fg); border-color: var(--line-strong); }
+
+/* canvas */
+.view { position: relative; overflow: hidden; touch-action: none; cursor: grab;
+  background-color: var(--bg);
+  background-image: radial-gradient(var(--grid) 1.2px, transparent 1.2px); background-size: 24px 24px; }
+.view.dragging { cursor: grabbing; }
+.world { position: absolute; left: 0; top: 0; transform-origin: 0 0; will-change: transform; }
+.world.animate { transition: transform 420ms cubic-bezier(.2, .7, .2, 1); }
+svg.edges { position: absolute; left: 0; top: 0; overflow: visible; pointer-events: none; }
+.edge { fill: none; stroke: var(--edge); stroke-width: 1.6; }
+.edge.dash { stroke-dasharray: 6 5; }
+.edge-label { font: 12px var(--font-sans); fill: var(--muted); paint-order: stroke; stroke: var(--bg); stroke-width: 5px; }
+.edge.hot { stroke: var(--accent); stroke-width: 2.6; }
+.edge-label.hot { fill: var(--accent); font-weight: 700; }
+.arrowhead { fill: var(--edge); }
+
+.zone { position: absolute; background: var(--surface); border: 1px solid var(--line); border-radius: 14px; padding: 22px 22px 24px; }
+.zone > header { display: grid; gap: 2px; margin-bottom: 16px; }
+.zone h2 { font-size: 22px; line-height: 1.3; margin: 0; letter-spacing: -.01em; }
+.zone .sub { color: var(--muted); font-size: 14px; margin: 0; max-width: 80ch; }
+.zone .kicker { font: 500 12px var(--font-mono); color: var(--subtle); letter-spacing: .04em; }
+.group + .group { margin-top: 18px; }
+.group h3 { font-size: 13px; font-weight: 700; color: var(--muted); margin: 0 0 8px; letter-spacing: .02em; }
+.grid { display: grid; gap: 10px; }
+.node { display: grid; gap: 4px; align-content: start; background: var(--bg); border: 1px solid var(--line);
+  border-radius: 10px; padding: 10px 12px; cursor: pointer; text-align: left; min-width: 0;
+  font: inherit; color: inherit; }
+.node:hover { border-color: var(--line-strong); }
+.node strong { font-size: 14px; line-height: 1.35; }
+.node code { font: 12px var(--font-mono); color: var(--subtle); overflow-wrap: anywhere; }
+.node p { margin: 0; color: var(--muted); font-size: 13px; line-height: 1.55; }
+.node .tags { display: flex; gap: 4px; flex-wrap: wrap; }
+.tag { font: 500 11px var(--font-sans); border-radius: 999px; padding: 1px 8px; border: 1px solid transparent; }
+.tag.human { color: var(--accent); background: var(--accent-soft); }
+.tag.new { color: var(--ok); background: var(--ok-soft); }
+.tag.ext { color: var(--warn); background: var(--warn-soft); }
+.node.sel { border-color: var(--accent); box-shadow: 0 0 0 2px var(--accent); }
+.world.focusing .node:not(.sel):not(.near) { opacity: .35; }
+.world.focusing .zone { }
+.step-n { font: 500 12px var(--font-mono); color: var(--subtle); }
+
+/* level of detail: far = titles only */
+.world[data-lod="far"] .node p, .world[data-lod="far"] .node code, .world[data-lod="far"] .edge-label,
+.world[data-lod="far"] .zone .sub, .world[data-lod="far"] .zone .kicker { visibility: hidden; }
+.zone { --inv: 1; }
+.world[data-lod="far"] .zone h2 { position: absolute; left: 22px; top: 14px; transform: scale(var(--inv)); transform-origin: 0 0;
+  white-space: nowrap; background: var(--surface); padding-right: 8px; z-index: 1; }
+
+/* floating parts */
+.mini { position: absolute; right: 16px; bottom: 16px; width: 200px; background: var(--bg); border: 1px solid var(--line-strong);
+  border-radius: 8px; padding: 6px; z-index: 3; }
+.mini .map { position: relative; width: 100%; cursor: pointer; }
+.mini .mz { position: absolute; background: var(--sunk); border: 1px solid var(--line-strong); border-radius: 2px; }
+.mini .vp { position: absolute; border: 2px solid var(--accent); border-radius: 2px; pointer-events: none; }
+.zoomlvl { position: absolute; left: 16px; bottom: 16px; z-index: 3; font: 12px var(--font-mono); color: var(--subtle);
+  background: var(--bg); border: 1px solid var(--line); border-radius: 6px; padding: 4px 8px; }
+.hint { position: absolute; left: 16px; top: 12px; z-index: 3; font-size: 12px; color: var(--subtle);
+  background: var(--bg); border: 1px solid var(--line); border-radius: 6px; padding: 4px 8px; }
+.panel { position: absolute; top: 12px; right: 16px; width: 340px; max-height: calc(100% - 24px); overflow: auto; z-index: 4;
+  background: var(--bg); border: 1px solid var(--line-strong); border-radius: 12px; padding: 16px 18px;
+  display: grid; gap: 10px; }
+.panel h2 { margin: 0; font-size: 18px; line-height: 1.35; padding-right: 28px; }
+.panel .zone-name { font: 500 12px var(--font-mono); color: var(--subtle); }
+.panel p { margin: 0; color: var(--muted); }
+.panel code { font: 12px var(--font-mono); background: var(--sunk); padding: 2px 6px; border-radius: 4px; overflow-wrap: anywhere; }
+.panel ul { margin: 0; padding-left: 18px; display: grid; gap: 4px; }
+.panel li button { font: inherit; color: var(--accent); background: none; border: 0; padding: 0; cursor: pointer; text-align: left; }
+.panel .x { position: absolute; top: 10px; right: 10px; width: 32px; height: 32px; border: 0; background: none;
+  color: var(--subtle); font-size: 20px; cursor: pointer; border-radius: 6px; }
+.panel .x:hover { background: var(--surface); color: var(--fg); }
+.panel a { color: var(--accent); }
+.legend { display: flex; flex-wrap: wrap; gap: 6px 12px; font-size: 12px; color: var(--subtle); align-items: center; }
+
+@media (max-width: 720px) {
+  #q { width: 140px; }
+  .bar .meta { display: none; }
+  .mini { width: 120px; }
+  .zones { flex-wrap: nowrap; overflow-x: auto; padding-bottom: 2px; }
+  .chip { white-space: nowrap; }
+  .hint { display: none; }
+  .panel { left: 16px; right: 16px; width: auto; top: auto; bottom: 16px; max-height: 55%; }
+  .results { right: auto; left: 0; width: min(280px, calc(100vw - 32px)); }
+}
+@media (prefers-reduced-motion: reduce) { .world.animate { transition: none; } }
+</style>
+</head>
+<body>
+
+<div class="app">
+  <div class="bar">
+    <h1>AI 협업 레포 지도</h1>
+    <span class="meta">v0.2.0 기준 · 2026-10-11</span>
+    <div class="tools">
+      <div class="search">
+        <input id="q" type="search" placeholder="파일·스킬·워크플로 찾기" autocomplete="off" aria-label="지도에서 찾기" aria-controls="results">
+        <div class="results" id="results" role="listbox" hidden></div>
+      </div>
+      <button class="btn" id="zin" type="button" aria-label="확대">+</button>
+      <button class="btn" id="zout" type="button" aria-label="축소">−</button>
+      <button class="btn" id="fit" type="button">전체 보기</button>
+      <button class="btn theme-toggle" type="button" aria-pressed="false">다크 모드</button>
+      <a class="btn" href="./" style="display:inline-flex;align-items:center;text-decoration:none">해설 페이지</a>
+    </div>
+    <nav class="zones" id="zones" aria-label="영역으로 이동"></nav>
+  </div>
+  <div class="view" id="view" tabindex="0" aria-label="레포 구조 캔버스. 드래그로 이동, 휠이나 두 손가락으로 확대">
+    <div class="world" id="world">
+      <svg class="edges" id="edges" aria-hidden="true">
+        <defs><marker id="arr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+          <path class="arrowhead" d="M0 0 L10 5 L0 10 z"/></marker>
+          <marker id="arrhot" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+          <path d="M0 0 L10 5 L0 10 z" style="fill: var(--accent)"/></marker></defs>
+      </svg>
+    </div>
+    <div class="hint" id="hint">드래그로 이동 · 휠이나 두 손가락으로 확대 · 카드를 누르면 상세</div>
+    <div class="zoomlvl" id="zoomlvl">100%</div>
+    <div class="mini" aria-hidden="true"><div class="map" id="map"></div></div>
+    <aside class="panel" id="panel" hidden aria-live="polite">
+      <button class="x" id="close" type="button" aria-label="상세 닫기">×</button>
+      <div class="zone-name" id="pzone"></div>
+      <h2 id="ptitle"></h2>
+      <div id="ppath"></div>
+      <p id="pdesc"></p>
+      <div id="plinks"></div>
+      <div class="legend"><span class="tag human">사람</span> 사람이 판단하는 지점 <span class="tag new">이번 추가</span> 스킬·플러그인 관리에 새로 넣은 것 <span class="tag ext">다른 레포</span></div>
+    </aside>
+  </div>
+</div>
+
+<script>
+const REPO = "https://github.com/jungrok5/ai-code-collaboration-best-practices/blob/main/";
+const AID = "https://github.com/jungrok5/ai-design/blob/main/";
+
+// Zones in rows; heights come from content. n(id, title, path, desc, tags)
+const n = (id, t, p, d, tags = []) => ({ id, t, p, d, tags });
+const ZONES = [
+  { row: 0, x: 0, w: 4200, id: "flow", kicker: "흐름", title: "이슈 하나가 머지되기까지",
+    sub: "라벨이 상태를 나타냅니다: ai:ready → ai:in-progress → ai:review 또는 ai:needs-human → ai:done. 사람은 두 지점에서 판단합니다.",
+    groups: [{ cols: 7, nodes: [
+      n("f1", "1 이슈 등록", ".github/ISSUE_TEMPLATE/", "AI 작업·버그·기능 양식. AI 작업 양식은 목표, 완료 조건, 건드리면 안 되는 곳을 받습니다."),
+      n("f2", "2 AI 분류", ".github/workflows/claude-issue-triage.yml", "type·area·priority·size 라벨을 제안하고 빠진 정보를 댓글 한 번으로 묻습니다. 이슈를 닫지 않습니다."),
+      n("f3", "3 ai:ready 부여", ".github/labels.yml", "이 이슈를 AI에게 맡길지 사람이 결정합니다.", ["human"]),
+      n("f4", "4 AI 구현", ".github/workflows/claude-implement-issue.yml", "브랜치 생성, 테스트 먼저, make check 통과 커밋. 내 자리에서는 make ai-implement ISSUE=n."),
+      n("f5", "5 초안 PR", ".github/pull_request_template.md", "ai:generated 라벨, AI 사용 공개 체크박스. CI와 AI 리뷰가 돌지만 AI 리뷰는 참고용입니다."),
+      n("f6", "6 CODEOWNER 승인", ".github/CODEOWNERS", "받아들일지 사람이 결정합니다. 에이전트는 승인하거나 머지하지 않습니다.", ["human"]),
+      n("f7", "7 squash 머지", "docs/adr/0002-squash-merge-conventional-commits-attribution.md", "Conventional Commit 제목이 squash 커밋이 되고, 연결 이슈는 ai:done, 변경은 릴리스 노트로 갑니다."),
+    ] }] },
+
+  { row: 1, x: 0, w: 1040, id: "rules", kicker: "1층", title: "규칙: 모든 도구가 읽는 것",
+    sub: "AGENTS.md 하나가 원본이고 도구별 파일은 그 파일을 가리키기만 합니다. 강제력은 없고, 강제는 2·3층이 맡습니다.",
+    groups: [
+      { title: "단일 원본", cols: 1, nodes: [
+        n("agents", "AGENTS.md", "AGENTS.md", "약 60줄. 명령표, 작업 크기별 절차, 사람 소유 파일, 라벨, 언어 규칙. 에이전트가 틀릴 것만 적고 나머지는 docs/로 보냅니다."),
+      ] },
+      { title: "도구별 진입점", cols: 3, nodes: [
+        n("claudemd", "CLAUDE.md", "CLAUDE.md", "@AGENTS.md 한 줄과 Claude Code 전용 메모(설정 파일, 플러그인, worktree)."),
+        n("copilot", "Copilot", ".github/copilot-instructions.md", "Copilot 진입점. Copilot 에이전트 정의는 .github/agents/(reviewer, test-specialist)."),
+        n("cursor", "Cursor", ".cursor/rules/00-team-rules.mdc", "Cursor 규칙 4개와 BUGBOT.md."),
+        n("gemini", "Gemini", "GEMINI.md", "Gemini CLI와 Gemini Code Assist(.gemini/styleguide.md)."),
+        n("zed", "Zed · Aider", ".rules", ".rules(Zed), .aider.conf.yml(Aider)."),
+        n("review", "REVIEW.md", "REVIEW.md", "AI 리뷰어가 따르는 리뷰 기준."),
+      ] },
+      { title: "경로별 규칙(해당 파일을 다룰 때만 적용)", cols: 2, nodes: [
+        n("rules-claude", ".claude/rules/", ".claude/rules/", "ai-config, github-workflows, tests, writing-and-ui."),
+        n("rules-gh", ".github/instructions/", ".github/instructions/", "Copilot용 같은 4개 규칙."),
+      ] },
+    ] },
+
+  { row: 1, x: 1100, w: 1320, id: "pc", kicker: "2층", title: "개발자 PC에서 막기",
+    sub: "AI가 규칙을 잊어도 사고가 나지 않게 Claude Code 훅과 pre-commit이 막습니다. 막히면 우회하지 않고 사람에게 알립니다.",
+    groups: [
+      { title: "Claude Code 설정", cols: 3, nodes: [
+        n("settings", ".claude/settings.json", ".claude/settings.json", "사람 소유. 허용 명령 목록, 팀 마켓플레이스 등록(extraKnownMarketplaces), 켜는 플러그인(enabledPlugins). 개인 설정은 settings.local.json.", ["human"]),
+        n("sessionstart", "세션 시작 훅", ".claude/hooks/session-start.sh", "활성 설계와 영역별 담당자를 세션 첫 화면에 보여 줍니다."),
+        n("repo-skills", "레포 전용 스킬", ".claude/skills/", "new-repo, new-skill, validate-ai-config. 이 레포를 관리할 때만 쓰는 스킬."),
+      ] },
+      { title: "team-ai-workflow 플러그인의 훅", cols: 3, nodes: [
+        n("protect", "보호 파일 차단", "plugins/team-ai-workflow/scripts/protect-files.sh", "PreToolUse. .env*, 키, CODEOWNERS, scripts/rulesets/, .claude/settings.json 수정을 막습니다."),
+        n("gitguard", "git 가드", "plugins/team-ai-workflow/scripts/git_guard.py", "PreToolUse(Bash). main 직접 커밋, 공유 브랜치 강제 푸시, 우회 시도를 막습니다."),
+        n("format", "수정 직후 포맷", "plugins/team-ai-workflow/scripts/format-after-edit.sh", "PostToolUse. 스택에 맞는 포매터를 실행합니다. 글·화면 검사는 ai-design 훅이 따로 합니다."),
+      ] },
+      { title: "사람의 커밋에도 같은 검사", cols: 2, nodes: [
+        n("precommit", "pre-commit", ".pre-commit-config.yaml", "공백·JSON·YAML, 비밀 탐지, main 커밋 금지, actionlint, shellcheck, yamllint, markdownlint, 글·화면 기준(ai-design), Conventional Commit."),
+        n("make", "Makefile", "Makefile", "setup, check(CI와 같은 검사), style, doctor, ai-validate, overlap, ai-*. 스택은 scripts/stack.sh가 판별."),
+      ] },
+    ] },
+
+  { row: 1, x: 2480, w: 1720, id: "server", kicker: "3층", title: "GitHub 서버에서 막기",
+    sub: "어떤 도구로 만든 코드든 지나는 마지막 관문입니다. 룰셋이 PR, CODEOWNER 승인, ci-ok, squash만을 요구합니다.",
+    groups: [
+      { title: "관문", cols: 4, nodes: [
+        n("rulesets", "룰셋", "scripts/rulesets/main.json", "main: PR 필수, CODEOWNER 승인, 필수 체크 ci-ok, squash만. feature 브랜치용과 Copilot 리뷰용 선택 룰셋도 있습니다. 사람 소유.", ["human"]),
+        n("codeowners", "CODEOWNERS", ".github/CODEOWNERS", "영역별 승인자. 사람 소유.", ["human"]),
+        n("prtemplate", "PR 양식", ".github/pull_request_template.md", "AI 사용 공개 체크박스, 설계 링크, 테스트 근거."),
+        n("labels", "라벨", ".github/labels.yml", "ai:* 상태, size/*, area/*, ai:assisted/ai:generated, no-design, breaking-change."),
+      ] },
+      { title: "검사 워크플로", cols: 4, nodes: [
+        n("w-ci", "ci.yml", ".github/workflows/ci.yml", "make setup-ci → lint → typecheck → test → build. 필수 체크 ci-ok."),
+        n("w-pr", "pr-checks.yml", ".github/workflows/pr-checks.yml", "PR 제목 형식, size·area 라벨, AI 공개 체크, 1인당 리뷰 대기 상한."),
+        n("w-validate", "validate-ai-config.yml", ".github/workflows/validate-ai-config.yml", "플러그인·설정 스키마·actionlint·shellcheck·yamllint·markdownlint + zizmor."),
+        n("w-approval", "agent-approval-check.yml", ".github/workflows/agent-approval-check.yml", "에이전트 커밋이 든 PR에 사람 승인 N명을 요구하는 상태 체크."),
+        n("w-contract", "contract-check.yml", ".github/workflows/contract-check.yml", "API·스키마 파일의 깨지는 변경 탐지. breaking-change 라벨이 없으면 실패."),
+        n("w-design", "design-check.yml", ".github/workflows/design-check.yml", "변경 파일을 작업 보드와 비교해 겹치면 알림. 큰 PR에 설계 링크가 없으면 알림."),
+        n("w-codeql", "codeql.yml", ".github/workflows/codeql.yml", "코드 스캐닝. 비밀 스캔과 Dependabot이 함께 돕니다."),
+      ] },
+      { title: "AI 작업 워크플로(AI_BACKEND가 있을 때만)", cols: 4, nodes: [
+        n("w-claude", "claude.yml", ".github/workflows/claude.yml", "@claude 멘션에 답하고 요청한 변경을 커밋."),
+        n("w-review", "claude-code-review.yml", ".github/workflows/claude-code-review.yml", "PR 인라인 코멘트와 요약. 승인하지 않습니다."),
+        n("w-triage", "claude-issue-triage.yml", ".github/workflows/claude-issue-triage.yml", "이슈 분류(흐름 2단계)."),
+        n("w-impl", "claude-implement-issue.yml", ".github/workflows/claude-implement-issue.yml", "ai:ready 이슈 구현(흐름 4단계)."),
+        n("w-cifix", "claude-ci-fix.yml", ".github/workflows/claude-ci-fix.yml", "CI 실패 원인을 고치는 PR 또는 진단 댓글."),
+        n("w-maint", "claude-maintenance.yml", ".github/workflows/claude-maintenance.yml", "주간 유지보수 리포트 이슈."),
+        n("w-local", "ai-local-runner.yml", ".github/workflows/ai-local-runner.yml", "AI_BACKEND=local일 때 self-hosted 러너에서 같은 작업."),
+      ] },
+      { title: "운영 워크플로", cols: 4, nodes: [
+        n("w-sync", "issue-state-sync.yml", ".github/workflows/issue-state-sync.yml", "에이전트 PR에 ai:generated, 머지되면 연결 이슈 ai:done."),
+        n("w-labels", "labels-sync.yml", ".github/workflows/labels-sync.yml", "labels.yml을 레포 라벨에 반영."),
+        n("w-stale", "stale.yml", ".github/workflows/stale.yml", "60일 무활동 이슈·PR 정리."),
+        n("w-depbot", "dependabot-auto-merge.yml", ".github/workflows/dependabot-auto-merge.yml", "Dependabot minor·patch 자동 승인과 자동 머지."),
+        n("w-copilot", "copilot-setup-steps.yml", ".github/workflows/copilot-setup-steps.yml", "Copilot 클라우드 에이전트 환경 준비."),
+        n("w-bootstrap", "bootstrap-repo.yml", ".github/workflows/bootstrap-repo.yml", "레포 설정, 라벨, 룰셋 적용(관리자 토큰)."),
+      ] },
+    ] },
+
+  { row: 2, x: 0, w: 2420, id: "skills", kicker: "배포 단위", title: "플러그인과 스킬 관리",
+    sub: "팀 마켓플레이스 하나로 훅·스킬·서브에이전트를 모든 레포에 배포합니다. 이 레포 안의 플러그인과 다른 레포에서 가져온 플러그인을 같은 기준으로 들이고 갱신합니다.",
+    groups: [
+      { title: "팀 마켓플레이스 ai-collab", cols: 4, nodes: [
+        n("market", "marketplace.json", ".claude-plugin/marketplace.json", "플러그인 3개의 목록과 출처. 다른 레포 플러그인은 커밋 SHA로 고정합니다. 각 레포의 .claude/settings.json이 이 마켓플레이스를 등록합니다."),
+        n("p-workflow", "team-ai-workflow 1.6.0", "plugins/team-ai-workflow/", "기본 설치. 위 훅 3개, 스킬 10개, 서브에이전트 5개, 평가 3개. ai-design에 의존합니다."),
+        n("p-community", "team-ai-community 0.1.0", "plugins/team-ai-community/", "선택 설치. 팀원이 올린 스킬을 리뷰어 1명 승인으로 받습니다."),
+        n("p-aidesign", "ai-design 1.3.0", "jungrok5/ai-design @ 377c170", "다른 레포(git-subdir). polish-writing·polish-ui 스킬, 디자인 시스템 Clear, 수정 직후 글·화면 검사 훅.", ["ext"]),
+      ] },
+      { title: "team-ai-workflow 안", cols: 4, nodes: [
+        n("s-flow", "작업 스킬", "plugins/team-ai-workflow/skills/", "design, check-overlap, implement-issue, create-pr, review-pr, fix-ci, split-pr, triage-issue, write-adr, onboard."),
+        n("s-agents", "서브에이전트", "plugins/team-ai-workflow/agents/", "code-reviewer, security-reviewer, test-writer, docs-writer, issue-triager."),
+        n("s-evals", "평가", "plugins/team-ai-workflow/evals/", "스킬을 써야 할 때 쓰는지, 쓰지 말아야 할 때 안 쓰는지. make ai-eval."),
+        n("s-consumers", "ai-design을 쓰는 곳", "scripts/ai-design.sh", "고정 커밋을 .cache/에 받아 make style, pre-commit, 해설 페이지 빌드가 같은 버전을 씁니다. 템플릿으로 만든 레포는 .ai-design-version."),
+      ] },
+      { title: "스킬 등급과 승격(docs/18)", cols: 4, nodes: [
+        n("t-personal", "개인", "~/.claude/skills/<이름>/", "본인만. SKILL.md 하나. 승인 없음."),
+        n("t-community", "커뮤니티", "plugins/team-ai-community/skills/", "선택 설치. 플러그인 검증 통과, 리뷰어 1명."),
+        n("t-team", "팀", "plugins/team-ai-workflow/skills/", "기본 설치. 평가 케이스 2개(사용·미사용), 버전 동기화, CODEOWNER 승인.", ["human"]),
+        n("t-standard", "팀 기준", "docs/17-writing-and-design-standards.md", "팀 플러그인 + 검사 규칙 + 훅으로 항상 적용. 리드 승인.", ["human"]),
+        n("t-new", "make new-skill", "scripts/new-skill.sh", "등급에 맞는 뼈대와 평가 케이스 생성. /new-skill 스킬이 같은 일을 합니다."),
+        n("t-checks", "자동 검사", "scripts/check-ai-config.sh", "name·description 형식, plugin.json과 marketplace.json 버전 일치, 평가 케이스 누락 경고."),
+      ] },
+      { title: "다른 레포의 플러그인 들이기와 갱신(이번 추가)", cols: 4, nodes: [
+        n("d-admit", "들이기", "docs/18-adding-skills.md", "marketplace.json에 git-subdir·github 출처와 40자 SHA. 라이선스와 훅·스크립트를 읽고 들입니다. 외부 원본은 조직 계정 fork를 고정합니다. SKILL.md 한 장이면 복사가 더 단순합니다.", ["new", "human"]),
+        n("d-workflow", "plugin-deps.yml", ".github/workflows/plugin-deps.yml", "매주 월요일과 수동 실행. 고정된 항목마다 새 커밋이 있으면 PR을 하나씩 엽니다. git·Python·gh만 써서 GitHub Enterprise Server에서도 돕니다.", ["new"]),
+        n("d-script", "deps-update.py", "scripts/deps-update.py", "상대 레포에 버전 태그가 있으면 가장 높은 태그, 없으면 기본 브랜치 최신 커밋. 플러그인 폴더 밖만 바뀌면 PR을 열지 않습니다. 상대 레포에 아무 설정도 요구하지 않습니다.", ["new"]),
+        n("d-pr", "갱신 PR", "chore(deps): bump plugin <이름>", "비교 링크, 바뀐 파일, plugin.json 버전. 훅·MCP·bin/·스크립트가 바뀌면 맨 위에 표시합니다.", ["new"]),
+        n("d-review", "검토 기준", "docs/18-adding-skills.md", "텍스트만 바뀌면 CI와 변경 기록 확인. 실행 코드가 바뀌면 diff를 사람이 읽은 뒤 CODEOWNER 승인. 우리 플러그인과 외부 플러그인에 같은 기준.", ["new", "human"]),
+        n("d-install", "팀원 설치", "docs/04-claude-code-setup.md", "다른 레포 플러그인은 설정만으로 내려받지 않아 팀원마다 한 번 claude plugin install <이름>@ai-collab --scope project. plugin.json 버전이 바뀌어야 기존 설치가 갱신됩니다.", ["new"]),
+        n("d-settings", "필요한 설정", "Settings → Actions → General", "Actions가 PR을 만들 수 있게 허용(Save). 선택: DEPS_TOKEN 시크릿이 있으면 갱신 PR에서도 CI가 돕니다.", ["new", "human"]),
+      ] },
+    ] },
+
+  { row: 2, x: 2480, w: 840, id: "backends", kicker: "5층", title: "AI가 실행되는 곳",
+    sub: "같은 작업을 세 곳 중 하나에서 실행합니다. 서버 쪽 AI 작업은 레포 변수 AI_BACKEND가 있을 때만 돕니다.",
+    groups: [{ cols: 1, nodes: [
+      n("b-seat", "내 자리(기본)", "scripts/ai/", "make ai-triage ISSUE=1, ai-review PR=2, ai-implement ISSUE=1. 내 claude 로그인을 쓰고 API 키가 필요 없습니다."),
+      n("b-local", "사내 로컬 LLM", "infra/local-llm/docker-compose.yml", "AI_BACKEND=local. self-hosted 러너에서 scripts/ai/dispatch.sh가 같은 작업을 합니다."),
+      n("b-anthropic", "Anthropic", ".github/workflows/claude.yml", "AI_BACKEND=anthropic. claude*.yml이 공식 액션으로 실행. 구독 토큰이나 API 키 시크릿."),
+    ] }] },
+
+  { row: 2, x: 3380, w: 820, id: "design", kicker: "4층", title: "설계 먼저와 작업 보드",
+    sub: "작업 크기에 따라 절차가 다릅니다. 같은 영역을 누가 이미 하고 있는지 먼저 확인합니다.",
+    groups: [{ cols: 1, nodes: [
+      n("g-size", "작업 크기 판단", "AGENTS.md", "한 문장 변경은 이슈 → 브랜치 → PR. 여러 파일이면 초안 PR 맨 위에 계획. 여러 모듈·공개 인터페이스·하루 이상이면 설계 문서."),
+      n("g-design", "/design", "docs/designs/", "한 장짜리 설계와 Mermaid 도식. 설계 PR의 머지가 승인입니다.", ["human"]),
+      n("g-overlap", "/check-overlap · make overlap", "scripts/designs/board.py", "영역(예: src/auth/**)을 이미 맡은 설계나 열린 PR이 있으면 알려 줍니다."),
+      n("g-board", "work-board.yml", ".github/workflows/work-board.yml", "30분마다 등록된 레포들의 활성 설계와 열린 PR을 board.json으로 모아 해설 페이지와 함께 배포."),
+    ] }] },
+
+  { row: 3, x: 0, w: 1180, id: "multi", kicker: "6층", title: "여러 레포로 배포",
+    sub: "새 레포는 템플릿에서 한 번 만들고, 이후 변경은 플러그인 갱신과 조직 설정으로 퍼뜨립니다.",
+    groups: [{ cols: 2, nodes: [
+      n("m-new", "make new-repo", "scripts/new-repo.sh", "템플릿으로 새 레포 생성. bootstrap.sh가 도구를 설치하고 .ai-design-version을 씁니다."),
+      n("m-setup", "make github-setup", "scripts/setup-github.sh", "레포 설정, 라벨, 룰셋 적용. 서버에서는 bootstrap-repo.yml."),
+      n("m-plugins", "플러그인 갱신", ".claude-plugin/marketplace.json", "훅·스킬 변경은 플러그인 버전을 올려 모든 레포에 전달."),
+      n("m-org", "조직 설정", "docs/07-multi-repo-strategy.md", "재사용 워크플로, 조직 룰셋 'Require workflows to pass', 관리형 설정."),
+      n("m-boardrepos", "보드에 넣을 레포", ".github/work-board-repos.txt", "작업 보드가 설계와 PR을 모을 레포 목록."),
+      n("m-doctor", "make doctor", "scripts/doctor.sh", "설정 상태를 확인하고 사람에게 남은 일을 알려 줍니다(--json)."),
+    ] }] },
+
+  { row: 3, x: 1240, w: 1180, id: "docs", kicker: "참고", title: "문서와 결정 기록",
+    sub: "AGENTS.md에 넣지 않은 내용은 모두 docs/에 있습니다. 글과 화면은 docs/17 기준을 따르고 make style이 검사합니다.",
+    groups: [{ cols: 3, nodes: [
+      n("doc-play", "01 플레이북", "docs/01-playbook.md", "하루 작업 흐름과 역할."),
+      n("doc-lean", "15 가벼운 하네스", "docs/15-lean-harness.md", "모델이 기본으로 하는 일은 적지 않는 원칙."),
+      n("doc-team", "16 팀 규모 운영", "docs/16-team-scale-ai.md", "리뷰 부하, 계약 먼저, 프로토타입 프로필."),
+      n("doc-17", "17 글과 화면 기준", "docs/17-writing-and-design-standards.md", "ai-design 기준을 팀에 적용하는 방법."),
+      n("doc-18", "18 스킬 추가", "docs/18-adding-skills.md", "등급, 승격, 다른 레포 플러그인 들이기와 갱신.", ["new"]),
+      n("doc-adr", "ADR 0001–0007", "docs/adr/", "AGENTS.md 단일 원본, squash 머지, AI 리뷰는 참고용, 마켓플레이스 배포, 보호 경로, 가벼운 하네스, 설계 먼저."),
+      n("doc-site", "해설 페이지", "docs/site/guide.body.html", "scripts/build-site.sh가 Clear로 빌드해 GitHub Pages에 배포."),
+      n("doc-img", "한 장 요약 이미지", "docs/images/architecture.html", "README의 구조도. scripts/render-diagram.mjs가 라이트·다크 PNG로 렌더링."),
+      n("doc-matrix", "11 도구 지원표", "docs/11-tool-support-matrix.md", "도구별로 읽는 파일과 지원 기능."),
+    ] }] },
+
+  { row: 3, x: 2480, w: 1720, id: "release", kicker: "릴리스", title: "버전과 릴리스",
+    sub: "커밋 제목(feat:, fix:, docs:)으로 다음 버전과 변경 기록을 만듭니다. 릴리스 PR의 머지가 태그를 만듭니다.",
+    groups: [{ cols: 4, nodes: [
+      n("r-please", "release-please.yml", ".github/workflows/release-please.yml", "main push와 수동 실행. 릴리스 PR을 열고, 머지되면 태그와 GitHub Release."),
+      n("r-pr", "릴리스 PR", "chore(main): release 0.2.0", "version.txt와 CHANGELOG.md 갱신. 사람이 머지를 결정합니다.", ["human"]),
+      n("r-tag", "v0.2.0", "CHANGELOG.md", "2026-10-11 첫 릴리스. 기능 10, 버그 수정 5, 문서 13건."),
+      n("r-commit", "커밋 규칙", ".gitmessage.txt", "Conventional Commit 제목, AI 기여 trailer(Co-Authored-By)로 AI 지원 작업을 측정."),
+    ] }] },
+];
+
+// Edges: [from, to, label, dashed]
+const EDGES = [
+  ["agents", "claudemd", "가리킴"], ["agents", "copilot", ""], ["agents", "cursor", ""],
+  ["settings", "market", "마켓플레이스 등록"], ["market", "p-workflow", ""], ["market", "p-aidesign", "SHA 고정"],
+  ["p-workflow", "protect", "훅 제공"], ["p-workflow", "p-aidesign", "dependencies"],
+  ["p-aidesign", "s-consumers", "같은 커밋 사용"], ["s-consumers", "precommit", "글·화면 검사"],
+  ["d-workflow", "d-script", "실행"], ["d-script", "d-pr", "PR 생성"], ["d-pr", "d-review", ""], ["d-review", "market", "머지하면 SHA 갱신", true],
+  ["d-admit", "market", "항목 추가"], ["t-new", "t-community", ""], ["t-community", "t-team", "승격"],
+  ["f2", "w-triage", "", true], ["f4", "w-impl", "", true], ["f6", "codeowners", "", true], ["f7", "r-please", "릴리스 노트", true],
+  ["rulesets", "w-ci", "ci-ok 요구"], ["w-design", "g-board", "board.json 비교"], ["g-overlap", "g-board", ""],
+  ["b-local", "w-local", "", true], ["b-anthropic", "w-claude", "", true], ["m-plugins", "market", ""],
+  ["r-please", "r-pr", ""], ["r-pr", "r-tag", "머지"], ["sessionstart", "g-board", "활성 설계 표시", true],
+];
+
+const $ = (s, el = document) => el.querySelector(s);
+const view = $("#view"), world = $("#world"), svg = $("#edges");
+const NODES = new Map(), ZONE_OF = new Map();
+
+function esc(s) { return String(s).replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" })[c]); }
+const TAG = { human: ["human", "사람"], new: ["new", "이번 추가"], ext: ["ext", "다른 레포"] };
+
+function render() {
+  for (const z of ZONES) {
+    const el = document.createElement("section");
+    el.className = "zone"; el.id = "z-" + z.id; el.style.left = z.x + "px"; el.style.width = z.w + "px";
+    el.innerHTML = `<header><span class="kicker">${esc(z.kicker)}</span><h2>${esc(z.title)}</h2><p class="sub">${esc(z.sub)}</p></header>` +
+      z.groups.map(g => `<div class="group">${g.title ? `<h3>${esc(g.title)}</h3>` : ""}<div class="grid" style="grid-template-columns:repeat(${g.cols},minmax(0,1fr))">` +
+        g.nodes.map(nd => {
+          NODES.set(nd.id, nd); ZONE_OF.set(nd.id, z);
+          const tags = nd.tags.map(t => `<span class="tag ${TAG[t][0]}">${TAG[t][1]}</span>`).join("");
+          return `<button class="node" type="button" id="n-${nd.id}" data-id="${nd.id}">${tags ? `<span class="tags">${tags}</span>` : ""}<strong>${esc(nd.t)}</strong><code>${esc(nd.p)}</code><p>${esc(nd.d)}</p></button>`;
+        }).join("") + `</div></div>`).join("");
+    world.appendChild(el);
+  }
+  // stack rows by measured height
+  const rows = [...new Set(ZONES.map(z => z.row))].sort();
+  let y = 0;
+  for (const r of rows) {
+    let h = 0;
+    for (const z of ZONES.filter(z => z.row === r)) { const el = $("#z-" + z.id); el.style.top = y + "px"; h = Math.max(h, el.offsetHeight); }
+    for (const z of ZONES.filter(z => z.row === r)) $("#z-" + z.id).style.minHeight = h + "px";
+    y += h + 90;
+  }
+  document.querySelectorAll(".zone").forEach(z => {  // title text width at scale 1, for far-zoom titles
+    const r = document.createRange(); r.selectNodeContents(z.querySelector("h2")); z.dataset.tw = r.getBoundingClientRect().width; });
+  WORLD.w = Math.max(...ZONES.map(z => z.x + z.w)); WORLD.h = y - 90;
+  world.style.width = WORLD.w + "px"; world.style.height = WORLD.h + "px";
+  svg.setAttribute("width", WORLD.w); svg.setAttribute("height", WORLD.h);
+  drawEdges(); drawMini();
+  $("#zones").innerHTML = ZONES.map(z => `<button class="chip" type="button" data-zone="${z.id}">${esc(z.title)}</button>`).join("");
+}
+const WORLD = { w: 0, h: 0 };
+
+function box(id) {
+  const el = $("#n-" + id); let x = 0, y = 0, e = el;
+  while (e && e !== world) { x += e.offsetLeft; y += e.offsetTop; e = e.offsetParent; }
+  return { x, y, w: el.offsetWidth, h: el.offsetHeight, cx: x + el.offsetWidth / 2, cy: y + el.offsetHeight / 2 };
+}
+function anchor(b, toward) {
+  const dx = toward.cx - b.cx, dy = toward.cy - b.cy;
+  if (Math.abs(dx) / (b.w / 2) > Math.abs(dy) / (b.h / 2)) return { x: dx > 0 ? b.x + b.w : b.x, y: b.cy, dir: [Math.sign(dx), 0] };
+  return { x: b.cx, y: dy > 0 ? b.y + b.h : b.y, dir: [0, Math.sign(dy)] };
+}
+function drawEdges() {
+  const ns = "http://www.w3.org/2000/svg";
+  svg.querySelectorAll("g.e").forEach(g => g.remove());
+  EDGES.forEach(([a, b, label, dashed], i) => {
+    const A = box(a), B = box(b), p = anchor(A, B), q = anchor(B, A);
+    const k = Math.max(40, Math.min(160, Math.hypot(q.x - p.x, q.y - p.y) / 3));
+    const d = `M${p.x},${p.y} C${p.x + p.dir[0] * k},${p.y + p.dir[1] * k} ${q.x + q.dir[0] * k},${q.y + q.dir[1] * k} ${q.x},${q.y}`;
+    const g = document.createElementNS(ns, "g"); g.setAttribute("class", "e"); g.dataset.a = a; g.dataset.b = b;
+    const path = document.createElementNS(ns, "path");
+    path.setAttribute("d", d); path.setAttribute("class", "edge" + (dashed ? " dash" : "")); path.setAttribute("marker-end", "url(#arr)");
+    g.appendChild(path);
+    if (label) {
+      const t = document.createElementNS(ns, "text"); t.setAttribute("class", "edge-label"); t.textContent = label;
+      const mx = (p.x + q.x) / 2 + (p.dir[0] + q.dir[0]) * k * .375, my = (p.y + q.y) / 2 + (p.dir[1] + q.dir[1]) * k * .375;
+      t.setAttribute("x", mx); t.setAttribute("y", my - 6); t.setAttribute("text-anchor", "middle");
+      g.appendChild(t);
+    }
+    svg.appendChild(g);
+  });
+}
+
+// pan / zoom
+const S = { x: 0, y: 0, s: 1 };
+const MIN = 0.12, MAX = 2.2;
+function apply(animate = false) {
+  world.classList.toggle("animate", animate);
+  world.style.transform = `translate(${S.x}px, ${S.y}px) scale(${S.s})`;
+  world.dataset.lod = S.s < 0.42 ? "far" : "near";
+  const inv = Math.min(4, Math.max(1, 0.9 / S.s));
+  document.querySelectorAll(".zone").forEach(z => {  // keep each far-zoom title inside its zone
+    const fit = (z.offsetWidth - 44) / Math.max(1, +z.dataset.tw);
+    z.style.setProperty("--inv", Math.min(inv, Math.max(1, fit)).toFixed(2)); });
+  $("#zoomlvl").textContent = Math.round(S.s * 100) + "%";
+  drawViewport();
+}
+function zoomAt(cx, cy, f, animate = false) {
+  const r = view.getBoundingClientRect(), px = cx - r.left, py = cy - r.top;
+  const s = Math.min(MAX, Math.max(MIN, S.s * f)); const k = s / S.s;
+  S.x = px - (px - S.x) * k; S.y = py - (py - S.y) * k; S.s = s; apply(animate);
+}
+function fitRect(x, y, w, h, pad = 40, animate = true, maxS = MAX) {
+  const r = view.getBoundingClientRect();
+  const s = Math.min(maxS, Math.max(MIN, Math.min((r.width - pad * 2) / w, (r.height - pad * 2) / h)));
+  S.s = s; S.x = (r.width - w * s) / 2 - x * s; S.y = (r.height - h * s) / 2 - y * s; apply(animate);
+}
+const fitAll = (animate = true) => fitRect(0, 0, WORLD.w, WORLD.h, 24, animate);
+function goZone(id) { const el = $("#z-" + id); fitRect(el.offsetLeft, el.offsetTop, el.offsetWidth, el.offsetHeight, 24, true, 1.1); }
+function goNode(id) {
+  const b = box(id), r = view.getBoundingClientRect(), s = Math.max(S.s, 0.95);
+  S.s = s; S.x = r.width / 2 - b.cx * s; S.y = r.height / 2 - b.cy * s; apply(true); select(id);
+}
+
+const pts = new Map(); let moved = 0, last = null, pinch = null;
+view.addEventListener("pointerdown", e => {
+  if (e.target.closest(".panel, .mini")) return;
+  view.setPointerCapture(e.pointerId); pts.set(e.pointerId, { x: e.clientX, y: e.clientY });
+  moved = 0; last = { x: e.clientX, y: e.clientY }; world.classList.remove("animate");
+  if (pts.size === 2) { const [a, b] = [...pts.values()]; pinch = { d: Math.hypot(a.x - b.x, a.y - b.y) }; }
+});
+view.addEventListener("pointermove", e => {
+  if (!pts.has(e.pointerId)) return;
+  pts.set(e.pointerId, { x: e.clientX, y: e.clientY });
+  if (pts.size === 2 && pinch) {
+    const [a, b] = [...pts.values()], d = Math.hypot(a.x - b.x, a.y - b.y);
+    zoomAt((a.x + b.x) / 2, (a.y + b.y) / 2, d / pinch.d); pinch.d = d; moved += 10; return;
+  }
+  const dx = e.clientX - last.x, dy = e.clientY - last.y; last = { x: e.clientX, y: e.clientY };
+  moved += Math.abs(dx) + Math.abs(dy);
+  if (moved > 4) { view.classList.add("dragging"); S.x += dx; S.y += dy; apply(); }
+});
+function up(e) {
+  const wasClick = moved <= 4 && pts.size === 1;
+  pts.delete(e.pointerId); if (pts.size < 2) pinch = null; if (!pts.size) view.classList.remove("dragging");
+  if (wasClick && e.type === "pointerup") {
+    const nodeEl = document.elementFromPoint(e.clientX, e.clientY)?.closest(".node");
+    if (nodeEl) select(nodeEl.dataset.id); else clearSel();
+  }
+  if (pts.size === 1) last = [...pts.values()][0];
+}
+view.addEventListener("pointerup", up); view.addEventListener("pointercancel", up);
+view.addEventListener("wheel", e => { e.preventDefault(); zoomAt(e.clientX, e.clientY, Math.exp(-e.deltaY * (e.ctrlKey ? 0.01 : 0.0016))); }, { passive: false });
+view.addEventListener("keydown", e => {
+  const step = 60;
+  if (e.key === "ArrowLeft") S.x += step; else if (e.key === "ArrowRight") S.x -= step;
+  else if (e.key === "ArrowUp") S.y += step; else if (e.key === "ArrowDown") S.y -= step;
+  else if (e.key === "+" || e.key === "=") { const r = view.getBoundingClientRect(); zoomAt(r.left + r.width / 2, r.top + r.height / 2, 1.25, true); return; }
+  else if (e.key === "-") { const r = view.getBoundingClientRect(); zoomAt(r.left + r.width / 2, r.top + r.height / 2, 0.8, true); return; }
+  else if (e.key === "0") { fitAll(); return; }
+  else if (e.key === "Escape") { clearSel(); return; }
+  else if (e.key === "Enter" && document.activeElement?.classList.contains("node")) { select(document.activeElement.dataset.id); return; }
+  else return;
+  e.preventDefault(); apply();
+});
+// keyboard users: Tab into a card selects nothing until Enter; focusing scrolls it into view of the canvas
+world.addEventListener("focusin", e => { const el = e.target.closest(".node"); if (el && !pts.size) goNodeSoft(el.dataset.id); });
+function goNodeSoft(id) { const b = box(id), r = view.getBoundingClientRect();
+  const sx = b.x * S.s + S.x, sy = b.y * S.s + S.y;
+  if (sx < 0 || sy < 0 || sx + b.w * S.s > r.width || sy + b.h * S.s > r.height) { S.x = r.width / 2 - b.cx * S.s; S.y = r.height / 2 - b.cy * S.s; apply(true); } }
+
+$("#zin").onclick = () => { const r = view.getBoundingClientRect(); zoomAt(r.left + r.width / 2, r.top + r.height / 2, 1.3, true); };
+$("#zout").onclick = () => { const r = view.getBoundingClientRect(); zoomAt(r.left + r.width / 2, r.top + r.height / 2, 1 / 1.3, true); };
+$("#fit").onclick = () => fitAll();
+$("#zones").addEventListener("click", e => { const c = e.target.closest(".chip"); if (c) goZone(c.dataset.zone); });
+
+// selection + detail panel
+function linksOf(id) { return EDGES.filter(([a, b]) => a === id || b === id); }
+function select(id) {
+  const nd = NODES.get(id); if (!nd) return;
+  document.querySelectorAll(".node.sel, .node.near").forEach(el => el.classList.remove("sel", "near"));
+  $("#n-" + id).classList.add("sel");
+  const rel = linksOf(id);
+  rel.forEach(([a, b]) => $("#n-" + (a === id ? b : a)).classList.add("near"));
+  world.classList.add("focusing");
+  svg.querySelectorAll("g.e").forEach(g => {
+    const hot = g.dataset.a === id || g.dataset.b === id;
+    g.querySelector("path").classList.toggle("hot", hot); g.querySelector("path").setAttribute("marker-end", hot ? "url(#arrhot)" : "url(#arr)");
+    g.querySelector("text")?.classList.toggle("hot", hot);
+  });
+  $("#pzone").textContent = ZONE_OF.get(id).title;
+  $("#ptitle").textContent = nd.t;
+  $("#ppath").innerHTML = `<code>${esc(nd.p)}</code>`;
+  $("#pdesc").textContent = nd.d;
+  const url = /^[.\w].*\/|^[.\w][\w.-]*\.\w+$/.test(nd.p) && !nd.p.includes(" ") && !nd.p.startsWith("~")
+    ? (nd.p.startsWith("jungrok5/ai-design") ? "https://github.com/jungrok5/ai-design" : REPO + nd.p.replace(/\/$/, "")) : null;
+  const related = rel.map(([a, b, label]) => { const o = a === id ? b : a; return `<li><button type="button" data-go="${o}">${esc(NODES.get(o).t)}</button>${label ? ` <span style="color:var(--subtle)">· ${esc(label)}</span>` : ""}</li>`; }).join("");
+  $("#plinks").innerHTML = (url ? `<p><a href="${url}" target="_blank" rel="noopener">GitHub에서 열기</a></p>` : "") +
+    (related ? `<div><strong style="font-size:13px">연결</strong><ul>${related}</ul></div>` : "");
+  $("#panel").hidden = false; $("#hint").hidden = true;
+}
+function clearSel() {
+  world.classList.remove("focusing");
+  document.querySelectorAll(".node.sel, .node.near").forEach(el => el.classList.remove("sel", "near"));
+  svg.querySelectorAll("path.hot").forEach(p => { p.classList.remove("hot"); p.setAttribute("marker-end", "url(#arr)"); });
+  svg.querySelectorAll("text.hot").forEach(t => t.classList.remove("hot"));
+  $("#panel").hidden = true;
+}
+$("#close").onclick = clearSel;
+$("#plinks").addEventListener("click", e => { const b = e.target.closest("[data-go]"); if (b) goNode(b.dataset.go); });
+
+// search
+const q = $("#q"), res = $("#results"); let hits = [], cur = 0;
+function showResults() {
+  const v = q.value.trim().toLowerCase();
+  if (!v) { res.hidden = true; return; }
+  hits = [...NODES.values()].filter(nd => (nd.t + " " + nd.p + " " + nd.d).toLowerCase().includes(v)).slice(0, 12); cur = 0;
+  res.innerHTML = hits.length ? hits.map((nd, i) => `<button type="button" role="option" aria-selected="${i === 0}" data-go="${nd.id}">${esc(nd.t)}<small>${esc(nd.p)}</small></button>`).join("")
+    : `<div style="padding:8px;color:var(--subtle);font-size:13px">찾은 항목이 없습니다</div>`;
+  res.hidden = false;
+}
+q.addEventListener("input", showResults);
+q.addEventListener("keydown", e => {
+  if (e.key === "ArrowDown" || e.key === "ArrowUp") { e.preventDefault(); if (!hits.length) return; cur = (cur + (e.key === "ArrowDown" ? 1 : hits.length - 1)) % hits.length;
+    res.querySelectorAll("button").forEach((b, i) => b.setAttribute("aria-selected", i === cur)); }
+  else if (e.key === "Enter" && hits[cur]) { goNode(hits[cur].id); res.hidden = true; }
+  else if (e.key === "Escape") { res.hidden = true; }
+});
+res.addEventListener("click", e => { const b = e.target.closest("[data-go]"); if (b) { goNode(b.dataset.go); res.hidden = true; } });
+document.addEventListener("pointerdown", e => { if (!e.target.closest(".search")) res.hidden = true; });
+
+// minimap
+const map = $("#map"); let mk = 1;
+function drawMini() {
+  mk = map.clientWidth / WORLD.w; map.style.height = WORLD.h * mk + "px";
+  map.innerHTML = ZONES.map(z => { const el = $("#z-" + z.id);
+    return `<div class="mz" style="left:${el.offsetLeft * mk}px;top:${el.offsetTop * mk}px;width:${el.offsetWidth * mk}px;height:${el.offsetHeight * mk}px"></div>`; }).join("") + `<div class="vp" id="vp"></div>`;
+}
+function drawViewport() {
+  const vp = $("#vp"); if (!vp) return; const r = view.getBoundingClientRect();
+  vp.style.left = (-S.x / S.s) * mk + "px"; vp.style.top = (-S.y / S.s) * mk + "px";
+  vp.style.width = (r.width / S.s) * mk + "px"; vp.style.height = (r.height / S.s) * mk + "px";
+}
+map.addEventListener("pointerdown", e => {
+  e.stopPropagation(); const r = map.getBoundingClientRect(), vr = view.getBoundingClientRect();
+  const wx = (e.clientX - r.left) / mk, wy = (e.clientY - r.top) / mk;
+  S.x = vr.width / 2 - wx * S.s; S.y = vr.height / 2 - wy * S.s; apply(true);
+});
+
+window.addEventListener("resize", () => { drawMini(); drawViewport(); });
+let started = false;
+function start() { if (started) return; started = true; render(); fitAll(false); }
+// lay out after the fonts load so card heights are final; start anyway if they never do
+if (document.fonts && document.fonts.ready) document.fonts.ready.then(start); else start();
+setTimeout(start, 2500);
+</script>
+<script>
+// Design system "Clear" (ai-design): copy button for .ds-cmd blocks. Include once per page.
+// Text inside .ds-c (comments) is left out, so a block can explain each line and still paste cleanly.
+document.addEventListener("click", async (e) => {
+  const btn = e.target.closest(".ds-cmd button");
+  if (!btn) return;
+  const code = btn.parentElement.querySelector("code, pre");
+  const copy = code.cloneNode(true);
+  copy.querySelectorAll(".ds-c").forEach((n) => n.remove());
+  const text = copy.textContent.split("\n").map((l) => l.trimEnd()).filter(Boolean).join("\n");
+  const label = btn.textContent;
+  try { await navigator.clipboard.writeText(text); btn.textContent = "복사됨"; } catch { btn.textContent = "복사 실패"; }
+  setTimeout(() => { btn.textContent = label; }, 1500);
+});
+</script>
+</body>
+</html>
