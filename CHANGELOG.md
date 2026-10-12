@@ -1,5 +1,18 @@
 # Changelog
 
+## [0.3.0](https://github.com/jungrok5/ai-code-collaboration-best-practices/compare/v0.2.0...v0.3.0) (2026-10-12)
+
+
+### Features
+
+* **docs:** add default visual explanations and replace landing page ([#5](https://github.com/jungrok5/ai-code-collaboration-best-practices/issues/5)) ([c13ed64](https://github.com/jungrok5/ai-code-collaboration-best-practices/commit/c13ed64772868a7f557f8ac5710ab69cf9f8b541))
+
+
+### Documentation
+
+* **site:** pan-and-zoom repository map next to the explainer page ([85738cb](https://github.com/jungrok5/ai-code-collaboration-best-practices/commit/85738cb5d8daf608d701b60cf82e9c5aa98c6c10))
+* **site:** polish the visual explainer with ai-design ([#7](https://github.com/jungrok5/ai-code-collaboration-best-practices/issues/7)) ([b05e08a](https://github.com/jungrok5/ai-code-collaboration-best-practices/commit/b05e08a098a2c17862eed6114ac49165ae947834))
+
 ## [0.2.0](https://github.com/jungrok5/ai-code-collaboration-best-practices/compare/v0.1.0...v0.2.0) (2026-10-11)
 
 
