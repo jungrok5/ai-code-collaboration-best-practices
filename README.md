@@ -24,7 +24,7 @@
 | 층 | 내용 |
 | --- | --- |
 | ① 규칙 | `AGENTS.md` 하나(약 60줄)가 사람과 모든 에이전트의 규칙. 도구별 파일(`CLAUDE.md`, `copilot-instructions.md`, `.cursor/rules/` 등)은 이 파일을 가리키기만 함 |
-| ② 로컬 가드레일 | Claude Code 플러그인 `team-ai-workflow`: 보호 경로 수정·main 커밋·강제 푸시 차단 훅, 수정 직후 포맷, 스킬 10개, 서브에이전트 5개. 글·화면 스킬 2개와 수정 직후 검사는 의존 플러그인 `ai-design`이 함께 설치됨. pre-commit과 `make check`가 같은 검사를 사람의 커밋에도 적용 |
+| ② 로컬 가드레일 | Claude Code 플러그인 `team-ai-workflow`: 보호 경로 수정·main 커밋·강제 푸시 차단 훅, 수정 직후 포맷, 스킬 11개, 서브에이전트 5개. 글·화면 스킬 2개와 수정 직후 검사는 의존 플러그인 `ai-design`이 함께 설치됨. pre-commit과 `make check`가 같은 검사를 사람의 커밋에도 적용 |
 | ③ GitHub 거버넌스 | 이슈 양식 3종, PR 템플릿(AI 사용 공개 필수), CODEOWNERS, 라벨, 룰셋(PR·사람 승인·`ci-ok`·squash만), CodeQL·비밀 스캔·Dependabot |
 | ④ 자동화 | 워크플로 22개. 분류, `ai:ready` 이슈 구현, 초안 PR, AI 리뷰(참고용), CI 실패 수정, 설계 겹침 알림, 계약 변경 검사, 릴리스 |
 | ⑤ AI 실행 주체 | 내 자리(`make ai-*`, 키 없음)가 기본. 서버 자동화는 사내 로컬 LLM 또는 Anthropic 중 선택(`AI_BACKEND`) |
@@ -37,6 +37,8 @@
 - **팀 규모 운영:** 리뷰 대기 상한, 계약 우선, 반복되는 리뷰 지적의 규칙화, 스킬 평가, 프로토타입·운영 프로필을 둡니다([docs/16](docs/16-team-scale-ai.md)).
 - **글과 화면 기준:** 합니다체 문서 기준, 내용 형식 규칙, 디자인 시스템 "Clear"를 정했습니다. 수정 직후 훅, pre-commit, CI가 같은 규칙으로 검사합니다. 스킬과 규칙의 원본은 다른 프로젝트에서도 쓸 수 있도록 [jungrok5/ai-design](https://github.com/jungrok5/ai-design)에 두고, 이 레포는 고정한 커밋을 씁니다([docs/17](docs/17-writing-and-design-standards.md)).
 - **스킬 추가:** 개인, 커뮤니티, 팀 세 등급으로 추가합니다. 선택 설치용 `team-ai-community` 플러그인도 들어 있습니다([docs/18](docs/18-adding-skills.md)).
+
+설명 페이지와 기술 개념 시각화는 기본 팀 스킬 `explain-visually`를 사용합니다. 원문을 읽고 작업 흐름·검사 지점·사람의 판단을 그림과 단계별 설명으로 구성합니다. 설치된 팀 플러그인은 `claude plugin update team-ai-workflow@ai-collab`로 갱신합니다.
 
 ## 빠른 시작
 
@@ -117,7 +119,7 @@ Claude 훅은 Claude Code에서만 동작합니다. 다른 도구로 만든 변�
 │   └── skills/                     # 레포 전용 스킬: /new-repo, /new-skill, /validate-ai-config
 ├── .claude-plugin/marketplace.json # 이 레포 = 팀 마켓플레이스 "ai-collab" (ai-design은 고정 커밋으로 등록)
 ├── plugins/
-│   ├── team-ai-workflow/           # 팀 플러그인: hooks/, skills/(10), agents/(5), evals/. 의존 플러그인 ai-design
+│   ├── team-ai-workflow/           # 팀 플러그인: hooks/, skills/(11), agents/(5), evals/. 의존 플러그인 ai-design
 │   └── team-ai-community/          # 선택 설치 스킬
 ├── .github/
 │   ├── ISSUE_TEMPLATE/ · pull_request_template.md

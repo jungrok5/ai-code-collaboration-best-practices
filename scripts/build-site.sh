@@ -1,9 +1,9 @@
 #!/usr/bin/env bash
 # Build the GitHub Pages pages from their body files and the team design system "Clear" (tokens.css + components.css
 # + theme.js + copy.js, inlined so each page is one file):
-#   docs/site/guide.body.html → docs/site/index.html   (explainer, with Mermaid diagrams)
+#   docs/site/guide.body.html → docs/site/guide.html   (explainer, with Mermaid diagrams)
 #   docs/site/map.body.html   → docs/site/map.html     (pan-and-zoom map of the whole repository)
-# The same build is published as the claude.ai Artifact.
+# docs/site/index.html is the source-grounded visual explainer; keep it intact.
 set -euo pipefail
 cd "$(git rev-parse --show-toplevel 2>/dev/null || pwd)" || exit 1
 design="$(scripts/ai-design.sh)/plugins/ai-design/skills/polish-ui/design"
@@ -54,5 +54,5 @@ JS
 echo "wrote $out"
 }
 
-page docs/site/guide.body.html docs/site/index.html yes
+page docs/site/guide.body.html docs/site/guide.html yes
 page docs/site/map.body.html docs/site/map.html no

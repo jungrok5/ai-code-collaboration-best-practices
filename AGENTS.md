@@ -48,6 +48,7 @@ PRs: Conventional Commit title (it becomes the squash commit), the template's AI
 - Keep the AI attribution trailer (`Co-Authored-By: ...`) on commits; we use it to measure AI-assisted work.
 - Text people read and UI people use follow `docs/17-writing-and-design-standards.md` (skills `polish-writing`,
   `polish-ui`; `make style` checks the mechanical part after every edit and in CI). Never add facts while polishing.
+- Repository and technical explanations use `explain-visually` (`plugins/team-ai-workflow/skills/explain-visually/SKILL.md`): source-grounded diagrams, one concrete workflow, interactive steps and usable mobile zoom controls.
 - Talk to people in their language (Korean in this team); code, commits and PR text are in English.
 
 ## Labels that drive automation
