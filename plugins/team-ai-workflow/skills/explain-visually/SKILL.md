@@ -13,5 +13,5 @@ description: Create a Korean visual explainer for a repository, technical concep
 - `assets/viewer.html`, `assets/viewer.js`, `assets/diagram-runtime.js`를 설명 페이지의 출발점으로 사용합니다. 실제 내용으로 `data/manifest.json`을 작성합니다. 전체 AI 채팅 앱을 설치하거나 API 키를 요구할 필요는 없습니다.
 - 제목은 결과를, 그림은 관계를, 짧은 설명은 조건과 예외를 맡습니다. 노드 선택·이전/다음·확대/축소·전체보기·원문 링크·원본 저장을 제공합니다. 꾸밈과 반복 설명을 줄이고 팀의 `polish-writing`·`polish-ui` 기준을 따릅니다.
 - 전체보기는 그림 너비를 화면 안에 맞추고 스크롤 위치를 초기화합니다. 모바일 최소 너비가 확대·축소를 막지 않도록 공통 런타임을 사용합니다.
-- 의미가 있는 경우에만 AntV Infographic을 보조로 사용합니다. 이미지 생성과 인포그래픽 렌더링을 혼동하지 않습니다. 외부 수치나 효과를 새로 만들지 않습니다.
+- 설명 도구는 Next AI Draw.io로 통일합니다. 원문에 없는 수치나 효과를 새로 만들지 않습니다.
 - SVG가 실제 SVG 요소로 삽입되는지, 모든 그림과 노드 선택·단계 이동·확대/축소·전체보기가 동작하는지 확인합니다. 브라우저나 실기기 확인을 못 했다면 그 범위를 명시합니다. 결과 페이지와 원문 링크를 전달합니다.
