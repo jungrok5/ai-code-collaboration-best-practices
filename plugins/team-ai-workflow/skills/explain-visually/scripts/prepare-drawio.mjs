@@ -1,0 +1,11 @@
+import {readFile,writeFile} from 'node:fs/promises';
+import {resolve} from 'node:path';
+import {pathToFileURL} from 'node:url';
+const [input,output,modules='node_modules']=process.argv.slice(2);
+if(!input||!output)throw Error('Usage: prepare-drawio.mjs INPUT.xml OUTPUT.drawio [NODE_MODULES]');
+const dir=resolve(modules,'@next-ai-drawio/mcp-server/dist');
+const {installDomPolyfill}=await import(pathToFileURL(resolve(dir,'dom.js')));installDomPolyfill();
+const {prepareNewDiagram}=await import(pathToFileURL(resolve(dir,'new-diagram.js')));
+const result=prepareNewDiagram(await readFile(input,'utf8'));
+if(!result.ok)throw Error(result.error);
+await writeFile(output,result.xml);console.log(`Validated with Next AI Draw.io: ${output}`);

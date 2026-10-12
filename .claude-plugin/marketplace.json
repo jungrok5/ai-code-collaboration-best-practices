@@ -11,8 +11,8 @@
     {
       "name": "team-ai-workflow",
       "source": "./plugins/team-ai-workflow",
-      "description": "Guard-rail hooks (protected paths, no commits on main, no force-push to shared branches, auto-format), skills (design, check-overlap, implement-issue, create-pr, review-pr, fix-ci, split-pr, triage-issue, write-adr, onboard) and review subagents. Pulls in ai-design for the writing and UI standard.",
-      "version": "1.6.0",
+      "description": "Guard-rail hooks (protected paths, no commits on main, no force-push to shared branches, auto-format), skills (design, check-overlap, implement-issue, create-pr, review-pr, fix-ci, split-pr, triage-issue, write-adr, onboard, explain-visually) and review subagents. Pulls in ai-design for the writing and UI standard.",
+      "version": "1.7.0",
       "category": "development",
       "tags": [
         "workflow",

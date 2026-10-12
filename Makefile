@@ -2,7 +2,7 @@
 SHELL := /bin/bash
 .DEFAULT_GOAL := help
 
-.PHONY: new-skill style ai-eval designs overlap help setup setup-ci lint typecheck test build check ai-validate labels github-setup new-repo hooks ai-check ai-triage ai-review ai-implement ai-fix-ci ai-respond ai-maintenance ai-queue ai-local-check
+.PHONY: visual-check new-skill style ai-eval designs overlap help setup setup-ci lint typecheck test build check ai-validate labels github-setup new-repo hooks ai-check ai-triage ai-review ai-implement ai-fix-ci ai-respond ai-maintenance ai-queue ai-local-check
 
 help: ## Show this help
 	@grep -E '^[a-zA-Z_-]+:.*?## ' $(MAKEFILE_LIST) | awk 'BEGIN {FS = ":.*?## "}; {printf "  \033[36m%-14s\033[0m %s\n", $$1, $$2}'
@@ -91,3 +91,6 @@ designs: ## Rebuild docs/designs/INDEX.md and board.json from design front matte
 
 overlap: ## Who else is working here? make overlap AREAS="src/auth/** api:/login"  (or DIFF=origin/main)
 	@if [ -n "$(DIFF)" ]; then python3 scripts/designs/board.py overlap --diff "$(DIFF)"; else python3 scripts/designs/board.py overlap $(AREAS); fi
+
+visual-check: ## Check the visual page DOM (npm install --prefix .cache/visual-tests jsdom@30.1.2 first)
+	@node scripts/check-visual-page.mjs $(or $(VISUAL_TEST_MODULES),.cache/visual-tests/node_modules)

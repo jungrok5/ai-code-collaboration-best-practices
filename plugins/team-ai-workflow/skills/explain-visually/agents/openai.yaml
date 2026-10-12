@@ -1,0 +1,4 @@
+interface:
+  display_name: "시각적으로 설명하기"
+  short_description: "레포와 기술 개념을 단계별 그림과 원문 근거로 쉽게 설명합니다."
+  default_prompt: "$explain-visually로 이 저장소를 한 작업의 흐름과 검사 지점부터 한국어로 설명하는 페이지를 만드세요."
