@@ -28,7 +28,8 @@ build: ## Build (auto-detects stack)
 check: lint style typecheck test ## Full fast check — run before every commit
 
 style: ## Writing + UI style check from jungrok5/ai-design (pinned; docs/17). FILES="a.md b.tsx" to limit
-	@scripts/ai-design.sh style $(or $(FILES),$$(git ls-files '*.md' '*.mdx' '*.html' '*.css' '*.scss' '*.tsx' '*.jsx' '*.vue' '*.svelte' '*.astro' | grep -v '^docs/site/index.html$$' | grep -v '/evals/'))
+	@scripts/ai-design.sh style $(or $(FILES),$$(git ls-files '*.md' '*.mdx' '*.html' '*.css' '*.scss' '*.tsx' '*.jsx' '*.vue' '*.svelte' '*.astro' | grep -v '/evals/'))
+	@python3 scripts/check-visual-writing.py
 
 doctor: ## What is set up and what is left (tools, auth, plugin, GitHub settings). SCOPE=local|github JSON=1 FIX=1
 	@scripts/doctor.sh --scope $(or $(SCOPE),all) $(if $(JSON),--json) $(if $(FIX),--fix-safe)
