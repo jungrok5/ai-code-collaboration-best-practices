@@ -27,7 +27,7 @@
         "source": "git-subdir",
         "url": "jungrok5/ai-design",
         "path": "plugins/ai-design",
-        "sha": "377c17004c5b24c424da250423e3c94199a17a87"
+        "sha": "2652125cfcfdbe44eb60d7ef4edb6d4f6b1ef724"
       },
       "description": "Writing and UI standard from jungrok5/ai-design: polish-writing and polish-ui skills, the design system \"Clear\", and a style check after every edit. Pinned to a reviewed commit; required by team-ai-workflow.",
       "category": "productivity",
