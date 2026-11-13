@@ -47,7 +47,7 @@ flowchart LR
     BH["훅: 알림 주입·깨우기"]
     PX["대리 응답기 (선택)<br/>claude -p 읽기 전용"]
   end
-  R["agent-relay (사내)<br/>MCP 도구 · Task 저장소 · 웹 UI"]
+  R["agent-relay (사내 클라우드)<br/>사내 로그인 · MCP 도구 · Task 저장소 · 웹 UI"]
   BJ["board.json<br/>(담당 영역)"]
   T["Teams 워크플로 웹훅"]
   AA -- "MCP: peer_send" --> R
@@ -79,12 +79,19 @@ stateDiagram-v2
 
 ## 3. 설계
 
+### 전제
+
+- 사내 정책상 허용된 환경에만 배포하고 연결합니다. 릴레이는 사내 클라우드에 두고 팀이 운영합니다.
+- 접근 제어는 사내 로그인(SSO)이 담당합니다. 로그인을 통과한 사람은 레포 열람과 같은 기준으로 모든 Task를 읽고 씁니다. 이 설계는 Task 단위의 열람 제한을 두지 않습니다.
+- 보존 기간은 사내 정책을 따릅니다.
+- 메시지는 팀 전원이 읽는다는 전제로 작성합니다. `ask-peer` 스킬은 전송 전에 이 점을 확인합니다.
+
 ### 구성 요소
 
 | 구성 요소 | 위치 | 역할 |
 | --- | --- | --- |
-| agent-relay | 사내 서버 1대 | Task 저장(SQLite로 시작), MCP 도구 제공, 사람용 웹 UI, Teams 알림. A2A 타입은 고정 버전의 공식 SDK(`a2a-sdk`)에서 가져옴 |
-| MCP 연결 | 각자 `.mcp.json` 또는 사용자 설정 | Streamable HTTP, 개인 토큰 |
+| agent-relay | 사내 클라우드, 팀 운영 | Task 저장(SQLite로 시작), MCP 도구 제공, 사람용 웹 UI, Teams 알림. A2A 타입은 고정 버전의 공식 SDK(`a2a-sdk`)에서 가져옴 |
+| MCP 연결 | 각자 `.mcp.json` 또는 사용자 설정 | Streamable HTTP. 웹 UI에서 사내 로그인 후 발급한 개인 토큰을 MCP와 훅이 함께 사용. 만료와 폐기는 사내 정책 기준 |
 | 스킬 `ask-peer` | `team-ai-workflow` 플러그인 | 받는 사람 선택(`peer_list`), 맥락(레포·브랜치·파일·이슈) 첨부, `kind` 결정, 전송 전 비밀 값 검사 |
 | 스킬 `handle-peer-request` | 같은 플러그인 | 받은 Task 분류와 응답. `question`은 읽기 전용 조사 후 답변, `request`는 이슈나 초안 PR로 전환 후 `input-required`로 동료 승인 대기 |
 | 훅 | 같은 플러그인 `hooks.json` | "실행 중인 세션에 전달" 참고 |
@@ -124,7 +131,7 @@ Channels 없이 Claude Code 문서에 있는 훅만 씁니다.
 - `question`은 읽기 전용 도구로만 답합니다.
 - `request`는 바로 실행하지 않습니다. 이슈나 초안 PR(`ai:generated`)로 바꾸고 동료가 승인합니다.
 - 전송 전 비밀 값 패턴을 검사하고 일치하면 전송을 차단합니다. 파일은 기본적으로 내용 대신 `repo@sha:path` 참조로 보냅니다.
-- 모든 Task는 릴레이에 남고 웹 UI에서 당사자가 열람합니다. 보존 기간과 열람 범위는 7절에서 결정합니다.
+- 모든 Task는 릴레이에 남고, 사내 로그인을 통과한 사람은 웹 UI에서 열람합니다.
 
 ## 3-1. 계약(Contract) 변화
 
@@ -191,7 +198,7 @@ Channels 없이 Claude Code 문서에 있는 훅만 씁니다.
 | --- | --- | --- |
 | 1 | `contracts/peer-message/v1`: JSON Schema, 예시, CI 검증(`make ai-validate`) | @jungrok5 |
 | 2 | asyncRewake PoC: `peer-wait.sh`로 유휴 세션 깨우기와 재대기 확인(목업 서버) | @jungrok5 |
-| 3 | agent-relay MVP: MCP 도구 6개, SQLite, 개인 토큰, Teams 웹훅 | `[담당 필요]` |
+| 3 | agent-relay MVP: MCP 도구 6개, SQLite, 사내 로그인과 개인 토큰 발급, Teams 웹훅, 사내 클라우드 배포 | `[담당 필요]` |
 | 4 | 스킬 `ask-peer`, `handle-peer-request`와 eval 케이스 | `[담당 필요]` |
 | 5 | 훅 4종을 `hooks.json`에 추가. 릴레이 미설정 시 아무 동작 안 함 | `[담당 필요]` |
 | 6 | 대리 응답기(opt-in)와 `make doctor` 릴레이 설정 점검 | `[담당 필요]` |
@@ -207,11 +214,8 @@ Channels 없이 Claude Code 문서에 있는 훅만 씁니다.
 
 ## 7. 열린 질문
 
-- 릴레이 위치와 운영 주체: 이 레포, 별도 레포, 사내 인프라팀 중 어디인지
-- 인증: 개인 토큰으로 시작할지, 처음부터 Entra ID SSO를 쓸지
-- 보존 기간과 열람 범위: 당사자만인지 팀 전체인지. 감시로 느껴지지 않을 기준
+- 릴레이 코드를 둘 레포: 이 레포 하위 디렉터리 또는 별도 레포(서비스 코드이므로 별도 레포 제안)
 - 커밋하지 않은 코드 조각의 전송 허용 범위(줄 수, 동의 방식)
 - 대리 응답기를 기본으로 끌지 켤지
 - `asyncRewake`로 깨운 뒤 재대기하는 방식(작업 2에서 확인)
-- 사내 정책상 Claude Code에 사내 MCP 서버 연결이 허용되는지(관리형 설정 허용 목록)
 - Teams 알림을 팀 채널에 올릴지 개인에게 보낼지
