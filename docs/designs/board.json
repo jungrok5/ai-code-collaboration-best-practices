@@ -1,5 +1,5 @@
 {
- "generated": "2026-10-09",
+ "generated": "2026-11-13",
  "designs": [
   {
    "id": "0001-design-first-and-work-board",
@@ -19,6 +19,28 @@
    "issues": [],
    "updated": "2026-10-08",
    "file": "docs/designs/0001-design-first-and-work-board.md",
+   "repo": "ai-code-collaboration-best-practices"
+  },
+  {
+   "id": "0002-peer-agent-messaging",
+   "title": "Peer agent messaging between teammates' Claude Code sessions (A2A-shaped)",
+   "status": "draft",
+   "owner": "@jungrok5",
+   "repos": [
+    "jungrok5/ai-code-collaboration-best-practices"
+   ],
+   "areas": [
+    "contracts/peer-message/**",
+    "plugins/team-ai-workflow/hooks/hooks.json",
+    "plugins/team-ai-workflow/scripts/peer-*",
+    "plugins/team-ai-workflow/skills/ask-peer/**",
+    "plugins/team-ai-workflow/skills/handle-peer-request/**",
+    "contract:peer-message",
+    "infra:agent-relay"
+   ],
+   "issues": [],
+   "updated": "2026-11-13",
+   "file": "docs/designs/0002-peer-agent-messaging.md",
    "repo": "ai-code-collaboration-best-practices"
   }
  ]
