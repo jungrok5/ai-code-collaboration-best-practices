@@ -1,0 +1,6 @@
+{
+  "hooks": {
+    "SessionStart": [{"hooks": [{"type": "command", "command": "/path/to/peer-wait.sh", "asyncRewake": true, "timeout": 3600}]}],
+    "Stop": [{"hooks": [{"type": "command", "command": "/path/to/peer-wait.sh", "asyncRewake": true, "timeout": 3600}]}]
+  }
+}
