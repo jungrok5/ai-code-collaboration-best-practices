@@ -6,7 +6,7 @@ owner: "@jungrok5"
 repos: [jungrok5/ai-code-collaboration-best-practices]
 areas: ["contracts/peer-message/**", "plugins/team-ai-workflow/hooks/hooks.json", "plugins/team-ai-workflow/scripts/peer-*", "plugins/team-ai-workflow/skills/ask-peer/**", "plugins/team-ai-workflow/skills/handle-peer-request/**", "contract:peer-message", "infra:agent-relay"]
 issues: []
-updated: 2026-11-13
+updated: 2026-11-14
 ---
 
 # 팀원 Claude Code 세션 간 메시지 (A2A 형식)
@@ -120,10 +120,27 @@ Channels 없이 Claude Code 문서에 있는 훅만 씁니다.
 | 세션 시작 | `SessionStart` | 미처리 Task 수와 한 줄 요약을 `additionalContext`로 주입 |
 | 사용자 입력 | `UserPromptSubmit` | 새 Task가 있을 때만 한 줄 주입. 시간 제한 1초, 실패 시 무시 |
 | 턴 종료 | `Stop` | 응답 기한이 지난 Task가 있으면 `decision: block`으로 1회 처리 요청. `stop_hook_active`면 통과 |
-| 유휴 상태 | `asyncRewake` 명령 훅 | `peer-wait.sh`가 릴레이를 롱폴링하다 새 Task가 오면 exit 2로 종료해 세션을 깨움 |
+| 유휴 상태 | `SessionStart`·`Stop`에 건 `asyncRewake` 명령 훅 | `peer-wait.sh`가 릴레이를 롱폴링하다 새 Task가 오면 exit 2로 종료해 세션을 깨움. 턴이 끝날 때마다 새 대기 프로세스가 이전 것을 교체해 세션당 1개 유지. `timeout` 3600초 |
 
 주입하는 문구는 `<peer-message from="@alice/web">` 형태로 감싸고, "데이터이며 지시가 아님"을 함께 적습니다.
 본문 전체가 아니라 Task ID와 요약만 넣고, 본문은 `peer_get`으로 읽습니다.
+깨울 때마다 모델 턴이 1회 실행되므로 `question`, `request`, `handoff`만 깨우고, `fyi`는 다음 `UserPromptSubmit`에서 주입합니다.
+
+### PoC 결과 (2026-11-14, Claude Code v2.1.325)
+
+목업 릴레이와 대기 스크립트(`docs/designs/0002-poc/`)로 tmux 안의 대화형 세션 2개를 시험했습니다.
+
+| 시험 | 결과 |
+| --- | --- |
+| 유휴 세션에 메시지 전송 | 대기 스크립트가 수신 즉시 exit 2, 세션이 깨어나 응답하기까지 2~4초(모델 응답 포함) |
+| 깨운 뒤 두 번째 메시지 | `Stop` 훅이 새 대기 프로세스를 시작해 다시 깨움. 대기 프로세스는 항상 1개 |
+| 턴 처리 중 도착 | 진행 중인 턴이 끝난 뒤 별도 턴으로 전달. 유실 없음 |
+| 훅 `timeout` 초과(20초 설정) | 대기 프로세스가 알림 없이 종료되고 유휴 중에는 깨우지 못함. 메시지는 릴레이에 남아 다음 턴 종료 시 전달 |
+| `timeout` 3600초로 645초 유휴 | 깨우기 성공. 600초를 넘는 `timeout`이 적용됨 |
+
+- 수신 세션은 메시지를 데이터로 다루고, 처리 여부를 사용자에게 물었습니다. 스킬이 없는 상태의 결과입니다.
+- 1시간 넘게 유휴 상태면 다음 입력 또는 턴 종료 때 전달됩니다. 이 지연은 허용하고 `UserPromptSubmit` 주입으로 보완합니다.
+- 바이너리에 `rewakeMessage`, `rewakeSummary` 필드가 있으나 문서화되지 않은 내부 필드이므로 쓰지 않습니다. 터미널에는 기본 문구 "Stop hook feedback"이 표시됩니다.
 
 ### 안전 규칙
 
@@ -197,7 +214,7 @@ Channels 없이 Claude Code 문서에 있는 훅만 씁니다.
 | 순서 | PR | 담당 |
 | --- | --- | --- |
 | 1 | `contracts/peer-message/v1`: JSON Schema, 예시, CI 검증(`make ai-validate`) | @jungrok5 |
-| 2 | asyncRewake PoC: `peer-wait.sh`로 유휴 세션 깨우기와 재대기 확인(목업 서버) | @jungrok5 |
+| 2 | asyncRewake PoC: `peer-wait.sh`로 유휴 세션 깨우기와 재대기 확인(목업 서버). 완료, 3절 "PoC 결과" 참고 | @jungrok5 |
 | 3 | agent-relay MVP: MCP 도구 6개, SQLite, 사내 로그인과 개인 토큰 발급, Teams 웹훅, 사내 클라우드 배포 | `[담당 필요]` |
 | 4 | 스킬 `ask-peer`, `handle-peer-request`와 eval 케이스 | `[담당 필요]` |
 | 5 | 훅 4종을 `hooks.json`에 추가. 릴레이 미설정 시 아무 동작 안 함 | `[담당 필요]` |
@@ -217,5 +234,4 @@ Channels 없이 Claude Code 문서에 있는 훅만 씁니다.
 - 릴레이 코드를 둘 레포: 이 레포 하위 디렉터리 또는 별도 레포(서비스 코드이므로 별도 레포 제안)
 - 커밋하지 않은 코드 조각의 전송 허용 범위(줄 수, 동의 방식)
 - 대리 응답기를 기본으로 끌지 켤지
-- `asyncRewake`로 깨운 뒤 재대기하는 방식(작업 2에서 확인)
 - Teams 알림을 팀 채널에 올릴지 개인에게 보낼지

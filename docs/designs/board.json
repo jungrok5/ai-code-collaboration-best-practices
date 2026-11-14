@@ -1,5 +1,5 @@
 {
- "generated": "2026-11-13",
+ "generated": "2026-11-14",
  "designs": [
   {
    "id": "0001-design-first-and-work-board",
@@ -39,7 +39,7 @@
     "infra:agent-relay"
    ],
    "issues": [],
-   "updated": "2026-11-13",
+   "updated": "2026-11-14",
    "file": "docs/designs/0002-peer-agent-messaging.md",
    "repo": "ai-code-collaboration-best-practices"
   }
