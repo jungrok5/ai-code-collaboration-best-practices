@@ -37,6 +37,7 @@
 - **팀 규모 운영:** 리뷰 대기 상한, 계약 우선, 반복되는 리뷰 지적의 규칙화, 스킬 평가, 프로토타입·운영 프로필을 둡니다([docs/16](docs/16-team-scale-ai.md)).
 - **글과 화면 기준:** 합니다체 문서 기준, 내용 형식 규칙, 디자인 시스템 "Clear"를 정했습니다. 수정 직후 훅, pre-commit, CI가 같은 규칙으로 검사합니다. 스킬과 규칙의 원본은 다른 프로젝트에서도 쓸 수 있도록 [jungrok5/ai-design](https://github.com/jungrok5/ai-design)에 두고, 이 레포는 고정한 커밋을 씁니다([docs/17](docs/17-writing-and-design-standards.md)).
 - **스킬 추가:** 개인, 커뮤니티, 팀 세 등급으로 추가합니다. 선택 설치용 `team-ai-community` 플러그인도 들어 있습니다([docs/18](docs/18-adding-skills.md)).
+- **동료 AI와 직접 대화:** 팀이 운영하는 릴레이와 `peer-messaging` 플러그인으로, 내 Claude Code 세션이 동료 세션에 질문·요청을 보내고 답을 받습니다. 메시지가 오면 쉬고 있던 세션이 깨어납니다([docs/19](docs/19-peer-messaging.md)).
 
 설명 페이지와 기술 개념 시각화는 기본 팀 스킬 `explain-visually`를 사용합니다. 원문을 읽고 작업 흐름·검사 지점·사람의 판단을 그림과 단계별 설명으로 구성합니다. 설치된 팀 플러그인은 `claude plugin update team-ai-workflow@ai-collab`로 갱신합니다.
 
