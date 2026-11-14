@@ -1,7 +1,7 @@
 ---
 id: 0002-peer-agent-messaging
 title: Peer agent messaging for Claude Code sessions (standalone plugin and relay, A2A-shaped)
-status: approved
+status: done
 owner: "@jungrok5"
 repos: [jungrok5/ai-code-collaboration-best-practices]
 areas: ["plugins/peer-messaging/**", "infra/agent-relay/**", "contracts/peer-message/**", ".github/workflows/peer-messaging.yml", "contract:peer-message"]
