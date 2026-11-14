@@ -4,7 +4,7 @@ title: Peer agent messaging between teammates' Claude Code sessions (A2A-shaped)
 status: draft
 owner: "@jungrok5"
 repos: [jungrok5/ai-code-collaboration-best-practices]
-areas: ["contracts/peer-message/**", "plugins/team-ai-workflow/hooks/hooks.json", "plugins/team-ai-workflow/scripts/peer-*", "plugins/team-ai-workflow/skills/ask-peer/**", "plugins/team-ai-workflow/skills/handle-peer-request/**", "contract:peer-message", "infra:agent-relay"]
+areas: ["contracts/peer-message/**", "plugins/team-ai-workflow/hooks/hooks.json", "plugins/team-ai-workflow/scripts/peer-*", "plugins/team-ai-workflow/skills/ask-peer/**", "plugins/team-ai-workflow/skills/handle-peer-request/**", "infra/agent-relay/**", "contract:peer-message"]
 issues: []
 updated: 2026-11-14
 ---
@@ -47,7 +47,7 @@ flowchart LR
     BH["훅: 알림 주입·깨우기"]
     PX["대리 응답기 (기본 꺼짐)<br/>claude -p 읽기 전용"]
   end
-  R["agent-relay (사내 클라우드)<br/>사내 로그인 · MCP 도구 · Task 저장소 · 웹 UI"]
+  R["agent-relay (팀 공용 서버)<br/>사내 로그인 · MCP 도구 · Task 저장소 · 웹 UI"]
   BJ["board.json<br/>(담당 영역)"]
   T["Teams 개인 알림"]
   AA -- "MCP: peer_send" --> R
@@ -81,7 +81,7 @@ stateDiagram-v2
 
 ### 전제
 
-- 사내 정책상 허용된 환경에만 배포하고 연결합니다. 릴레이는 사내 클라우드에 두고 팀이 운영합니다.
+- 이 레포는 릴레이 코드와 배포 파일을 `infra/agent-relay/`로 제공합니다. 각 팀은 사내 정책상 허용된 공용 서버(예: 사내 클라우드)에 배포해 직접 운영합니다. `infra/local-llm/`과 같은 방식입니다.
 - 접근 제어는 사내 로그인(SSO)이 담당합니다. 로그인을 통과한 사람은 레포 열람과 같은 기준으로 모든 Task를 읽고 씁니다. 이 설계는 Task 단위의 열람 제한을 두지 않습니다.
 - 보존 기간은 사내 정책을 따릅니다.
 - 메시지는 팀 전원이 읽는다는 전제로 작성합니다. `ask-peer` 스킬은 전송 전에 이 점을 확인합니다.
@@ -90,7 +90,7 @@ stateDiagram-v2
 
 | 구성 요소 | 위치 | 역할 |
 | --- | --- | --- |
-| agent-relay | 사내 클라우드, 팀 운영. 코드는 별도 레포 `agent-relay` | Task 저장(SQLite로 시작), MCP 도구 제공, 사람용 웹 UI, 받는 사람에게 Teams 개인 알림. A2A 타입은 고정 버전의 공식 SDK(`a2a-sdk`)에서 가져옴 |
+| agent-relay | 코드와 배포 파일은 `infra/agent-relay/`. 팀 공용 서버에 배포 | Task 저장(SQLite로 시작), MCP 도구 제공, 사람용 웹 UI, 받는 사람에게 Teams 개인 알림. A2A 타입은 고정 버전의 공식 SDK(`a2a-sdk`)에서 가져옴 |
 | MCP 연결 | 각자 `.mcp.json` 또는 사용자 설정 | Streamable HTTP. 웹 UI에서 사내 로그인 후 발급한 개인 토큰을 MCP와 훅이 함께 사용. 만료와 폐기는 사내 정책 기준 |
 | 스킬 `ask-peer` | `team-ai-workflow` 플러그인 | 받는 사람 선택(`peer_list`), 맥락(레포·브랜치·파일·이슈) 첨부, `kind` 결정, 전송 전 비밀 값 검사 |
 | 스킬 `handle-peer-request` | 같은 플러그인 | 받은 Task 분류와 응답. `question`은 읽기 전용 조사 후 답변, `request`는 이슈나 초안 PR로 전환 후 `input-required`로 동료 승인 대기 |
@@ -216,11 +216,11 @@ Channels 없이 Claude Code 문서에 있는 훅만 씁니다.
 | --- | --- | --- |
 | 1 | `contracts/peer-message/v1`: JSON Schema, 예시, CI 검증(`make ai-validate`) | @jungrok5 |
 | 2 | asyncRewake PoC: `peer-wait.sh`로 유휴 세션 깨우기와 재대기 확인(목업 서버). 완료, 3절 "PoC 결과" 참고 | @jungrok5 |
-| 3 | agent-relay MVP(별도 레포 `agent-relay`): MCP 도구 6개, SQLite, 사내 로그인과 개인 토큰 발급, Teams 개인 알림, 사내 클라우드 배포 | `[담당 필요]` |
+| 3 | agent-relay MVP(`infra/agent-relay/`): MCP 도구 6개, SQLite, 사내 로그인과 개인 토큰 발급, Teams 개인 알림, Dockerfile·docker-compose·환경 변수 예시 | `[담당 필요]` |
 | 4 | 스킬 `ask-peer`, `handle-peer-request`와 eval 케이스 | `[담당 필요]` |
 | 5 | 훅 4종을 `hooks.json`에 추가. 릴레이 미설정 시 아무 동작 안 함 | `[담당 필요]` |
 | 6 | 대리 응답기(사람별 켜기·끄기, 기본 꺼짐)와 `make doctor` 릴레이 설정 점검 | `[담당 필요]` |
-| 7 | 사용 안내 문서와 해설 페이지 | `[담당 필요]` |
+| 7 | 사용 안내 문서(공용 서버 배포, MCP 연결, 훅 켜기)와 해설 페이지 | `[담당 필요]` |
 | 나중 | 릴레이에 A2A HTTP 바인딩 추가(사내 다른 에이전트 연동 시) | 미정 |
 
 ## 6. 검증

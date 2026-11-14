@@ -35,8 +35,8 @@
     "plugins/team-ai-workflow/scripts/peer-*",
     "plugins/team-ai-workflow/skills/ask-peer/**",
     "plugins/team-ai-workflow/skills/handle-peer-request/**",
-    "contract:peer-message",
-    "infra:agent-relay"
+    "infra/agent-relay/**",
+    "contract:peer-message"
    ],
    "issues": [],
    "updated": "2026-11-14",
