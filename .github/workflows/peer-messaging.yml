@@ -1,0 +1,43 @@
+# Peer messaging (design 0002): validates the peer-message contract and runs the relay and hook tests.
+# Everything is Python standard library except the schema check, which installs jsonschema.
+name: Peer messaging
+
+on:
+  pull_request:
+    paths:
+      - "contracts/peer-message/**"
+      - "infra/agent-relay/**"
+      - "plugins/peer-messaging/**"
+      - ".github/workflows/peer-messaging.yml"
+  push:
+    branches: [main]
+    paths:
+      - "contracts/peer-message/**"
+      - "infra/agent-relay/**"
+      - "plugins/peer-messaging/**"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: peer-messaging-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  test:
+    name: contract and relay tests
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          persist-credentials: false
+      - uses: astral-sh/setup-uv@c18668ad3cf93ea998bef934396af7bb5c839dc7 # v10.2.0
+        with:
+          python-version: "3.12"
+      - name: Validate contract examples
+        run: uv run --no-project --with jsonschema==4.26.0 python contracts/peer-message/v1/validate.py
+      - name: Relay and hook tests
+        if: hashFiles('infra/agent-relay/tests/*.py') != ''
+        run: uv run --no-project --with jsonschema==4.26.0 python -m unittest discover -s infra/agent-relay/tests -t infra/agent-relay -v

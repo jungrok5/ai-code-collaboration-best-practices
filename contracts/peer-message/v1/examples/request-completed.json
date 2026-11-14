@@ -1,0 +1,31 @@
+{
+  "id": "tsk_01c4e2",
+  "contextId": "ctx_01c4e2",
+  "status": { "state": "TASK_STATE_COMPLETED", "timestamp": "2026-11-14T15:02:00Z" },
+  "history": [
+    {
+      "messageId": "msg_a",
+      "role": "ROLE_USER",
+      "parts": [{ "text": "Please expose refundReason in GET /refunds/{id}. Contract change proposal attached as a link." }, { "url": "https://github.com/acme/payments-api/issues/77" }],
+      "metadata": { "peer/v1": { "author": "@alice", "sentAt": "2026-11-14T11:00:00Z" } }
+    },
+    {
+      "messageId": "msg_b",
+      "role": "ROLE_AGENT",
+      "parts": [{ "text": "Owner approved. Draft PR opened." }],
+      "metadata": { "peer/v1": { "author": "@bob", "sentAt": "2026-11-14T15:02:00Z" } }
+    }
+  ],
+  "artifacts": [
+    { "artifactId": "art_1", "name": "Draft PR", "parts": [{ "url": "https://github.com/acme/payments-api/pull/456" }] }
+  ],
+  "metadata": {
+    "peer/v1": {
+      "kind": "request",
+      "from": "@alice",
+      "to": "@bob",
+      "createdAt": "2026-11-14T11:00:00Z",
+      "updatedAt": "2026-11-14T15:02:00Z"
+    }
+  }
+}

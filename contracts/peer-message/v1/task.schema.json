@@ -1,0 +1,121 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/jungrok5/ai-code-collaboration-best-practices/contracts/peer-message/v1/task.schema.json",
+  "title": "peer-message v1 Task",
+  "description": "A peer-messaging task between two coding agents. Shape and names follow the A2A 1.0 Task object in ProtoJSON form (TASK_STATE_*, ROLE_*, one-of parts). Team fields live under metadata[\"peer/v1\"].",
+  "type": "object",
+  "required": ["id", "contextId", "status", "history", "artifacts", "metadata"],
+  "additionalProperties": false,
+  "properties": {
+    "id": { "$ref": "#/$defs/id" },
+    "contextId": { "$ref": "#/$defs/id" },
+    "status": { "$ref": "#/$defs/taskStatus" },
+    "history": { "type": "array", "minItems": 1, "items": { "$ref": "#/$defs/message" } },
+    "artifacts": { "type": "array", "items": { "$ref": "#/$defs/artifact" } },
+    "metadata": {
+      "type": "object",
+      "required": ["peer/v1"],
+      "properties": { "peer/v1": { "$ref": "#/$defs/peerMetadata" } }
+    }
+  },
+  "$defs": {
+    "id": { "type": "string", "minLength": 1, "maxLength": 128 },
+    "timestamp": { "type": "string", "format": "date-time" },
+    "address": {
+      "description": "@handle or @handle/repo",
+      "type": "string",
+      "pattern": "^@[A-Za-z0-9][A-Za-z0-9._-]{0,63}(/[A-Za-z0-9._-]{1,100})?$"
+    },
+    "taskState": {
+      "enum": [
+        "TASK_STATE_SUBMITTED",
+        "TASK_STATE_WORKING",
+        "TASK_STATE_INPUT_REQUIRED",
+        "TASK_STATE_AUTH_REQUIRED",
+        "TASK_STATE_COMPLETED",
+        "TASK_STATE_FAILED",
+        "TASK_STATE_CANCELED",
+        "TASK_STATE_REJECTED"
+      ]
+    },
+    "taskStatus": {
+      "type": "object",
+      "required": ["state", "timestamp"],
+      "additionalProperties": false,
+      "properties": {
+        "state": { "$ref": "#/$defs/taskState" },
+        "message": { "$ref": "#/$defs/message" },
+        "timestamp": { "$ref": "#/$defs/timestamp" }
+      }
+    },
+    "part": {
+      "description": "Exactly one of text, url or data (A2A Part one-of). raw bytes are not used in v1.",
+      "type": "object",
+      "minProperties": 1,
+      "properties": {
+        "text": { "type": "string" },
+        "url": { "type": "string", "format": "uri" },
+        "data": {},
+        "filename": { "type": "string" },
+        "mediaType": { "type": "string" },
+        "metadata": { "type": "object" }
+      },
+      "additionalProperties": false,
+      "oneOf": [
+        { "required": ["text"], "not": { "anyOf": [{ "required": ["url"] }, { "required": ["data"] }] } },
+        { "required": ["url"], "not": { "anyOf": [{ "required": ["text"] }, { "required": ["data"] }] } },
+        { "required": ["data"], "not": { "anyOf": [{ "required": ["text"] }, { "required": ["url"] }] } }
+      ]
+    },
+    "message": {
+      "type": "object",
+      "required": ["messageId", "role", "parts"],
+      "additionalProperties": false,
+      "properties": {
+        "messageId": { "$ref": "#/$defs/id" },
+        "role": { "enum": ["ROLE_USER", "ROLE_AGENT"] },
+        "parts": { "type": "array", "minItems": 1, "items": { "$ref": "#/$defs/part" } },
+        "taskId": { "$ref": "#/$defs/id" },
+        "contextId": { "$ref": "#/$defs/id" },
+        "metadata": {
+          "type": "object",
+          "properties": {
+            "peer/v1": {
+              "type": "object",
+              "properties": {
+                "author": { "$ref": "#/$defs/address" },
+                "sentAt": { "$ref": "#/$defs/timestamp" }
+              }
+            }
+          }
+        }
+      }
+    },
+    "artifact": {
+      "type": "object",
+      "required": ["artifactId", "parts"],
+      "additionalProperties": false,
+      "properties": {
+        "artifactId": { "$ref": "#/$defs/id" },
+        "name": { "type": "string" },
+        "description": { "type": "string" },
+        "parts": { "type": "array", "minItems": 1, "items": { "$ref": "#/$defs/part" } },
+        "metadata": { "type": "object" }
+      }
+    },
+    "peerMetadata": {
+      "type": "object",
+      "required": ["kind", "from", "to", "createdAt"],
+      "additionalProperties": false,
+      "properties": {
+        "kind": { "enum": ["question", "request", "fyi", "handoff"] },
+        "from": { "$ref": "#/$defs/address" },
+        "to": { "$ref": "#/$defs/address" },
+        "subject": { "type": "string", "maxLength": 200 },
+        "replyBy": { "$ref": "#/$defs/timestamp" },
+        "createdAt": { "$ref": "#/$defs/timestamp" },
+        "updatedAt": { "$ref": "#/$defs/timestamp" }
+      }
+    }
+  }
+}

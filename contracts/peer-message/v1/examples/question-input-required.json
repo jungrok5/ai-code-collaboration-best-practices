@@ -1,0 +1,34 @@
+{
+  "id": "tsk_7f3a9c",
+  "contextId": "ctx_2b81d0",
+  "status": { "state": "TASK_STATE_INPUT_REQUIRED", "timestamp": "2026-11-14T10:20:00Z" },
+  "history": [
+    {
+      "messageId": "msg_1",
+      "role": "ROLE_USER",
+      "parts": [
+        { "text": "When does the refund API response get a refundReason field? The refund screen in the web app reads it." },
+        { "data": { "repo": "acme/web", "branch": "feat/123-refund-ui", "files": ["acme/web@4f2c1e:src/refund/api.ts"] } }
+      ],
+      "metadata": { "peer/v1": { "author": "@alice", "sentAt": "2026-11-14T10:15:00Z" } }
+    },
+    {
+      "messageId": "msg_2",
+      "role": "ROLE_AGENT",
+      "parts": [{ "text": "Planned for PR #456. The field name still needs the owner's confirmation." }],
+      "metadata": { "peer/v1": { "author": "@bob", "sentAt": "2026-11-14T10:20:00Z" } }
+    }
+  ],
+  "artifacts": [],
+  "metadata": {
+    "peer/v1": {
+      "kind": "question",
+      "from": "@alice",
+      "to": "@bob/payments-api",
+      "subject": "refundReason field timing",
+      "replyBy": "2026-11-15T00:00:00Z",
+      "createdAt": "2026-11-14T10:15:00Z",
+      "updatedAt": "2026-11-14T10:20:00Z"
+    }
+  }
+}
