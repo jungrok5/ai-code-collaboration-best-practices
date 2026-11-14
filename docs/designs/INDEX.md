@@ -3,4 +3,4 @@
 | id | 제목 | 상태 | 담당 | 영역 | 이슈 |
 | --- | --- | --- | --- | --- | --- |
 | [0001-design-first-and-work-board](0001-design-first-and-work-board.md) | Design-first tiers and a cross-repo work board | approved | @jungrok5 | `docs/designs/**`, `scripts/designs/**`, `.github/workflows/work-board.yml`, `.github/workflows/design-check.yml`, `plugins/team-ai-workflow/skills/design/**` |  |
-| [0002-peer-agent-messaging](0002-peer-agent-messaging.md) | Peer agent messaging between teammates' Claude Code sessions (A2A-shaped) | draft | @jungrok5 | `contracts/peer-message/**`, `plugins/team-ai-workflow/hooks/hooks.json`, `plugins/team-ai-workflow/scripts/peer-*`, `plugins/team-ai-workflow/skills/ask-peer/**`, `plugins/team-ai-workflow/skills/handle-peer-request/**`, `infra/agent-relay/**`, `contract:peer-message` |  |
+| [0002-peer-agent-messaging](0002-peer-agent-messaging.md) | Peer agent messaging for Claude Code sessions (standalone plugin and relay, A2A-shaped) | draft | @jungrok5 | `plugins/peer-messaging/**`, `infra/agent-relay/**`, `contracts/peer-message/**`, `.github/workflows/peer-messaging.yml`, `contract:peer-message` |  |
