@@ -195,8 +195,10 @@ class Service:
         self._set_state(task, state)
         self.store.save_task(task)
         sender = meta["from"][1:]
-        self.store.add_event(sender, None, task_id, "reply", True)
-        self._notify("task.replied", task, sender, text)
+        wake = state != "TASK_STATE_WORKING"  # an acknowledgement shows up in the next summary instead
+        self.store.add_event(sender, None, task_id, "reply", wake)
+        if wake:
+            self._notify("task.replied", task, sender, text)
         return self.brief(task)
 
     def cancel(self, caller: str, task_id: str = "", reason: str = "") -> dict:
@@ -229,5 +231,5 @@ class Service:
         for e in events:
             task = self.store.task(e["task_id"])
             if task:
-                out.append({"event": e["type"], **self.brief(task)})
+                out.append({"eventId": e["id"], "event": e["type"], **self.brief(task)})
         return out

@@ -1,0 +1,14 @@
+{
+  "$schema": "https://www.schemastore.org/claude-code-plugin-manifest.json",
+  "name": "peer-messaging",
+  "version": "0.1.0",
+  "description": "Let your Claude Code session ask and answer teammates' Claude Code sessions through a team-hosted relay (infra/agent-relay). A2A-shaped tasks, MCP tools, and hooks that wake an idle session when a peer message arrives. Standalone: needs only PEER_RELAY_URL and PEER_RELAY_TOKEN.",
+  "author": {
+    "name": "ai-code-collaboration-best-practices maintainers",
+    "url": "https://github.com/jungrok5/ai-code-collaboration-best-practices"
+  },
+  "homepage": "https://github.com/jungrok5/ai-code-collaboration-best-practices/tree/main/plugins/peer-messaging",
+  "repository": "https://github.com/jungrok5/ai-code-collaboration-best-practices",
+  "license": "MIT",
+  "keywords": ["collaboration", "agents", "messaging", "a2a", "mcp", "team"]
+}

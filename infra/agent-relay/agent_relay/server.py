@@ -187,6 +187,15 @@ def make_handler(cfg: Config, store: Store, svc: Service):
                     f"<h1>Token for @{esc(who)}</h1><p>Shown once. Put it in "
                     f"<code>PEER_RELAY_TOKEN</code>.</p><pre>{esc(token)}</pre>",
                 )
+            if path == "/api/ack":
+                who = self._caller()
+                if not who:
+                    return self._json(401, {"error": "missing or invalid token"})
+                try:
+                    ids = [int(i) for i in json.loads(raw or b"{}").get("ids", [])]
+                except (ValueError, TypeError, AttributeError):
+                    return self._json(400, {"error": 'expected {"ids": [int, ...]}'})
+                return self._json(200, {"acknowledged": store.ack_events(who, ids)})
             if path != "/mcp":
                 return self._json(404, {"error": "not found"})
             who = self._caller()

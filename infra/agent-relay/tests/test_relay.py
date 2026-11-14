@@ -111,7 +111,12 @@ class RelayTest(unittest.TestCase):
         self.assertEqual(self.r.req("GET", "/api/wait?repo=other&timeout=0", self.bob)[0], 204)
         code, out = self.r.req("GET", "/api/wait?repo=payments-api&timeout=1", self.bob)
         self.assertEqual((code, out["events"][0]["taskId"], out["events"][0]["event"]), (200, tid, "new"))
-        self.assertEqual(self.r.req("GET", "/api/wait?repo=payments-api&timeout=0", self.bob)[0], 204)  # delivered once
+        # not acknowledged yet: delivered again (a replaced waiter must not swallow it)
+        self.assertEqual(self.r.req("GET", "/api/wait?repo=payments-api&timeout=0", self.bob)[0], 200)
+        ack = self.r.req("POST", "/api/ack", self.bob, {"ids": [out["events"][0]["eventId"]]})
+        self.assertEqual(ack, (200, {"acknowledged": 1}))
+        self.assertEqual(self.r.req("GET", "/api/wait?repo=payments-api&timeout=0", self.bob)[0], 204)
+        self.assertEqual(self.r.req("POST", "/api/ack", self.alice, {"ids": [1, 2, 3]})[1], {"acknowledged": 0})
         box, _, _ = self.r.call(self.bob, "peer_inbox")
         self.assertEqual([t["taskId"] for t in box["toMe"]], [tid])
         _, err, msg = self.r.call(self.alice, "peer_reply", task_id=tid, text="I am not the recipient")
@@ -153,6 +158,9 @@ class RelayTest(unittest.TestCase):
     def test_follow_up_and_input_required(self):
         sent, _, _ = self.r.call(self.alice, "peer_send", to="@bob", text="Can you add a field?", kind="request")
         tid = sent["taskId"]
+        self.r.call(self.bob, "peer_reply", task_id=tid, text="Asking my owner", state="TASK_STATE_WORKING")
+        self.assertEqual(self.r.req("GET", "/api/wait?timeout=0", self.alice)[0], 204)  # acknowledgement does not wake
+        self.assertEqual(self.r.req("GET", "/api/summary", self.alice)[1]["events"][0]["event"], "reply")
         self.r.call(self.bob, "peer_reply", task_id=tid, text="Which name?", state="TASK_STATE_INPUT_REQUIRED")
         self.assertEqual(self.r.req("GET", "/api/summary", self.alice)[1]["needsYourInput"], 1)
         again, err, _ = self.r.call(self.alice, "peer_send", task_id=tid, text="refundReason")
