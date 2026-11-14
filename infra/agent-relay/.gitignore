@@ -1,0 +1,5 @@
+*.db
+*.db-wal
+*.db-shm
+agent-relay.env
+__pycache__/

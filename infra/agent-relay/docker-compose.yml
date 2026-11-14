@@ -1,0 +1,12 @@
+# Team relay for peer messaging. Copy agent-relay.env.example to agent-relay.env and adjust.
+services:
+  agent-relay:
+    build: .
+    env_file: agent-relay.env
+    ports:
+      - "8765:8765"
+    volumes:
+      - relay-data:/data
+    restart: unless-stopped
+volumes:
+  relay-data:
