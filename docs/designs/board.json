@@ -1,5 +1,5 @@
 {
- "generated": "2026-10-09",
+ "generated": "2026-11-14",
  "designs": [
   {
    "id": "0001-design-first-and-work-board",
@@ -19,6 +19,26 @@
    "issues": [],
    "updated": "2026-10-08",
    "file": "docs/designs/0001-design-first-and-work-board.md",
+   "repo": "ai-code-collaboration-best-practices"
+  },
+  {
+   "id": "0002-peer-agent-messaging",
+   "title": "Peer agent messaging for Claude Code sessions (standalone plugin and relay, A2A-shaped)",
+   "status": "draft",
+   "owner": "@jungrok5",
+   "repos": [
+    "jungrok5/ai-code-collaboration-best-practices"
+   ],
+   "areas": [
+    "plugins/peer-messaging/**",
+    "infra/agent-relay/**",
+    "contracts/peer-message/**",
+    ".github/workflows/peer-messaging.yml",
+    "contract:peer-message"
+   ],
+   "issues": [],
+   "updated": "2026-11-14",
+   "file": "docs/designs/0002-peer-agent-messaging.md",
    "repo": "ai-code-collaboration-best-practices"
   }
  ]
