@@ -151,23 +151,34 @@ class Store:
             )
             self.changed.notify_all()
 
-    def take_events(self, handle: str, repo: str | None, *, wake_only: bool) -> list[dict]:
+    def pending_events(self, handle: str, repo: str | None, *, wake_only: bool) -> list[dict]:
         sql = "SELECT id, task_id, type, wake FROM events WHERE handle=? AND delivered=0 AND (repo IS NULL OR repo=?)"
         if wake_only:
             sql += " AND wake=1"
         with self.lock:
-            rows = [dict(r) for r in self.db.execute(sql + " ORDER BY id", (handle, repo or "")).fetchall()]
-            if rows:
-                self.db.execute(
-                    f"UPDATE events SET delivered=1 WHERE id IN ({','.join('?' * len(rows))})", [r["id"] for r in rows]
-                )
+            return [dict(r) for r in self.db.execute(sql + " ORDER BY id", (handle, repo or "")).fetchall()]
+
+    def ack_events(self, handle: str, ids: list[int]) -> int:
+        if not ids:
+            return 0
+        with self.lock:
+            sql = f"UPDATE events SET delivered=1 WHERE handle=? AND id IN ({','.join('?' * len(ids))})"
+            return self.db.execute(sql, [handle, *ids]).rowcount
+
+    def take_events(self, handle: str, repo: str | None, *, wake_only: bool) -> list[dict]:
+        """Return pending events and mark them delivered (used by the synchronous summary hook)."""
+        with self.lock:
+            rows = self.pending_events(handle, repo, wake_only=wake_only)
+            self.ack_events(handle, [r["id"] for r in rows])
         return rows
 
     def wait_events(self, handle: str, repo: str | None, timeout: float) -> list[dict]:
+        """Long-poll for wake events. Nothing is marked delivered here: the waiter acknowledges what it showed,
+        so a request whose client has gone away (a replaced waiter) cannot swallow an event."""
         deadline = time.monotonic() + timeout
         with self.changed:
             while True:
-                events = self.take_events(handle, repo, wake_only=True)
+                events = self.pending_events(handle, repo, wake_only=True)
                 remaining = deadline - time.monotonic()
                 if events or remaining <= 0:
                     return events

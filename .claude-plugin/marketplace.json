@@ -49,6 +49,19 @@
         "skills",
         "community"
       ]
+    },
+    {
+      "name": "peer-messaging",
+      "source": "./plugins/peer-messaging",
+      "description": "Ask and answer teammates' Claude Code sessions through a team-hosted relay (infra/agent-relay): A2A-shaped tasks over MCP, plus hooks that wake an idle session when a peer message arrives. Standalone; needs PEER_RELAY_URL and PEER_RELAY_TOKEN.",
+      "version": "0.1.0",
+      "category": "productivity",
+      "tags": [
+        "collaboration",
+        "agents",
+        "messaging",
+        "a2a"
+      ]
     }
   ]
 }

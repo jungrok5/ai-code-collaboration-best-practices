@@ -69,7 +69,8 @@ Teams 개인 알림은 Teams의 **Workflows** 앱에서 HTTP 요청을 받는 �
 | 경로 | 용도 |
 | --- | --- |
 | `POST /mcp` | MCP(Streamable HTTP, JSON 응답). 도구 `peer_list`, `peer_send`, `peer_inbox`, `peer_get`, `peer_reply`, `peer_cancel` |
-| `GET /api/wait?repo=&timeout=` | 훅용 롱폴링. 깨우는 이벤트가 있으면 200과 목록, 없으면 204 |
+| `GET /api/wait?repo=&timeout=` | 훅용 롱폴링. 깨우는 이벤트가 있으면 200과 목록, 없으면 204. 받은 쪽이 `/api/ack`로 확인하기 전까지 같은 이벤트를 다시 보냄 |
+| `POST /api/ack` | 훅이 표시한 이벤트 확인(`{"ids": [...]}`) |
 | `GET /api/summary?repo=` | 훅용 요약. 아직 전달하지 않은 이벤트와 처리 대기 수 |
 | `GET /`, `GET /t/<id>` | 웹 UI. 토큰 쿠키(`/login`) 또는 SSO 헤더 필요 |
 | `GET /healthz` | 상태 확인 |
