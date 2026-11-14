@@ -1,5 +1,23 @@
 # Changelog
 
+## [0.3.0](https://github.com/jungrok5/ai-code-collaboration-best-practices/compare/v0.2.0...v0.3.0) (2026-11-14)
+
+
+### Features
+
+* **agent-relay:** add stdlib-only peer messaging relay ([#13](https://github.com/jungrok5/ai-code-collaboration-best-practices/issues/13)) ([3cfab71](https://github.com/jungrok5/ai-code-collaboration-best-practices/commit/3cfab7115cd37550b094ac671420d3186fb5f51a))
+* **contracts:** add peer-message v1 task schema ([#12](https://github.com/jungrok5/ai-code-collaboration-best-practices/issues/12)) ([8f82070](https://github.com/jungrok5/ai-code-collaboration-best-practices/commit/8f8207065526bcf0a84b6f6c9d72f4ddba2943c1))
+* **docs:** add default visual explanations and replace landing page ([#5](https://github.com/jungrok5/ai-code-collaboration-best-practices/issues/5)) ([c13ed64](https://github.com/jungrok5/ai-code-collaboration-best-practices/commit/c13ed64772868a7f557f8ac5710ab69cf9f8b541))
+* **peer-messaging:** add standalone peer messaging plugin ([#14](https://github.com/jungrok5/ai-code-collaboration-best-practices/issues/14)) ([a8598fd](https://github.com/jungrok5/ai-code-collaboration-best-practices/commit/a8598fd744d84cda55dfa7fb00ab57284b9d70f8))
+
+
+### Documentation
+
+* **design:** peer agent messaging for Claude Code sessions (standalone plugin and relay) ([#11](https://github.com/jungrok5/ai-code-collaboration-best-practices/issues/11)) ([9a41f8e](https://github.com/jungrok5/ai-code-collaboration-best-practices/commit/9a41f8e3852bcb724c9a4a4dd9bd1ff217c0aae7))
+* **peer-messaging:** add usage guide and architecture explainer ([#15](https://github.com/jungrok5/ai-code-collaboration-best-practices/issues/15)) ([2f80e5d](https://github.com/jungrok5/ai-code-collaboration-best-practices/commit/2f80e5de6ae9eefd239339dc5d6107fd79c11505))
+* **site:** pan-and-zoom repository map next to the explainer page ([85738cb](https://github.com/jungrok5/ai-code-collaboration-best-practices/commit/85738cb5d8daf608d701b60cf82e9c5aa98c6c10))
+* **site:** polish the visual explainer with ai-design ([#7](https://github.com/jungrok5/ai-code-collaboration-best-practices/issues/7)) ([b05e08a](https://github.com/jungrok5/ai-code-collaboration-best-practices/commit/b05e08a098a2c17862eed6114ac49165ae947834))
+
 ## [0.2.0](https://github.com/jungrok5/ai-code-collaboration-best-practices/compare/v0.1.0...v0.2.0) (2026-10-11)
 
 
