@@ -24,7 +24,7 @@ jobs:
       pull-requests: write
       statuses: write
     steps:
-      - uses: anthropics/claude-code-action/agent-approval-check@58985842b834ed26087302ba27d07bc24ca8697a # main
+      - uses: anthropics/claude-code-action/agent-approval-check@4d75e5f390ee76b2e09c1980ecc99ff3a2e088c8 # main
         with:
           required_approvals: 1
           agent_emails: "noreply@anthropic.com"
